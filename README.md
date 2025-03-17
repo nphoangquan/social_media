@@ -32,7 +32,7 @@ Dự án Website mạng xã hội (Social Media Application)
 
 1. Clone repo
 ```bash
-git clone https://github.com/yourusername/socialmedia-app.git](https://github.com/QHPN/introvertia.git
+git clone https://github.com/yourusername/socialmedia-app.git
 ```
 
 2. Cài đặt dependencies
@@ -40,14 +40,15 @@ git clone https://github.com/yourusername/socialmedia-app.git](https://github.co
 npm install
 ```
 
-3. Chạy ứng dụng local
+3. Cài đặt Clerk
+```bash
+npm install @clerk/nextjs
+```
+
+4. Chạy ứng dụng local
 ```bash
 npm run dev
 ```
-
-## 🔗 Triển khai
-
-Dự án được triển khai bằng [Vercel](https://vercel.com/) và Database sử dụng MySQL trên Railway Cloud.
 
 ---
 
