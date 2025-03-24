@@ -20,6 +20,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "genk.mediacdn.vn",
       },
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+      },
+      {
+        protocol: "https",
+        hostname: "static.wikia.nocookie.net",
+      },
     ],
   }
 };
