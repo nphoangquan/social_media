@@ -1,7 +1,8 @@
+import { User } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 
-const UserInfoCard = ({ userId }: { userId: string }) => {
+const UserInfoCard = ({ user }: { user: User }) => {
   return (
     <div className="p-4 bg-white rounded-lg shadow-md text-sm flex flex-col gap-4">
       {/* TOP */}
@@ -14,8 +15,13 @@ const UserInfoCard = ({ userId }: { userId: string }) => {
       {/* BOTTOM */}
       <div className="flex flex-col gap-4 text-gray-500">
         <div className="flex items-center gap-2">
-          <span className="text-xl text-black">Lloyd Fleming</span>
-          <span className="text-sm">@jonathan</span>
+        <span className="text-xl text-black">
+            {" "}
+            {user.name && user.surname
+              ? user.name + " " + user.surname
+              : user.username}
+          </span>
+          <span className="text-sm">@{user.username}</span>
         </div>
         <p>
           Lorem ipsum dolor sit amet consectetur, adipisicing elit. Perferendis
