@@ -1,6 +1,6 @@
 # Social Media Application - Đồ Án Cơ Sở
 
-Dự án Website mạng xã hội (Social Media Application)
+Website mạng xã hội (Social Media Application)
 
 ## Công nghệ sử dụng
 
@@ -21,7 +21,7 @@ Dự án Website mạng xã hội (Social Media Application)
 
 ### Database:
 
-- MySQL
+- PostgreSQL
 
 ### Deployment:
 
