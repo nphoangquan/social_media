@@ -75,8 +75,8 @@ const ProfileCard = async () => {
           </span>
         </div>
         <Link href={`/profile/${user.username}`}>
-          <button className="bg-blue-500 text-white text-xs p-2 rounded-md">
-            My Profile
+          <button className="bg-blue-500 text-white text-xs p-2 rounded-md cursor-pointer">
+            Profile
           </button>
         </Link>
       </div>

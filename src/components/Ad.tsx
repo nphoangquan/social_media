@@ -32,14 +32,14 @@ const Ad = ({ size }: { size: "sm" | "md" | "lg" }) => {
             height={24}
             className="rounded-full w-6 h-6 object-cover"
           />
-          <span className="text-blue-500 font-medium">BigChef Lounge</span>
+          <span className="text-blue-500 font-medium">Nguyen Phan Hoang Quan</span>
         </div>
         <p className={size === "sm" ? "text-xs" : "text-sm"}>
           {size === "sm"
-            ? "Lorem ipsum dolor sit amet consectetur adipisicing elit."
+            ? "Cuu Toi Voi."
             : size === "md"
-            ? "Lorem ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet consectetur adipisicing elit."
-            : "Lorem ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet consectetur adipisicing elit."}
+            ? "Cuu."
+            : "Huhuhuhuhuhu"}
         </p>
         <button className="bg-gray-200 text-gray-500 p-2 text-xs rounded-lg">
           Learn more

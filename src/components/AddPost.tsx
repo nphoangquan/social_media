@@ -1,79 +1,90 @@
-import Image from "next/image";
-import { auth } from "@clerk/nextjs/server";
-import prisma from "@/lib/client";
+"use client";
 
-const AddPost = async () => {
-  const { userId } = await auth();
+import { useUser } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
+import { CldUploadWidget } from "next-cloudinary";
+import Image from "next/image";
+import { useState } from "react";
+import AddPostButton from "./AddPostButton";
+import { addPost } from "@/lib/actions";
+
+const AddPost = () => {
+  const { user, isLoaded } = useUser();
+  const [desc, setDesc] = useState("");
+  const [img, setImg] = useState<any>();
+
+  if (!isLoaded) {
+    return "Loading...";
+  }
 
   return (
     <div className="p-4 bg-white shadow-md rounded-lg flex gap-4 justify-between text-sm">
-      {/*AVATAR*/}
+      {/* AVATAR */}
       <Image
-        src="https://genk.mediacdn.vn/k:2015/1-78918-47c60bff6263d078621b9e023c6616fe-1450690114301/lien-minh-huyen-thoai-faker-dang-kho-mau-tai-rank-han-quyet-doi-lai-vi-tri-top-1.jpg"
-        alt="Profile picture"
+        src={user?.imageUrl || "/noAvatar.png"}
+        alt=""
         width={48}
         height={48}
         className="w-12 h-12 object-cover rounded-full"
       />
-      {/*POST*/}
+      {/* POST */}
       <div className="flex-1">
-        {/*TEXT INPUT*/}
-        <form action="" className="flex gap-4">
+        {/* TEXT INPUT */}
+        <form action={(formData)=>addPost(formData,img?.secure_url || "")} className="flex gap-4">
           <textarea
-            placeholder="What's on your mind my fellow?"
-            className="flex-1 bg-gray-100 rounded-lg p-2"
+            placeholder="What's on your mind?"
+            className="flex-1 bg-slate-100 rounded-lg p-2"
             name="desc"
+            onChange={(e) => setDesc(e.target.value)}
           ></textarea>
-          <Image
-            src="/emoji.png"
-            alt=""
-            width={20}
-            height={20}
-            className="w-5 h-5 cursor-pointer self-end"
-          />
-          <button>Send</button>
+          <div className="">
+            <Image
+              src="/emoji.png"
+              alt=""
+              width={20}
+              height={20}
+              className="w-5 h-5 cursor-pointer self-end"
+            />
+            <AddPostButton />
+          </div>
         </form>
-        {/*POST OPTION*/}
+        {/* POST OPTIONS */}
         <div className="flex items-center gap-4 mt-4 text-gray-400 flex-wrap">
+          <CldUploadWidget
+            uploadPreset="social-media"
+            onSuccess={(result, { widget }) => {
+              setImg(result.info);
+              widget.close();
+            }}
+          >
+            {({ open }) => {
+              return (
+                <div
+                  className="flex items-center gap-2 cursor-pointer"
+                  onClick={() => open()}
+                >
+                  <Image src="/addimage.png" alt="" width={20} height={20} />
+                  Photo
+                </div>
+              );
+            }}
+          </CldUploadWidget>
           <div className="flex items-center gap-2 cursor-pointer">
-            <Image
-              src="/addimage.png"
-              alt=""
-              width={20}
-              height={20}
-              className="w-5 h-5 cursor-pointer self-end"
-            />
-            Photo
-            <Image
-              src="/addVideo.png"
-              alt=""
-              width={20}
-              height={20}
-              className="w-5 h-5 cursor-pointer self-end"
-            />
+            <Image src="/addVideo.png" alt="" width={20} height={20} />
             Video
-            <Image
-              src="/poll.png"
-              alt=""
-              width={20}
-              height={20}
-              className="w-5 h-5 cursor-pointer self-end"
-            />
-            Polls
-            <Image
-              src="/events.png"
-              alt=""
-              width={20}
-              height={20}
-              className="w-5 h-5 cursor-pointer self-end"
-            />
-            Events
+          </div>
+          <div className="flex items-center gap-2 cursor-pointer">
+            <Image src="/poll.png" alt="" width={20} height={20} />
+            Poll
+          </div>
+          <div className="flex items-center gap-2 cursor-pointer">
+            <Image src="/addevent.png" alt="" width={20} height={20} />
+            Event
           </div>
         </div>
       </div>
-      {/*AVATAR*/}
-      <div className="class"></div>
     </div>
   );
 };
+
 export default AddPost;
