@@ -40,12 +40,7 @@ git clone https://github.com/yourusername/socialmedia-app.git
 npm install
 ```
 
-3. Cài đặt Clerk
-```bash
-npm install @clerk/nextjs
-```
-
-4. Chạy ứng dụng local
+3. Chạy ứng dụng local
 ```bash
 npm run dev
 ```
