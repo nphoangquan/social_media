@@ -30,8 +30,8 @@ const UserInfoCardInteraction = ({
         followingRequestSent:
           !prev.following && !prev.followingRequestSent ? true : false,
       }));
-    } catch (err) {
-      console.log(err);
+    } catch {
+      // Error handling silently ignored
     }
   };
 
@@ -43,8 +43,8 @@ const UserInfoCardInteraction = ({
         ...prev,
         blocked: !prev.blocked,
       }));
-    } catch (err) {
-      console.log(err);
+    } catch {
+      // Error handling silently ignored
     }
   };
 
@@ -61,9 +61,9 @@ const UserInfoCardInteraction = ({
         : { ...state, blocked: !state.blocked }
   );
   return (
-    <>
+    <div className="flex flex-col gap-3 mt-2">
       <form action={follow}>
-        <button className="w-full bg-blue-500 text-white text-sm rounded-md p-2">
+        <button className="w-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 text-sm rounded-xl p-3 hover:bg-emerald-100 dark:hover:bg-emerald-800/20 hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors font-medium shadow-sm hover:shadow-md">
           {optimisticState.following
             ? "Following"
             : optimisticState.followingRequestSent
@@ -71,14 +71,12 @@ const UserInfoCardInteraction = ({
             : "Follow"}
         </button>
       </form>
-      <form action={block} className="self-end ">
-        <button>
-          <span className="text-red-400 text-xs cursor-pointer">
-            {optimisticState.blocked ? "Unblock User" : "Block User"}
-          </span>
+      <form action={block} className="self-end">
+        <button className="text-red-400 text-xs cursor-pointer hover:underline hover:text-red-600 dark:hover:text-red-300 transition-colors">
+          {optimisticState.blocked ? "Unblock User" : "Block User"}
         </button>
       </form>
-    </>
+    </div>
   );
 };
 

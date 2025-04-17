@@ -33,8 +33,8 @@ const Stories = async () => {
     },
   });
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md overflow-scroll text-xs scrollbar-hide">
-      <div className="flex gap-8 w-max">
+    <div className="p-6 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-zinc-800/20 border border-zinc-100/50 dark:border-zinc-800/50 overflow-x-auto scrollbar-hide">
+      <div className="flex gap-6 w-max">
         <StoryList stories={stories} userId={currentUserId}/>
       </div>
     </div>

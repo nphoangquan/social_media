@@ -15,18 +15,19 @@ type FeedPostType = PostType & { user: User } & {
 const Post = async ({ post }: { post: FeedPostType }) => {
   const { userId } = await auth();
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       {/* USER */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Image
-            src={post.user.avatar || "/noAvatar.png"}
-            width={40}
-            height={40}
-            alt=""
-            className="w-10 h-10 rounded-full"
-          />
-          <span className="font-medium">
+        <div className="flex items-center gap-3">
+          <div className="relative w-10 h-10 rounded-full overflow-hidden ring-2 ring-zinc-100 dark:ring-zinc-800">
+            <Image
+              src={post.user.avatar || "/noAvatar.png"}
+              fill
+              alt=""
+              className="object-cover"
+            />
+          </div>
+          <span className="font-medium text-zinc-800 dark:text-zinc-200">
             {post.user.name && post.user.surname
               ? post.user.name + " " + post.user.surname
               : post.user.username}
@@ -37,26 +38,35 @@ const Post = async ({ post }: { post: FeedPostType }) => {
       {/* DESC */}
       <div className="flex flex-col gap-4">
         {post.img && (
-          <div className="w-full min-h-96 relative">
+          <div className="w-full min-h-96 relative rounded-xl overflow-hidden group">
             <Image
               src={post.img}
               fill
-              className="object-cover rounded-md"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
               alt=""
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
         )}
-        <p>{post.desc}</p>
+        <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed">{post.desc}</p>
       </div>
       {/* INTERACTION */}
-      <Suspense fallback="Loading...">
+      <Suspense fallback={
+        <div className="h-8 flex items-center justify-center">
+          <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-zinc-400/50 border-solid border-current border-e-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+        </div>
+      }>
         <PostInteraction
           postId={post.id}
           likes={post.likes.map((like) => like.userId)}
           commentNumber={post._count.comments}
         />
       </Suspense>
-      <Suspense fallback="Loading...">
+      <Suspense fallback={
+        <div className="h-8 flex items-center justify-center">
+          <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-zinc-400/50 border-solid border-current border-e-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+        </div>
+      }>
         <Comments postId={post.id} />
       </Suspense>
     </div>

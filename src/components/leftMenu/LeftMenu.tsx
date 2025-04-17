@@ -1,93 +1,96 @@
 import Link from "next/link";
 import ProfileCard from "./ProfileCard";
-import Image from "next/image";
 import Ad from "../Ad";
+import { 
+  FileText, 
+  Activity, 
+  Store, 
+  Calendar, 
+  Image as ImageIcon, 
+  Video, 
+  Newspaper, 
+  BookOpen, 
+  List, 
+  Settings 
+} from "lucide-react";
 
 const LeftMenu = ({ type }: { type: "home" | "profile" }) => {
   return (
     <div className="flex flex-col gap-6">
       {type === "home" && <ProfileCard />}
-      <div className="p-4 bg-white rounded-lg shadow-md text-sm text-gray-500 flex flex-col gap-2">
-        <Link
-          href="/"
-          className="flex items-center gap-4 p-2 rounded-lg hover:bg-slate-100"
-        >
-          <Image src="/posts.png" alt="" width={20} height={20} />
-          <span>My Posts</span>
-        </Link>
-        <hr className="border-t-1 border-gray-50 w-36 self-center" />
-        <Link
-          href="/"
-          className="flex items-center gap-4 p-2 rounded-lg hover:bg-slate-100"
-        >
-          <Image src="/activity.png" alt="" width={20} height={20} />
-          <span>Activity</span>
-        </Link>
-        <hr className="border-t-1 border-gray-50 w-36 self-center" />
-        <Link
-          href="/"
-          className="flex items-center gap-4 p-2 rounded-lg hover:bg-slate-100"
-        >
-          <Image src="/market.png" alt="" width={20} height={20} />
-          <span>Marketplace</span>
-        </Link>
-        <hr className="border-t-1 border-gray-50 w-36 self-center" />
-        <Link
-          href="/"
-          className="flex items-center gap-4 p-2 rounded-lg hover:bg-slate-100"
-        >
-          <Image src="/events.png" alt="" width={20} height={20} />
-          <span>Events</span>
-        </Link>
-        <hr className="border-t-1 border-gray-50 w-36 self-center" />
-        <Link
-          href="/"
-          className="flex items-center gap-4 p-2 rounded-lg hover:bg-slate-100"
-        >
-          <Image src="/albums.png" alt="" width={20} height={20} />
-          <span>Albums</span>
-        </Link>
-        <hr className="border-t-1 border-gray-50 w-36 self-center" />
-        <Link
-          href="/"
-          className="flex items-center gap-4 p-2 rounded-lg hover:bg-slate-100"
-        >
-          <Image src="/videos.png" alt="" width={20} height={20} />
-          <span>Videos</span>
-        </Link>
-        <hr className="border-t-1 border-gray-50 w-36 self-center" />
-        <Link
-          href="/"
-          className="flex items-center gap-4 p-2 rounded-lg hover:bg-slate-100"
-        >
-          <Image src="/news.png" alt="" width={20} height={20} />
-          <span>News</span>
-        </Link>
-        <hr className="border-t-1 border-gray-50 w-36 self-center" />
-        <Link
-          href="/"
-          className="flex items-center gap-4 p-2 rounded-lg hover:bg-slate-100"
-        >
-          <Image src="/courses.png" alt="" width={20} height={20} />
-          <span>Courses</span>
-        </Link>
-        <hr className="border-t-1 border-gray-50 w-36 self-center" />
-        <Link
-          href="/"
-          className="flex items-center gap-4 p-2 rounded-lg hover:bg-slate-100"
-        >
-          <Image src="/lists.png" alt="" width={20} height={20} />
-          <span>Lists</span>
-        </Link>
-        <hr className="border-t-1 border-gray-50 w-36 self-center" />
-        <Link
-          href="/"
-          className="flex items-center gap-4 p-2 rounded-lg hover:bg-slate-100"
-        >
-          <Image src="/settings.png" alt="" width={20} height={20} />
-          <span>Settings</span>
-        </Link>
-        <hr className="border-t-1 border-gray-50 w-36 self-center" />
+      <div className="p-6 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-zinc-800/20 border border-zinc-100/50 dark:border-zinc-800/50 text-sm">
+        <div className="flex flex-col gap-1">
+          <Link
+            href="/"
+            className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
+          >
+            <FileText className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <span className="font-medium">My Posts</span>
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
+          >
+            <Activity className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <span className="font-medium">Activity</span>
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
+          >
+            <Store className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <span className="font-medium">Marketplace</span>
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
+          >
+            <Calendar className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <span className="font-medium">Events</span>
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
+          >
+            <ImageIcon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <span className="font-medium">Albums</span>
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
+          >
+            <Video className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <span className="font-medium">Videos</span>
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
+          >
+            <Newspaper className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <span className="font-medium">News</span>
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
+          >
+            <BookOpen className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <span className="font-medium">Courses</span>
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
+          >
+            <List className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <span className="font-medium">Lists</span>
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
+          >
+            <Settings className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <span className="font-medium">Settings</span>
+          </Link>
+        </div>
       </div>
       <Ad size='sm'/>
     </div>

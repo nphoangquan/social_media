@@ -71,10 +71,16 @@ const Feed = async ({ username }: { username?: string }) => {
     });
   }
   return (
-    <div className="p-4 bg-white shadow-md rounded-lg flex flex-col gap-12">
-      {posts.length ? (posts.map(post=>(
-        <Post key={post.id} post={post}/>
-      ))) : "No posts found!"}
+    <div className="p-6 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-zinc-800/20 border border-zinc-100/50 dark:border-zinc-800/50 flex flex-col gap-12">
+      {posts.length ? (
+        posts.map(post => (
+          <Post key={post.id} post={post}/>
+        ))
+      ) : (
+        <div className="text-center py-8 text-zinc-500 dark:text-zinc-400">
+          No posts found!
+        </div>
+      )}
     </div>
   );
 };

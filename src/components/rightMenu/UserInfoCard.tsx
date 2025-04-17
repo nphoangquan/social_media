@@ -1,10 +1,19 @@
 import prisma from "@/lib/client";
 import { auth } from "@clerk/nextjs/server";
 import { User } from "@prisma/client";
-import Image from "next/image";
 import Link from "next/link";
 import UserInfoCardInteraction from "./UserInfoCardInteraction";
 import UpdateUser from "./UpdateUser";
+
+// Lucide Icons
+import {
+  MapPin,
+  GraduationCap,
+  Briefcase,
+  Link as LinkIcon,
+  CalendarDays,
+  MoreVertical,
+} from "lucide-react";
 
 const UserInfoCard = async ({ user }: { user: User }) => {
   const createdAtDate = new Date(user.createdAt);
@@ -29,12 +38,8 @@ const UserInfoCard = async ({ user }: { user: User }) => {
       },
     });
 
-    // blockRes ? (isUserBlocked = true) : (isUserBlocked = false);
-    if (blockRes) {
-      isUserBlocked = true;
-    } else {
-      isUserBlocked = false;
-    }
+    isUserBlocked = !!blockRes;
+
     const followRes = await prisma.follower.findFirst({
       where: {
         followerId: currentUserId,
@@ -42,12 +47,8 @@ const UserInfoCard = async ({ user }: { user: User }) => {
       },
     });
 
-    // followRes ? (isFollowing = true) : (isFollowing = false);
-    if (followRes) {
-      isFollowing = true;
-    } else {
-      isFollowing = false;
-    }
+    isFollowing = !!followRes;
+
     const followReqRes = await prisma.followRequest.findFirst({
       where: {
         senderId: currentUserId,
@@ -55,77 +56,77 @@ const UserInfoCard = async ({ user }: { user: User }) => {
       },
     });
 
-    // followReqRes ? (isFollowingSent = true) : (isFollowingSent = false);
-    if (followReqRes) {
-      isFollowingSent = true;
-    } else {
-      isFollowingSent = false;
-    }
+    isFollowingSent = !!followReqRes;
   }
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md text-sm flex flex-col gap-4">
+    <div className="p-6 bg-white/80 dark:bg-zinc-900/80 rounded-2xl shadow-lg dark:shadow-zinc-800/20 text-sm border border-zinc-100/50 dark:border-zinc-800/50 hover:shadow-xl dark:hover:shadow-zinc-800/30 transition-all duration-300 flex flex-col gap-4">
       {/* TOP */}
-      <div className="flex justify-between items-center font-medium">
-        <span className="text-gray-500">User Information</span>
+      <div className="flex justify-between items-center mb-2 font-medium text-zinc-500 dark:text-zinc-400">
+        <span className="text-xs uppercase tracking-wider font-semibold">User Information</span>
         {currentUserId === user.id ? (
-          <UpdateUser user={user}/>
+          <UpdateUser user={user} />
         ) : (
-          <Link href="/" className="text-blue-500 text-xs">
-            See all
-          </Link>
+          <MoreVertical className="w-4 h-4 cursor-pointer hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors" />
         )}
       </div>
+
       {/* BOTTOM */}
-      <div className="flex flex-col gap-4 text-gray-500">
+      <div className="flex flex-col gap-4 text-zinc-600 dark:text-zinc-300">
         <div className="flex items-center gap-2">
-          <span className="text-xl text-black">
-            {" "}
-            {user.name && user.surname
-              ? user.name + " " + user.surname
-              : user.username}
+          <span className="text-xl text-zinc-900 dark:text-zinc-100 font-medium">
+            {user.name && user.surname ? `${user.name} ${user.surname}` : user.username}
           </span>
-          <span className="text-sm">@{user.username}</span>
+          <span className="text-sm text-zinc-500 dark:text-zinc-400">@{user.username}</span>
         </div>
-        {user.description && <p>{user.description}</p>}
+
+        {user.description && <p className="leading-relaxed">{user.description}</p>}
+
         {user.city && (
-          <div className="flex items-center gap-2">
-            <Image src="/map.png" alt="" width={16} height={16} />
+          <div className="flex items-center gap-2 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group">
+            <MapPin className="w-4 h-4 group-hover:scale-110 transition-transform" />
             <span>
-              Living in <b>{user.city}</b>
+              Living in <b className="text-zinc-800 dark:text-zinc-200">{user.city}</b>
             </span>
           </div>
         )}
+
         {user.school && (
-          <div className="flex items-center gap-2">
-            <Image src="/school.png" alt="" width={16} height={16} />
+          <div className="flex items-center gap-2 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group">
+            <GraduationCap className="w-4 h-4 group-hover:scale-110 transition-transform" />
             <span>
-              Went to <b>{user.school}</b>
+              Went to <b className="text-zinc-800 dark:text-zinc-200">{user.school}</b>
             </span>
           </div>
         )}
+
         {user.work && (
-          <div className="flex items-center gap-2">
-            <Image src="/work.png" alt="" width={16} height={16} />
+          <div className="flex items-center gap-2 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group">
+            <Briefcase className="w-4 h-4 group-hover:scale-110 transition-transform" />
             <span>
-              Works at <b>{user.work}</b>
+              Works at <b className="text-zinc-800 dark:text-zinc-200">{user.work}</b>
             </span>
           </div>
         )}
+
         <div className="flex items-center justify-between">
           {user.website && (
-            <div className="flex gap-1 items-center">
-              <Image src="/link.png" alt="" width={16} height={16} />
-              <Link href={user.website} className="text-blue-500 font-medium">
+            <div className="flex gap-1 items-center group hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              <LinkIcon className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <Link
+                href={user.website}
+                className="text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors font-medium"
+              >
                 {user.website}
               </Link>
             </div>
           )}
-          <div className="flex gap-1 items-center">
-            <Image src="/date.png" alt="" width={16} height={16} />
+          <div className="flex gap-1 items-center text-xs text-zinc-500 dark:text-zinc-400 group hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+            <CalendarDays className="w-4 h-4 group-hover:scale-110 transition-transform" />
             <span>Joined {formattedDate}</span>
           </div>
         </div>
+
         {currentUserId && currentUserId !== user.id && (
           <UserInfoCardInteraction
             userId={user.id}

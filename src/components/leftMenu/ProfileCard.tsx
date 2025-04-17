@@ -1,5 +1,5 @@
-import prisma from "@/lib/client";
 import { auth } from "@clerk/nextjs/server";
+import prisma from "@/lib/client";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -8,7 +8,7 @@ const ProfileCard = async () => {
 
   if (!userId) return null;
 
-  const user = await prisma.user.findFirst({
+  const user = await prisma.user.findUnique({
     where: {
       id: userId,
     },
@@ -24,59 +24,40 @@ const ProfileCard = async () => {
   if (!user) return null;
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md text-sm flex flex-col gap-6">
-      <div className="h-20 relative">
+    <div className="p-6 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-zinc-800/20 border border-zinc-100/50 dark:border-zinc-800/50">
+      {/* TOP */}
+      <div className="relative h-32 -mx-6 -mt-6 mb-4">
         <Image
           src={user.cover || "/noCover.png"}
           alt=""
           fill
-          className="rounded-md object-cover"
+          className="object-cover rounded-t-2xl"
         />
-        <Image
-          src={user.avatar || "/noAvatar.png"}
-          alt=""
-          width={48}
-          height={48}
-          className="rounded-full object-cover w-12 h-12 absolute left-0 right-0 m-auto -bottom-6 ring-1 ring-white z-10"
-        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
       </div>
-      <div className="h-20 flex flex-col gap-2 items-center">
-        <span className="font-semibold">
-          {user.name && user.surname
-            ? user.name + " " + user.surname
-            : user.username}
-        </span>
-        <div className="flex items-center gap-4">
-          <div className="flex">
-            <Image
-              src="https://images.pexels.com/photos/19578755/pexels-photo-19578755/free-photo-of-woman-watching-birds-and-landscape.jpeg?auto=compress&cs=tinysrgb&w=800&lazy=load"
-              alt=""
-              width={12}
-              height={12}
-              className="rounded-full object-cover w-3 h-3"
-            />
-            <Image
-              src="https://images.pexels.com/photos/19578755/pexels-photo-19578755/free-photo-of-woman-watching-birds-and-landscape.jpeg?auto=compress&cs=tinysrgb&w=800&lazy=load"
-              alt=""
-              width={12}
-              height={12}
-              className="rounded-full object-cover w-3 h-3"
-            />
-            <Image
-              src="https://images.pexels.com/photos/19578755/pexels-photo-19578755/free-photo-of-woman-watching-birds-and-landscape.jpeg?auto=compress&cs=tinysrgb&w=800&lazy=load"
-              alt=""
-              width={12}
-              height={12}
-              className="rounded-full object-cover w-3 h-3"
-            />
-          </div>
-          <span className="text-xs text-gray-500">
+      {/* AVATAR */}
+      <div className="relative flex flex-col items-center -mt-14 mb-4">
+        <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-white dark:ring-zinc-900 mb-3">
+          <Image
+            src={user.avatar || "/noAvatar.png"}
+            alt=""
+            fill
+            className="object-cover"
+          />
+        </div>
+        <div className="text-center">
+          <h2 className="font-semibold text-zinc-800 dark:text-zinc-200 mb-1">
+            {user.name && user.surname
+              ? user.name + " " + user.surname
+              : user.username}
+          </h2>
+          <span className="text-sm text-zinc-500 dark:text-zinc-400">
             {user._count.followers} Followers
           </span>
         </div>
-        <Link href={`/profile/${user.username}`}>
-          <button className="bg-blue-500 text-white text-xs p-2 rounded-md cursor-pointer">
-            Profile
+        <Link href={`/profile/${user.username}`} className="mt-4">
+          <button className="bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white text-sm font-medium px-6 py-2 rounded-xl transition-colors">
+            View Profile
           </button>
         </Link>
       </div>

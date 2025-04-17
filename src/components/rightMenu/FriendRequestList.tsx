@@ -4,6 +4,7 @@ import { acceptFollowRequest, declineFollowRequest } from "@/lib/actions";
 import { FollowRequest, User } from "@prisma/client";
 import Image from "next/image";
 import { useOptimistic, useState } from "react";
+import { Check, X } from "lucide-react";
 
 type RequestWithUser = FollowRequest & {
   sender: User;
@@ -56,24 +57,12 @@ const FriendRequestList = ({ requests }: { requests: RequestWithUser[] }) => {
           <div className="flex gap-3 justify-end">
             <form action={() => accept(request.id, request.sender.id)}>
               <button title="Accept Friend Request">
-                <Image
-                  src="/accept.png"
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="cursor-pointer"
-                />
+                <Check className="w-5 h-5 cursor-pointer text-green-500" />
               </button>
             </form>
             <form action={() => decline(request.id, request.sender.id)}>
               <button title="Decline Friend Request">
-                <Image
-                  src="/reject.png"
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="cursor-pointer"
-                />
+                <X className="w-5 h-5 cursor-pointer text-red-500" />
               </button>
             </form>
           </div>

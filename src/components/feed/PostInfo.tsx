@@ -1,8 +1,8 @@
 "use client";
 
 import { deletePost } from "@/lib/actions";
-import Image from "next/image";
 import { useState } from "react";
+import { MoreVertical } from "lucide-react";
 
 const PostInfo = ({ postId }: { postId: number }) => {
   const [open, setOpen] = useState(false);
@@ -10,13 +10,9 @@ const PostInfo = ({ postId }: { postId: number }) => {
   const deletePostWithId = deletePost.bind(null, postId);
   return (
     <div className="relative">
-      <Image
-        src="/more.png"
-        width={16}
-        height={16}
-        alt=""
+      <MoreVertical
+        className="w-4 h-4 cursor-pointer"
         onClick={() => setOpen((prev) => !prev)}
-        className="cursor-pointer"
       />
       {open && (
         <div className="absolute top-4 right-0 bg-white p-4 w-32 rounded-lg flex flex-col gap-2 text-xs shadow-lg z-30">

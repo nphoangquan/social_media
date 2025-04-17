@@ -2,8 +2,8 @@
 
 import { switchLike } from "@/lib/actions";
 import { useAuth } from "@clerk/nextjs";
-import Image from "next/image";
 import { useOptimistic, useState } from "react";
+import { Heart, MessageCircle, Share2 } from "lucide-react";
 
 const PostInteraction = ({
   postId,
@@ -14,7 +14,7 @@ const PostInteraction = ({
   likes: string[];
   commentNumber: number;
 }) => {
-  const { isLoaded, userId } = useAuth();
+  const { userId } = useAuth();
   const [likeState, setLikeState] = useState({
     likeCount: likes.length,
     isLiked: userId ? likes.includes(userId) : false,
@@ -22,7 +22,7 @@ const PostInteraction = ({
 
   const [optimisticLike, switchOptimisticLike] = useOptimistic(
     likeState,
-    (state, value) => {
+    (state) => {
       return {
         likeCount: state.isLiked ? state.likeCount - 1 : state.likeCount + 1,
         isLiked: !state.isLiked,
@@ -43,54 +43,40 @@ const PostInteraction = ({
     }
   };
   return (
-    <div className="flex items-center justify-between text-sm my-4">
-      <div className="flex gap-8">
-        <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-xl">
+    <div className="flex items-center justify-between text-sm">
+      <div className="flex gap-4">
+        <div className="flex items-center gap-4 bg-zinc-100/80 dark:bg-zinc-800/50 px-4 py-2 rounded-xl group">
           <form action={likeAction}>
-            <button title="Like Post">
-              <Image
-                src={optimisticLike.isLiked ? "/liked.png" : "/like.png"}
-                width={16}
-                height={16}
-                alt=""
-                className="cursor-pointer"
+            <button title="Like Post" className="hover:scale-110 transition-transform">
+              <Heart
+                className={`w-4 h-4 cursor-pointer transition-colors ${
+                  optimisticLike.isLiked 
+                    ? "fill-emerald-500 text-emerald-500 dark:fill-emerald-400 dark:text-emerald-400" 
+                    : "text-zinc-500 dark:text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400"
+                }`}
               />
             </button>
           </form>
-          <span className="text-gray-300">|</span>
-          <span className="text-gray-500">
+          <span className="text-zinc-300 dark:text-zinc-600">|</span>
+          <span className="text-zinc-500 dark:text-zinc-400">
             {optimisticLike.likeCount}
-            <span className="hidden md:inline"> Likes</span>
+            <span className="hidden md:inline ml-1">Likes</span>
           </span>
         </div>
-        <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-xl">
-          <Image
-            src="/comment.png"
-            width={16}
-            height={16}
-            alt=""
-            className="cursor-pointer"
-          />
-          <span className="text-gray-300">|</span>
-          <span className="text-gray-500">
-            {commentNumber}<span className="hidden md:inline"> Comments</span>
+        <div className="flex items-center gap-4 bg-zinc-100/80 dark:bg-zinc-800/50 px-4 py-2 rounded-xl group">
+          <MessageCircle className="w-4 h-4 cursor-pointer text-zinc-500 dark:text-zinc-400 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors" />
+          <span className="text-zinc-300 dark:text-zinc-600">|</span>
+          <span className="text-zinc-500 dark:text-zinc-400">
+            {commentNumber}<span className="hidden md:inline ml-1">Comments</span>
           </span>
         </div>
       </div>
-      <div className="">
-        <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-xl">
-          <Image
-            src="/share.png"
-            width={16}
-            height={16}
-            alt=""
-            className="cursor-pointer"
-          />
-          <span className="text-gray-300">|</span>
-          <span className="text-gray-500">
-            <span className="hidden md:inline"> Share</span>
-          </span>
-        </div>
+      <div className="flex items-center gap-4 bg-zinc-100/80 dark:bg-zinc-800/50 px-4 py-2 rounded-xl group">
+        <Share2 className="w-4 h-4 cursor-pointer text-zinc-500 dark:text-zinc-400 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors" />
+        <span className="text-zinc-300 dark:text-zinc-600">|</span>
+        <span className="text-zinc-500 dark:text-zinc-400">
+          <span className="hidden md:inline">Share</span>
+        </span>
       </div>
     </div>
   );
