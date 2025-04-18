@@ -3,53 +3,57 @@ import { MoreVertical } from "lucide-react";
 
 const Ad = ({ size }: { size: "sm" | "md" | "lg" }) => {
   return (
-    <div className="p-6 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-zinc-800/20 text-sm border border-zinc-100/50 dark:border-zinc-800/50 hover:shadow-xl dark:hover:shadow-zinc-800/30 transition-all duration-300">
+    <div className="bg-zinc-900/90 rounded-xl shadow-lg text-sm overflow-hidden">
       {/* TOP */}
-      <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 font-medium mb-5">
+      <div className="flex items-center justify-between text-zinc-400 font-medium px-4 pt-3 pb-2">
         <span className="text-xs uppercase tracking-wider font-semibold">Sponsored Ads</span>
-        <MoreVertical className="w-4 h-4 cursor-pointer hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors" />
+        <MoreVertical className="w-4 h-4 cursor-pointer hover:text-zinc-300 transition-colors" />
       </div>
       {/* BOTTOM */}
-      <div
-        className={`flex flex-col ${size === "sm" ? "gap-3" : "gap-5"}`}
-      >
-        <div
-          className={`relative w-full overflow-hidden rounded-xl ${
-            size === "sm" ? "h-24" : size === "md" ? "h-36" : "h-48"
-          }`}
-        >
+      <div className={`flex flex-col ${size === "sm" ? "gap-2" : "gap-3"}`}>
+        {/* Main Image Container - No Border */}
+        <div className={`relative w-full overflow-hidden ${
+          size === "sm" ? "h-32" : size === "md" ? "h-40" : "h-52"
+        }`}>
           <Image
-            src="https://images.pexels.com/photos/23193135/pexels-photo-23193135.jpeg?auto=compress&cs=tinysrgb&w=800&lazy=load"
-            alt=""
+            src="/itv_second.svg"
+            alt="Introvertia Ad"
             fill
             className="object-cover hover:scale-105 transition-transform duration-500"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
         </div>
-        <div className="flex items-center gap-3">
-          <div className="relative w-9 h-9 rounded-full overflow-hidden ring-2 ring-white dark:ring-zinc-900 shadow-md">
+        
+        {/* Logo and Title */}
+        <div className="flex items-center gap-3 px-4">
+          <div className="relative w-8 h-8 rounded-md overflow-hidden">
             <Image
-              src="https://images.pexels.com/photos/23193135/pexels-photo-23193135.jpeg?auto=compress&cs=tinysrgb&w=800&lazy=load"
-              alt=""
+              src="/introvertia-icon.svg"
+              alt="Introvertia Logo"
               fill
               className="object-cover"
             />
           </div>
           <div className="flex flex-col">
-            <span className="text-zinc-900 dark:text-zinc-100 font-medium hover:underline cursor-pointer group-hover:text-emerald-500 transition-colors">Nguyen Phan Hoang Quan</span>
-            <span className="text-xs text-zinc-500 dark:text-zinc-400">Sponsored</span>
+            <span className="text-zinc-100 font-medium">INTROVERTIA</span>
+            <span className="text-xs text-zinc-500">Sponsored</span>
           </div>
         </div>
-        <p className={`${size === "sm" ? "text-xs" : "text-sm"} text-zinc-600 dark:text-zinc-300 leading-relaxed`}>
+        
+        {/* Description */}
+        <p className={`px-4 ${size === "sm" ? "text-xs" : "text-sm"} text-zinc-300 leading-relaxed`}>
           {size === "sm"
-            ? "Cuu Toi Voi."
+            ? "Introvertia - The social network for introverts."
             : size === "md"
-            ? "Cuu."
-            : "Huhuhuhuhuhu"}
+            ? "Introvertia - Connect with others who understand your energy needs."
+            : "Introvertia - The social network designed for introverts. Connect meaningfully without the social pressure."}
         </p>
-        <button className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 p-3 text-xs rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-800/20 hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors font-medium w-full shadow-sm hover:shadow-md">
-          Learn more
-        </button>
+        
+        {/* Button */}
+        <div className="px-4 pb-4">
+          <button className="bg-zinc-800 text-zinc-200 p-2.5 text-xs rounded-lg hover:bg-zinc-700 transition-colors font-medium w-full">
+            Learn more
+          </button>
+        </div>
       </div>
     </div>
   );

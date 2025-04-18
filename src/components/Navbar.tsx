@@ -18,7 +18,7 @@ const Navbar = ({ logoFont }: NavbarProps) => {
   return (
     <div className="h-24 flex items-center justify-between">
       {/* LEFT */}
-      <div className="md:hidden lg:block w-[20%]">
+      <div className="md:hidden lg:block w-[25%] pl-2">
         <Link 
           href="/" 
           className="flex items-center gap-2 group"
@@ -37,7 +37,7 @@ const Navbar = ({ logoFont }: NavbarProps) => {
         </Link>
       </div>
       {/* CENTER */}
-      <div className="hidden md:flex w-[50%] text-sm items-center justify-between">
+      <div className="hidden md:flex w-[45%] text-sm items-center justify-between ml-6">
         {/* LINKS */}
         <div className="flex gap-6 text-zinc-400">
           <Link href="/" className="flex items-center gap-2 hover:text-zinc-100 transition-colors">
