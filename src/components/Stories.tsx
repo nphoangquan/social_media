@@ -13,28 +13,19 @@ const Stories = async () => {
       expiresAt: {
         gt: new Date(),
       },
-      OR: [
-        {
-          user: {
-            followers: {
-              some: {
-                followerId: currentUserId,
-              },
-            },
-          },
-        },
-        {
-          userId: currentUserId,
-        },
-      ],
     },
     include: {
       user: true,
     },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    take: 20,
   });
+  
   return (
-    <div className="p-6 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-zinc-800/20 border border-zinc-100/50 dark:border-zinc-800/50 overflow-x-auto scrollbar-hide">
-      <div className="flex gap-6 w-max">
+    <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl shadow-md dark:shadow-zinc-800/30 p-4">
+      <div className="flex overflow-x-auto hide-scrollbar gap-2 pb-2">
         <StoryList stories={stories} userId={currentUserId}/>
       </div>
     </div>

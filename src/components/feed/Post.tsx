@@ -15,7 +15,7 @@ type FeedPostType = PostType & { user: User } & {
 const Post = async ({ post }: { post: FeedPostType }) => {
   const { userId } = await auth();
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 px-4 py-3">
       {/* USER */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -37,18 +37,23 @@ const Post = async ({ post }: { post: FeedPostType }) => {
       </div>
       {/* DESC */}
       <div className="flex flex-col gap-4">
+        {/* Hiển thị mô tả trước hình ảnh */}
+        {post.desc && (
+          <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed">{post.desc}</p>
+        )}
+        
         {post.img && (
-          <div className="w-full min-h-96 relative rounded-xl overflow-hidden group">
+          <div className="mx-[-16px] my-2">
             <Image
               src={post.img}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              width={1200}
+              height={800}
+              className="w-full h-auto"
               alt=""
+              priority
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
         )}
-        <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed">{post.desc}</p>
       </div>
       {/* INTERACTION */}
       <Suspense fallback={

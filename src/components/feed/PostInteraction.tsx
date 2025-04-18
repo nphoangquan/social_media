@@ -2,7 +2,7 @@
 
 import { switchLike } from "@/lib/actions";
 import { useAuth } from "@clerk/nextjs";
-import { useOptimistic, useState } from "react";
+import { useOptimistic, useState, useEffect } from "react";
 import { Heart, MessageCircle, Share2 } from "lucide-react";
 
 const PostInteraction = ({
@@ -20,6 +20,13 @@ const PostInteraction = ({
     isLiked: userId ? likes.includes(userId) : false,
   });
 
+  useEffect(() => {
+    setLikeState({
+      likeCount: likes.length,
+      isLiked: userId ? likes.includes(userId) : false,
+    });
+  }, [likes, userId]);
+
   const [optimisticLike, switchOptimisticLike] = useOptimistic(
     likeState,
     (state) => {
@@ -31,6 +38,8 @@ const PostInteraction = ({
   );
 
   const likeAction = async () => {
+    if (!userId) return;
+    
     switchOptimisticLike("");
     try {
       switchLike(postId);

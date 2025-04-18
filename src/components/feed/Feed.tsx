@@ -1,11 +1,9 @@
-import { auth } from "@clerk/nextjs/server";
 import Post from "./Post";
 import prisma from "@/lib/client";
 
 const Feed = async ({ username }: { username?: string }) => {
-  const { userId } = await auth();
-
-  let posts:any[] =[];
+  // TODO: Định nghĩa type cụ thể thay vì dùng any[]
+  let posts: any[] = [];
 
   if (username) {
     posts = await prisma.post.findMany({
@@ -31,27 +29,8 @@ const Feed = async ({ username }: { username?: string }) => {
         createdAt: "desc",
       },
     });
-  }
-
-  if (!username && userId) {
-    const following = await prisma.follower.findMany({
-      where: {
-        followerId: userId,
-      },
-      select: {
-        followingId: true,
-      },
-    });
-
-    const followingIds = following.map((f) => f.followingId);
-    const ids = [userId,...followingIds]
-
+  } else {
     posts = await prisma.post.findMany({
-      where: {
-        userId: {
-          in: ids,
-        },
-      },
       include: {
         user: true,
         likes: {
@@ -68,16 +47,20 @@ const Feed = async ({ username }: { username?: string }) => {
       orderBy: {
         createdAt: "desc",
       },
+      take: 20,
     });
   }
+  
   return (
-    <div className="p-6 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-zinc-800/20 border border-zinc-100/50 dark:border-zinc-800/50 flex flex-col gap-12">
+    <div className="flex flex-col bg-transparent">
       {posts.length ? (
         posts.map(post => (
-          <Post key={post.id} post={post}/>
+          <div key={post.id} className="mb-4 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl overflow-hidden shadow-md dark:shadow-zinc-800/20">
+            <Post post={post}/>
+          </div>
         ))
       ) : (
-        <div className="text-center py-8 text-zinc-500 dark:text-zinc-400">
+        <div className="text-center py-8 text-zinc-500 dark:text-zinc-400 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl shadow-md dark:shadow-zinc-800/20">
           No posts found!
         </div>
       )}

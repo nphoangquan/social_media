@@ -72,7 +72,7 @@ const StoryList = ({
   return (
     <>
       <CldUploadWidget
-        uploadPreset="social"
+        uploadPreset="social-media"
         onSuccess={(result, { widget }) => {
           setImg(result.info as CloudinaryResult);
           widget.close();
@@ -106,47 +106,29 @@ const StoryList = ({
               background: "rgba(0, 0, 0, 0.8)"
             }
           },
-          // showPoweredBy: false,
-          // sources: ["local", "url", "camera", "google_drive", "dropbox", "shutterstock", "gettyimages", "instagram", "facebook", "unsplash"],
-          // multiple: false,
-          // maxFiles: 1,
-          // resourceType: "auto",
-          // clientAllowedFormats: ["jpg", "jpeg", "png", "gif", "mp4", "mov", "avi", "webm"],
-          // maxFileSize: 50000000,
-          // theme: "minimal",
         }}
       >
         {({ open }) => {
           return (
             <div
-              className="flex flex-col items-center gap-2 cursor-pointer relative group"
+              className="cursor-pointer group mr-2"
               onClick={() => open()}
             >
-              <div className="relative w-20 h-20 overflow-hidden rounded-full shadow-md">
-                <div className="absolute inset-0 ring-4 ring-white dark:ring-zinc-900 z-10" />
-                <Image
-                  src={img?.secure_url || user?.imageUrl || "/noAvatar.png"}
-                  alt=""
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="bg-emerald-500/80 dark:bg-emerald-600/80 text-white rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
-                    <Plus className="w-5 h-5" />
+              <div className="relative w-28 h-48 rounded-xl overflow-hidden shadow-md bg-zinc-900 transition-transform duration-500 group-hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-t from-black to-black/50" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <div className="bg-white dark:bg-zinc-800 rounded-full w-10 h-10 flex items-center justify-center shadow-md">
+                    <Plus className="w-6 h-6 text-zinc-800 dark:text-zinc-200" />
                   </div>
+                  <span className="text-white font-medium text-sm mt-2">Create story</span>
                 </div>
               </div>
-              {img ? (
-                <form action={add} onClick={(e) => e.stopPropagation()}>
+              {img && (
+                <form action={add} className="mt-2 flex justify-center">
                   <button className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 px-4 py-1.5 text-xs rounded-full hover:bg-emerald-100 dark:hover:bg-emerald-800/20 hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors font-medium shadow-sm hover:shadow-md">
                     Share
                   </button>
                 </form>
-              ) : (
-                <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                  Add Story
-                </span>
               )}
             </div>
           );
@@ -155,22 +137,42 @@ const StoryList = ({
       {/* STORIES */}
       {optimisticStories.map((story) => (
         <div
-          className="flex flex-col items-center gap-2 cursor-pointer group"
+          className="cursor-pointer group relative mr-2"
           key={story.id}
         >
-          <div className="relative w-20 h-20 overflow-hidden rounded-full shadow-md">
-            <div className="absolute inset-0 ring-4 ring-emerald-500/40 dark:ring-emerald-600/30 z-10" />
-            <Image
-              src={story.user.avatar || "/noAvatar.png"}
-              alt=""
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+          <div className="relative w-28 h-48 rounded-xl overflow-hidden shadow-md transition-transform duration-500 group-hover:scale-105">
+            {/* Story image with zoom effect */}
+            <div className="w-full h-full overflow-hidden">
+              <Image
+                src={story.img || "/noImage.png"}
+                alt=""
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+            </div>
+            
+            {/* User avatar at top */}
+            <div className="absolute top-2 left-2 flex items-center gap-1">
+              <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-white">
+                <Image
+                  src={story.user.avatar || "/noAvatar.png"}
+                  alt=""
+                  width={32}
+                  height={32}
+                  className="object-cover"
+                />
+              </div>
+            </div>
+            
+            {/* Username at bottom with dark background only behind the text */}
+            <div className="absolute bottom-0 left-0 right-0">
+              <div className="bg-gradient-to-t from-black/80 to-transparent h-12 px-2 flex items-end pb-2">
+                <span className="text-white text-xs font-medium line-clamp-1">
+                  {story.user.name || story.user.username}
+                </span>
+              </div>
+            </div>
           </div>
-          <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-            {story.user.name || story.user.username}
-          </span>
         </div>
       ))}
     </>

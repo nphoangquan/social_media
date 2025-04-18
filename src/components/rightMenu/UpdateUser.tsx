@@ -55,7 +55,7 @@ const UpdateUser = ({ user }: { user: User }) => {
             </div>
 
             <CldUploadWidget
-              uploadPreset="social"
+              uploadPreset="social-media"
               onSuccess={(result) => setCover(result.info as CloudinaryResult)}
               options={{
                 styles: {
