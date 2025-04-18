@@ -102,6 +102,9 @@ const StoryList = ({
                 active: true,
               },
             },
+            frame: {
+              background: "rgba(0, 0, 0, 0.8)"
+            }
           },
           // showPoweredBy: false,
           // sources: ["local", "url", "camera", "google_drive", "dropbox", "shutterstock", "gettyimages", "instagram", "facebook", "unsplash"],
