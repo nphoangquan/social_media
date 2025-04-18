@@ -109,22 +109,21 @@ const UserInfoCard = async ({ user }: { user: User }) => {
           </div>
         )}
 
-        <div className="flex items-center justify-between">
-          {user.website && (
-            <div className="flex gap-1 items-center group hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              <LinkIcon className="w-4 h-4 group-hover:scale-110 transition-transform" />
-              <Link
-                href={user.website}
-                className="text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors font-medium"
-              >
-                {user.website}
-              </Link>
-            </div>
-          )}
-          <div className="flex gap-1 items-center text-xs text-zinc-500 dark:text-zinc-400 group hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-            <CalendarDays className="w-4 h-4 group-hover:scale-110 transition-transform" />
-            <span>Joined {formattedDate}</span>
+        {user.website && (
+          <div className="flex gap-1 items-center group hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+            <LinkIcon className="w-4 h-4 group-hover:scale-110 transition-transform" />
+            <Link
+              href={user.website}
+              className="text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors font-medium"
+            >
+              {user.website}
+            </Link>
           </div>
+        )}
+        
+        <div className="flex gap-1 items-center text-xs text-zinc-500 dark:text-zinc-400 group hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <CalendarDays className="w-4 h-4 group-hover:scale-110 transition-transform" />
+          <span>Joined {formattedDate}</span>
         </div>
 
         {currentUserId && currentUserId !== user.id && (
