@@ -25,7 +25,7 @@ const Navbar = ({ logoFont }: NavbarProps) => {
         >
           <div className="relative w-8 h-8">
             <Image
-              src="/introvertia-icon.svg"
+              src="/introvertia-icon.png"
               alt="Introvertia Logo"
               fill
               className="group-hover:brightness-125 transition-all"

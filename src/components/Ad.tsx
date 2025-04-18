@@ -16,7 +16,7 @@ const Ad = ({ size }: { size: "sm" | "md" | "lg" }) => {
           size === "sm" ? "h-32" : size === "md" ? "h-40" : "h-52"
         }`}>
           <Image
-            src="/itv_second.svg"
+            src="/itv_second.png"
             alt="Introvertia Ad"
             fill
             className="object-cover hover:scale-105 transition-transform duration-500"
@@ -27,7 +27,7 @@ const Ad = ({ size }: { size: "sm" | "md" | "lg" }) => {
         <div className="flex items-center gap-3 px-4">
           <div className="relative w-8 h-8 rounded-md overflow-hidden">
             <Image
-              src="/introvertia-icon.svg"
+              src="/introvertia-icon.png"
               alt="Introvertia Logo"
               fill
               className="object-cover"
