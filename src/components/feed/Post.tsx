@@ -58,7 +58,7 @@ const Post = async ({ post }: { post: FeedPostType }) => {
       {/* INTERACTION */}
       <Suspense fallback={
         <div className="h-8 flex items-center justify-center">
-          <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-zinc-400/50 border-solid border-current border-e-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+          <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-zinc-400/50 border-solid border-e-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
         </div>
       }>
         <PostInteraction
@@ -69,7 +69,7 @@ const Post = async ({ post }: { post: FeedPostType }) => {
       </Suspense>
       <Suspense fallback={
         <div className="h-8 flex items-center justify-center">
-          <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-zinc-400/50 border-solid border-current border-e-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+          <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-zinc-400/50 border-solid border-e-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
         </div>
       }>
         <Comments postId={post.id} />

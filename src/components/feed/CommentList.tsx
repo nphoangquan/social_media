@@ -62,11 +62,12 @@ const CommentList = ({
     <>
       {user && (
         <div className="flex items-center gap-3 mb-6">
-          <div className="relative w-8 h-8 rounded-full overflow-hidden ring-2 ring-zinc-100 dark:ring-zinc-800">
+          <div className="relative w-10 h-10 rounded-full overflow-hidden ring-2 ring-zinc-100 dark:ring-zinc-800">
             <Image
               src={user.imageUrl || "noAvatar.png"}
               alt=""
               fill
+              loading="lazy"
               className="object-cover"
             />
           </div>
@@ -85,6 +86,7 @@ const CommentList = ({
           </form>
         </div>
       )}
+
       <div className="space-y-6">
         {/* COMMENT */}
         {optimisticComments.map((comment) => (
@@ -108,14 +110,18 @@ const CommentList = ({
                 </span>
                 <MoreVertical className="w-4 h-4 cursor-pointer text-zinc-400 dark:text-zinc-500 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-              <p className="text-zinc-600 dark:text-zinc-300 text-sm leading-relaxed">{comment.desc}</p>
+              <p className="text-zinc-600 dark:text-zinc-300 text-sm leading-relaxed">
+                {comment.desc}
+              </p>
               <div className="flex items-center gap-6 text-xs mt-3">
                 <div className="flex items-center gap-4 text-zinc-500 dark:text-zinc-400 group/like">
                   <Heart className="w-4 h-4 cursor-pointer group-hover/like:text-emerald-500 dark:group-hover/like:text-emerald-400 transition-colors" />
                   <span className="text-zinc-300 dark:text-zinc-600">|</span>
                   <span>0 Likes</span>
                 </div>
-                <button className="text-zinc-500 dark:text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">Reply</button>
+                <button className="text-zinc-500 dark:text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">
+                  Reply
+                </button>
               </div>
             </div>
           </div>

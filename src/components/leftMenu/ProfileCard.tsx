@@ -56,7 +56,7 @@ const ProfileCard = async () => {
           </span>
         </div>
         <Link href={`/profile/${user.username}`} className="mt-4">
-          <button className="bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white text-sm font-medium px-6 py-2 rounded-xl transition-colors">
+          <button className="bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white text-sm font-medium px-6 py-2 rounded-xl transition-colors cursor-pointer">
             View Profile
           </button>
         </Link>
