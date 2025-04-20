@@ -22,7 +22,7 @@ export default function CommentList({
 
   async function handleSubmit(formData: FormData) {
     if (!user) return;
-    
+
     const desc = formData.get("comment") as string;
     if (!desc?.trim()) return;
 
@@ -50,7 +50,7 @@ export default function CommentList({
     };
 
     addOptimisticComment([optimisticComment, ...optimisticComments]);
-    
+
     try {
       await addComment(postId, desc.trim());
       (document.getElementById("comment-form") as HTMLFormElement).reset();

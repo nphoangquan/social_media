@@ -80,9 +80,9 @@ const StoryList = ({
         options={{
           styles: {
             palette: {
-              window: "#0a0a0a", // dark background instead of transparent blue
+              window: "#0a0a0a",
               windowBorder: "#a1a1aa",
-              windowShadow: "rgba(0, 0, 0, 0.95)", // dark shadow
+              windowShadow: "rgba(0, 0, 0, 0.95)",
               tabIcon: "#10b981",
               menuIcons: "#10b981",
               textDark: "#ffffff",
@@ -110,11 +110,11 @@ const StoryList = ({
       >
         {({ open }) => {
           return (
-            <div
-              className="cursor-pointer group mr-2"
-              onClick={() => open()}
-            >
-              <div className="relative w-28 h-48 rounded-xl overflow-hidden shadow-md bg-zinc-900 transition-transform duration-500 group-hover:scale-105">
+            <div className="cursor-pointer group mr-2">
+              <div 
+                className="relative w-28 h-48 rounded-xl overflow-hidden shadow-md bg-zinc-900 transition-transform duration-500 group-hover:scale-105"
+                onClick={() => open()}
+              >
                 <div className="absolute inset-0 bg-gradient-to-t from-black to-black/50" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <div className="bg-white dark:bg-zinc-800 rounded-full w-10 h-10 flex items-center justify-center shadow-md">
@@ -125,7 +125,10 @@ const StoryList = ({
               </div>
               {img && (
                 <form action={add} className="mt-2 flex justify-center">
-                  <button className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 px-4 py-1.5 text-xs rounded-full hover:bg-emerald-100 dark:hover:bg-emerald-800/20 hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors font-medium shadow-sm hover:shadow-md">
+                  <button 
+                    type="submit"
+                    className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 px-4 py-1.5 text-xs rounded-full hover:bg-emerald-100 dark:hover:bg-emerald-800/20 hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors font-medium shadow-sm hover:shadow-md"
+                  >
                     Share
                   </button>
                 </form>
