@@ -234,7 +234,6 @@ export const switchLike = async (postId: number) => {
     throw new Error("Something went wrong");
   }
 };
-
 export const addComment = async (postId: number, desc: string) => {
   const { userId } = await auth();
 
@@ -258,6 +257,42 @@ export const addComment = async (postId: number, desc: string) => {
     throw new Error("Something went wrong!");
   }
 };
+// export const addComment = async (postId: number, desc: string) => {
+//   const { userId } = await auth();
+
+//   if (!userId) throw new Error("User is not authenticated!");
+
+//   // Validate comment length
+//   const Comment = z.string().min(1, "Comment cannot be empty").max(500, "Comment is too long");
+  
+//   try {
+//     const validatedDesc = Comment.safeParse(desc);
+    
+//     if (!validatedDesc.success) {
+//       throw new Error(validatedDesc.error.errors[0].message);
+//     }
+
+//     const createdComment = await prisma.comment.create({
+//       data: {
+//         desc: validatedDesc.data,
+//         userId,
+//         postId,
+//       },
+//       include: {
+//         user: true,
+//       },
+//     });
+
+//     revalidatePath("/");
+//     return createdComment;
+//   } catch (err) {
+//     console.error("Error adding comment:", err);
+//     if (err instanceof Error) {
+//       throw new Error(err.message);
+//     }
+//     throw new Error("Failed to add comment. Please try again.");
+//   }
+// };
 
 export const addPost = async (formData: FormData, img: string) => {
   const desc = formData.get("desc") as string;
