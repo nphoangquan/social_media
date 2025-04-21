@@ -40,23 +40,25 @@ export default function PostDetail({
             <div className="flex items-center gap-3 mb-4">
               <Link 
                 href={`/profile/${post.user.username}`} 
-                className="relative w-10 h-10 rounded-full overflow-hidden ring-2 ring-zinc-100 dark:ring-zinc-800 cursor-pointer"
+                className="relative w-10 h-10 rounded-full overflow-hidden ring-2 ring-zinc-100 dark:ring-zinc-800 cursor-pointer group"
               >
                 <Image
                   src={post.user.avatar || "/noAvatar.png"}
                   fill
                   alt=""
-                  className="object-cover"
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               </Link>
               <div>
                 <Link 
                   href={`/profile/${post.user.username}`}
-                  className="font-medium text-zinc-800 dark:text-zinc-200 hover:underline cursor-pointer"
+                  className="relative group"
                 >
-                  {post.user.name && post.user.surname
-                    ? post.user.name + " " + post.user.surname
-                    : post.user.username}
+                  <span className="font-medium text-zinc-800 dark:text-zinc-200 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500 cursor-pointer transition-all duration-500 animate-gradient-slow bg-[length:200%_auto]">
+                    {post.user.name && post.user.surname
+                      ? post.user.name + " " + post.user.surname
+                      : post.user.username}
+                  </span>
                 </Link>
                 <div className="text-xs text-zinc-500 dark:text-zinc-400">
                   {new Date(post.createdAt).toLocaleDateString()}

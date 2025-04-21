@@ -1,8 +1,22 @@
 @import "tailwindcss";
-
+/* @import "tailwindcss/preflight"; */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes gradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient-slow {
+  animation: gradient 3s ease infinite;
+  background-size: 200% 200%;
+}
 
 .scrollbar-hide::-webkit-scrollbar{
   display: none;
