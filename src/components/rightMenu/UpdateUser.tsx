@@ -56,13 +56,20 @@ const UpdateUser = ({ user }: { user: User }) => {
 
             <CldUploadWidget
               uploadPreset="social-media"
-              onSuccess={(result) => setCover(result.info as CloudinaryResult)}
+              onSuccess={(result, { widget }) => {
+                setCover(result.info as CloudinaryResult);
+                widget.close();
+              }}
               options={{
+                maxFiles: 1,
+                resourceType: "image",
+                clientAllowedFormats: ["jpg", "jpeg", "png", "gif"],
+                maxFileSize: 10000000,
                 styles: {
                   palette: {
-                    window: "#0a0a0a", // dark background instead of transparent blue
+                    window: "#0a0a0a",
                     windowBorder: "#a1a1aa",
-                    windowShadow: "rgba(0, 0, 0, 0.95)", // dark shadow
+                    windowShadow: "rgba(0, 0, 0, 0.95)",
                     tabIcon: "#10b981",
                     menuIcons: "#10b981",
                     textDark: "#ffffff",
@@ -73,28 +80,19 @@ const UpdateUser = ({ user }: { user: User }) => {
                     error: "#e11d48",
                     inProgress: "#10b981",
                     complete: "#10b981",
-                    sourceBg: "#0a0a0a"
+                    sourceBg: "#0a0a0a",
                   },
-                  
                   fonts: {
                     default: null,
                     "'Inter', sans-serif": {
                       url: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap",
-                      active: true
-                    }
+                      active: true,
+                    },
                   },
                   frame: {
                     background: "rgba(0, 0, 0, 0.8)"
                   }
-                },
-                showPoweredBy: false,
-                sources: ["local", "url", "camera"],
-                multiple: false,
-                maxFiles: 1,
-                resourceType: "image",
-                clientAllowedFormats: ["jpg", "jpeg", "png", "gif"],
-                maxFileSize: 5000000,
-                theme: "minimal"
+                }
               }}
             >
               {({ open }) => (

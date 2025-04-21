@@ -78,6 +78,9 @@ const StoryList = ({
           widget.close();
         }}
         options={{
+          resourceType: "image",
+          clientAllowedFormats: ["jpg", "jpeg", "png", "gif"],
+          maxFileSize: 10000000,
           styles: {
             palette: {
               window: "#0a0a0a",
@@ -105,7 +108,7 @@ const StoryList = ({
             frame: {
               background: "rgba(0, 0, 0, 0.8)"
             }
-          },
+          }
         }}
       >
         {({ open }) => {

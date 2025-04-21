@@ -6,7 +6,7 @@ const AddPostButton = () => {
   const { pending } = useFormStatus();
   return (
     <button
-      className="bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 px-4 py-1.5 rounded-xl text-white text-sm font-medium transition-colors disabled:bg-emerald-400/50 dark:disabled:bg-emerald-500/50 disabled:cursor-not-allowed"
+      className="bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 px-4 py-1.5 rounded-xl text-white text-sm font-medium transition-colors disabled:bg-emerald-400/50 dark:disabled:bg-emerald-500/50 disabled:cursor-not-allowed cursor-pointer"
       disabled={pending}
     >
       {pending ? (
