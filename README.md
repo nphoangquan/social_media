@@ -5,7 +5,7 @@
 ![Next.js Version](https://img.shields.io/badge/Next.js-15.2.4-000000?logo=next.js)
 ![Prisma Version](https://img.shields.io/badge/Prisma-6.5.0-2D3748?logo=prisma)
 
-![Introvertia Banner](https://via.placeholder.com/1920x400.png?text=Introvertia+Social+Media+%E2%80%93+Connect+Deeply+%F0%9F%8C%8D)
+![Introvertia Banner](/itv_second.png)
 
 A social media platform focused on quality connections and refined user experience.
 
