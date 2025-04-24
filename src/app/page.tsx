@@ -6,7 +6,7 @@ import RightMenu from "@/components/rightMenu/RightMenu";
 
 const Homepage = () => {
   return (
-    <div className="flex gap-10 pt-6">
+    <div className="flex gap-6 pt-6">
       <div className="hidden xl:block w-[16%]">
         <LeftMenu type="home"/>
       </div>
@@ -17,7 +17,7 @@ const Homepage = () => {
           <Feed />
         </div>
       </div>
-      <div className="hidden lg:block w-[22%]">
+      <div className="hidden lg:block w-[26%]">
         <RightMenu />
       </div>
     </div>

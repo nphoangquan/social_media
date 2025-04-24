@@ -19,8 +19,8 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" suppressHydrationWarning className="dark">
-        <body suppressHydrationWarning className={`${inter.className} bg-zinc-950 text-zinc-100`}>
+      <html suppressHydrationWarning lang="en" className="dark">
+        <body className={`${inter.className} bg-zinc-950 text-zinc-100`}>
           <div className="w-full bg-zinc-900/80 backdrop-blur-sm border-b border-zinc-800/50 px-4 md:px-8 lg:px-24 xl:px-40 2xl:px-80 sticky top-0 z-50">
             <Navbar logoFont={orbitron.className} />
           </div>
