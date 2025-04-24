@@ -346,3 +346,22 @@ export const deletePost = async (postId: number) => {
     console.log(err);
   }
 };
+
+export const deleteComment = async (commentId: number) => {
+  const { userId } = await auth();
+
+  if (!userId) throw new Error("User is not authenticated!");
+
+  try {
+    await prisma.comment.delete({
+      where: {
+        id: commentId,
+        userId, // Only allow users to delete their own comments
+      },
+    });
+    revalidatePath("/");
+  } catch (err) {
+    console.log(err);
+    throw new Error("Something went wrong!");
+  }
+};

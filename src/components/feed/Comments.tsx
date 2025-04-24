@@ -36,9 +36,14 @@ const Comments = async ({ post }: { post: Post & { user: User } }) => {
     })),
   }));
 
+  const postWithComments = {
+    ...post,
+    comments: commentsWithLikes,
+  };
+
   return (
     <div className="border-t border-zinc-100/50 dark:border-zinc-800/50 pt-4">
-      <CommentList comments={commentsWithLikes} postId={post.id} post={post} />
+      <CommentList comments={commentsWithLikes} postId={post.id} post={postWithComments} />
     </div>
   );
 };

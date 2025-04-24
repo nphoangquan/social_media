@@ -19,11 +19,11 @@ export default function PostDetail({
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center p-4 pt-10">
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-3xl h-[80vh] shadow-xl flex flex-col">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-3xl max-h-[90vh] shadow-lg dark:shadow-zinc-800/20 border border-zinc-100/50 dark:border-zinc-800/50 flex flex-col relative">
         {/* Header */}
-        <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-zinc-800 dark:text-zinc-200">Post</h2>
+        <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between shrink-0">
+          <h2 className="text-xl font-semibold text-zinc-800 dark:text-zinc-200">Post</h2>
           <button 
             title="Close"
             onClick={onClose}
@@ -98,7 +98,7 @@ export default function PostDetail({
           </div>
 
           {/* Comments Section */}
-          <div className="p-4">
+          <div className="p-4 pb-8">
             <CommentList comments={post.comments} postId={post.id} showAll={true} post={post} />
           </div>
         </div>

@@ -1,11 +1,11 @@
 "use client";
 
-import { addComment } from "@/lib/actions";
+import { addComment, deleteComment } from "@/lib/actions";
 import { useUser } from "@clerk/nextjs";
 import { Comment, User, Post } from "@prisma/client";
 import Image from "next/image";
 import { useOptimistic, useState } from "react";
-import { Send, MessageCircle } from "lucide-react";
+import { Send, MessageCircle, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import PostDetail from "./PostDetail";
 
@@ -85,10 +85,21 @@ export default function CommentList({
   }
 
   const CommentItem = ({ comment }: { comment: CommentWithUser }) => {
+    const { user } = useUser();
     const isReplying = replyingTo === comment.id;
     const [showAllReplies, setShowAllReplies] = useState(false);
+    const router = useRouter();
     
     const displayedReplies = showAllReplies ? comment.replies : (comment.replies?.slice(0, 1) || []);
+
+    const handleDeleteComment = async () => {
+      try {
+        await deleteComment(comment.id);
+        router.refresh();
+      } catch (err) {
+        console.error("Failed to delete comment:", err);
+      }
+    };
 
     return (
       <div className="space-y-2">
@@ -126,6 +137,16 @@ export default function CommentList({
               >
                 Reply
               </button>
+              {user?.id === comment.userId && (
+                <button
+                  type="button"
+                  onClick={handleDeleteComment}
+                  className="text-xs text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                  title="Delete comment"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </button>
+              )}
               <div className="text-xs text-zinc-400 dark:text-zinc-500">
                 {new Intl.DateTimeFormat("en-US", {
                   year: "numeric",

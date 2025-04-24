@@ -5,11 +5,18 @@ import { deletePost } from "@/lib/actions";
 import { useState } from "react";
 import { MoreVertical, Eye, Trash2, Edit } from "lucide-react";
 import EditPostWidget from "./EditPostWidget";
-import { Post, User } from "@prisma/client";
+import PostDetail from "./PostDetail";
+import { Post, User, Comment } from "@prisma/client";
 
-const PostInfo = ({ post }: { post: Post & { user: User } }) => {
+type PostWithUserAndComments = Post & {
+  user: User;
+  comments: (Comment & { user: User })[];
+};
+
+const PostInfo = ({ post }: { post: PostWithUserAndComments }) => {
   const [open, setOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showPostDetail, setShowPostDetail] = useState(false);
   const router = useRouter();
 
   const handleDeleteClick = async () => {
@@ -38,7 +45,10 @@ const PostInfo = ({ post }: { post: Post & { user: User } }) => {
           <div className="absolute top-8 right-0 bg-zinc-900 p-4 w-40 rounded-xl flex flex-col gap-3 text-sm shadow-lg border border-zinc-800 z-30">
             <button 
               className="flex items-center gap-2 group cursor-pointer"
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false);
+                setShowPostDetail(true);
+              }}
               type="button"
             >
               <Eye className="w-4 h-4 text-white group-hover:text-emerald-500 transition-colors" />
@@ -73,6 +83,13 @@ const PostInfo = ({ post }: { post: Post & { user: User } }) => {
         <EditPostWidget
           post={post}
           onClose={() => setIsEditing(false)}
+        />
+      )}
+
+      {showPostDetail && (
+        <PostDetail
+          post={post}
+          onClose={() => setShowPostDetail(false)}
         />
       )}
     </>

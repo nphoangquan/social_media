@@ -1,21 +1,63 @@
 import Image from "next/image";
 import Comments from "./Comments";
-import { Post as PostType, User } from "@prisma/client";
+import { Post as PostType, User, Comment } from "@prisma/client";
 import PostInteraction from "./PostInteraction";
 import { Suspense } from "react";
 import PostInfo from "./PostInfo";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
+import prisma from "@/lib/client";
 
-type FeedPostType = PostType & { user: User } & {
+type FeedPostType = PostType & { 
+  user: User;
   likes: [{ userId: string }];
-} & {
   _count: { comments: number };
   video?: string;
+  comments: (Comment & { user: User })[];
 };
 
 const Post = async ({ post }: { post: FeedPostType }) => {
   const { userId } = await auth();
+
+  // Fetch comments with their users
+  const comments = await prisma.comment.findMany({
+    where: {
+      postId: post.id,
+      parentId: null,
+    },
+    include: {
+      user: true,
+      likes: true,
+      replies: {
+        include: {
+          user: true,
+          likes: true,
+        },
+        orderBy: {
+          createdAt: 'asc',
+        },
+      },
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  // Transform comments to include like count
+  const commentsWithLikes = comments.map(comment => ({
+    ...comment,
+    likes: comment.likes.length,
+    replies: comment.replies.map(reply => ({
+      ...reply,
+      likes: reply.likes.length,
+    })),
+  }));
+
+  const postWithComments = {
+    ...post,
+    comments: commentsWithLikes,
+  };
+
   return (
     <div className="flex flex-col gap-6 px-4 py-3">
       {/* USER */}
@@ -43,7 +85,7 @@ const Post = async ({ post }: { post: FeedPostType }) => {
             </span>
           </Link>
         </div>
-        {userId === post.user.id && <PostInfo post={post} />}
+        {userId === post.user.id && <PostInfo post={postWithComments} />}
       </div>
       {/* DESC */}
       <div className="flex flex-col gap-4">
@@ -88,6 +130,7 @@ const Post = async ({ post }: { post: FeedPostType }) => {
           postId={post.id}
           likes={post.likes.map((like) => like.userId)}
           commentNumber={post._count.comments}
+          post={postWithComments}
         />
       </Suspense>
       <Suspense fallback={
@@ -95,7 +138,7 @@ const Post = async ({ post }: { post: FeedPostType }) => {
           <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-zinc-400/50 border-solid border-e-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
         </div>
       }>
-        <Comments post={post} />
+        <Comments post={postWithComments} />
       </Suspense>
     </div>
   );
