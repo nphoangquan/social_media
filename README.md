@@ -1,4 +1,4 @@
-# 🚀 Introvertia - Social Network for Introverts 🌌
+# Introvertia - Social Network for Introverts
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ![React Version](https://img.shields.io/badge/React-19-61DAFB?logo=react)
@@ -10,7 +10,7 @@
 A social media platform focused on quality connections and refined user experience.
 
 ## 📑 Table of Contents
-- [🚀 Introvertia - Social Network for Introverts 🌌](#-introvertia---social-network-for-introverts-)
+- [Introvertia - Social Network for Introverts](#introvertia---social-network-for-introverts)
   - [📑 Table of Contents](#-table-of-contents)
   - [✨ Key Features](#-key-features)
   - [🛠 Tech Stack](#-tech-stack)
@@ -21,7 +21,6 @@ A social media platform focused on quality connections and refined user experien
   - [📥 Installation](#-installation)
   - [⚙️ Configuration](#️-configuration)
   - [🚀 Deployment](#-deployment)
-  - [🤝 Contributing](#-contributing)
 
 ## ✨ Key Features
 - 💬 Real-time chat with Socket.io
@@ -93,12 +92,12 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_..."
 - Railway for PostgreSQL
 - Cloudinary for media storage
 
-## 🤝 Contributing
+<!-- ## 🤝 Contributing
 1. Fork the repository
 2. Create new branch (`git checkout -b feature/amazing-feature`)
 3. Commit changes (`git commit -m 'Add amazing feature'`)
 4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+5. Open a Pull Request -->
 
 ---
 
