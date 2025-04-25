@@ -8,11 +8,11 @@ import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import prisma from "@/lib/client";
 
-type FeedPostType = PostType & { 
+export type FeedPostType = PostType & { 
   user: User;
   likes: [{ userId: string }];
   _count: { comments: number };
-  video?: string;
+  video?: string | null;
   comments: (Comment & { user: User })[];
 };
 

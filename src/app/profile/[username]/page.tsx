@@ -6,8 +6,12 @@ import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
-const ProfilePage = async ({ params }: { params: { username: string } }) => {
-  const {username} = await params;
+type PageProps = {
+  params: Promise<{ username: string }>;
+};
+
+const ProfilePage = async ({ params }: PageProps) => {
+  const { username } = await params;
 
   const user = await prisma.user.findFirst({
     where: {

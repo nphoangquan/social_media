@@ -1,12 +1,17 @@
-import Post from "./Post";
+import Post, { FeedPostType } from "./Post";
 import prisma from "@/lib/client";
+import { Post as PostType, User, Comment } from "@prisma/client";
 
 const Feed = async ({ username }: { username?: string }) => {
-  // TODO: Định nghĩa type cụ thể thay vì dùng any[]
-  let posts: any[] = [];
+  let rawPosts: (PostType & {
+    user: User;
+    likes: { userId: string }[];
+    _count: { comments: number };
+    comments: (Comment & { user: User })[];
+  })[] = [];
 
   if (username) {
-    posts = await prisma.post.findMany({
+    rawPosts = await prisma.post.findMany({
       where: {
         user: {
           username: username,
@@ -24,13 +29,18 @@ const Feed = async ({ username }: { username?: string }) => {
             comments: true,
           },
         },
+        comments: {
+          include: {
+            user: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
       },
     });
   } else {
-    posts = await prisma.post.findMany({
+    rawPosts = await prisma.post.findMany({
       include: {
         user: true,
         likes: {
@@ -43,6 +53,11 @@ const Feed = async ({ username }: { username?: string }) => {
             comments: true,
           },
         },
+        comments: {
+          include: {
+            user: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -50,6 +65,11 @@ const Feed = async ({ username }: { username?: string }) => {
       take: 20,
     });
   }
+
+  const posts: FeedPostType[] = rawPosts.map(post => ({
+    ...post,
+    likes: post.likes.length > 0 ? [post.likes[0]] : [{ userId: '' }]
+  }));
   
   return (
     <div className="flex flex-col bg-transparent">

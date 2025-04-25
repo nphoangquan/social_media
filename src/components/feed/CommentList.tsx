@@ -4,10 +4,11 @@ import { addComment, deleteComment } from "@/lib/actions";
 import { useUser } from "@clerk/nextjs";
 import { Comment, User, Post } from "@prisma/client";
 import Image from "next/image";
-import { useOptimistic, useState } from "react";
+import { useOptimistic, useState, useEffect } from "react";
 import { Send, MessageCircle, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import PostDetail from "./PostDetail";
+import dynamic from "next/dynamic";
 
 type CommentWithUser = Comment & { 
   user: User;
@@ -15,7 +16,9 @@ type CommentWithUser = Comment & {
   likes?: number;
 };
 
-export default function CommentList({
+export default dynamic(() => Promise.resolve(CommentList), { ssr: false });
+
+function CommentList({
   comments,
   postId,
   showAll = false,
@@ -89,6 +92,17 @@ export default function CommentList({
     const isReplying = replyingTo === comment.id;
     const [showAllReplies, setShowAllReplies] = useState(false);
     const router = useRouter();
+    const [isClient, setIsClient] = useState(false);
+    const [formattedDate, setFormattedDate] = useState("");
+    
+    useEffect(() => {
+      setIsClient(true);
+      setFormattedDate(new Intl.DateTimeFormat("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date(comment.createdAt)));
+    }, [comment.createdAt]);
     
     const displayedReplies = showAllReplies ? comment.replies : (comment.replies?.slice(0, 1) || []);
 
@@ -148,11 +162,7 @@ export default function CommentList({
                 </button>
               )}
               <div className="text-xs text-zinc-400 dark:text-zinc-500">
-                {new Intl.DateTimeFormat("en-US", {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                }).format(new Date(comment.createdAt))}
+                {isClient ? formattedDate : "Loading..."}
               </div>
             </div>
             {isReplying && user && (

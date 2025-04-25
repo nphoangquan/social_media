@@ -5,7 +5,8 @@ import { useUser } from "@clerk/nextjs";
 import { Story, User } from "@prisma/client";
 import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
-import { useOptimistic, useState } from "react";
+import Link from "next/link";
+import { useOptimistic, useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 
 interface CloudinaryResult {
@@ -26,17 +27,38 @@ const StoryList = ({
   stories: StoryWithUser[];
   userId: string;
 }) => {
-  const [storyList, setStoryList] = useState(stories);
+  // Initialize with filtered stories
+  const [storyList, setStoryList] = useState(() => {
+    const now = new Date();
+    return stories.filter(story => new Date(story.expiresAt) > now);
+  });
   const [img, setImg] = useState<CloudinaryResult | null>(null);
 
   const { user } = useUser();
+
+  // Add auto-expiration check
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      setStoryList(prev => prev.filter(story => new Date(story.expiresAt) > now));
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Sync with stories prop when it changes
+  useEffect(() => {
+    const now = new Date();
+    setStoryList(stories.filter(story => new Date(story.expiresAt) > now));
+  }, [stories]);
 
   const add = async () => {
     if (!img?.secure_url) return;
 
     addOptimisticStory({
-      id: Math.random(),
+      id: Date.now(),
       img: img.secure_url,
+      video: null,
       createdAt: new Date(Date.now()),
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
       userId: userId,
@@ -60,6 +82,7 @@ const StoryList = ({
       const createdStory = await addStory(img.secure_url);
       setStoryList((prev) => [createdStory!, ...prev]);
       setImg(null);
+      window.location.reload();
     } catch {
       // Error handling silently ignored
     }
@@ -67,8 +90,9 @@ const StoryList = ({
 
   const [optimisticStories, addOptimisticStory] = useOptimistic(
     storyList,
-    (state, value: StoryWithUser) => [value, ...state]
+    (state, newStory: StoryWithUser) => [newStory, ...state]
   );
+
   return (
     <>
       <CldUploadWidget
@@ -140,11 +164,13 @@ const StoryList = ({
           );
         }}
       </CldUploadWidget>
+
       {/* STORIES */}
       {optimisticStories.map((story) => (
-        <div
-          className="cursor-pointer group relative mr-2"
+        <Link
           key={story.id}
+          href={`/story/${story.id}`}
+          className="cursor-pointer group relative mr-2"
         >
           <div className="relative w-28 h-48 rounded-xl overflow-hidden shadow-md transition-transform duration-500 group-hover:scale-105">
             {/* Story image with zoom effect */}
@@ -179,7 +205,7 @@ const StoryList = ({
               </div>
             </div>
           </div>
-        </div>
+        </Link>
       ))}
     </>
   );

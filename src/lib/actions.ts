@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import prisma from "./client";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import { uploadFile } from "./uploadFile";
 
 export const switchFollow = async (userId: string) => {
   const { userId: currentUserId } = await auth();
@@ -259,7 +260,7 @@ export const addComment = async (postId: number, desc: string, parentId?: number
     throw new Error("Something went wrong!");
   }
 };
-
+//add cac bai post
 export const addPost = async (formData: FormData, media: string, mediaType?: "image" | "video") => {
   const desc = formData.get("desc") as string;
 
@@ -365,3 +366,37 @@ export const deleteComment = async (commentId: number) => {
     throw new Error("Something went wrong!");
   }
 };
+
+export async function createStory(formData: FormData) {
+  const { userId } = await auth();
+  if (!userId) throw new Error('Not authenticated');
+
+  const file = formData.get('file') as File;
+  const type = formData.get('type') as string;
+
+  if (!file) throw new Error('No file provided');
+
+  try {
+    // Upload file to storage service (e.g. S3, Cloudinary)
+    const uploadedFile = await uploadFile(file);
+
+    // Calculate expiry time (24 hours from now)
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24);
+
+    // Create story in database
+    await prisma.story.create({
+      data: {
+        userId,
+        expiresAt,
+        ...(type === 'video' 
+          ? { video: uploadedFile.url } 
+          : { img: uploadedFile.url }
+        ),
+      },
+    });
+  } catch (error) {
+    console.error('Error creating story:', error);
+    throw new Error('Failed to create story');
+  }
+}
