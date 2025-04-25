@@ -4,12 +4,12 @@ import Ad from "../Ad";
 import { 
   FileText, 
   Activity, 
-  Store, 
+  // Store, 
   Calendar, 
   Image as ImageIcon, 
   Video, 
-  Newspaper, 
-  BookOpen, 
+  // Newspaper, 
+  // BookOpen, 
   List, 
   Settings 
 } from "lucide-react";
@@ -34,13 +34,13 @@ const LeftMenu = ({ type }: { type: "home" | "profile" }) => {
             <Activity className="w-5 h-5 group-hover:scale-110 transition-transform" />
             <span className="font-medium">Activity</span>
           </Link>
-          <Link
+          {/* <Link
             href="/"
             className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
           >
             <Store className="w-5 h-5 group-hover:scale-110 transition-transform" />
             <span className="font-medium">Marketplace</span>
-          </Link>
+          </Link> */}
           <Link
             href="/"
             className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
@@ -62,26 +62,26 @@ const LeftMenu = ({ type }: { type: "home" | "profile" }) => {
             <Video className="w-5 h-5 group-hover:scale-110 transition-transform" />
             <span className="font-medium">Videos</span>
           </Link>
-          <Link
+          {/* <Link
             href="/"
             className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
           >
             <Newspaper className="w-5 h-5 group-hover:scale-110 transition-transform" />
             <span className="font-medium">News</span>
-          </Link>
-          <Link
+          </Link> */}
+          {/* <Link
             href="/"
             className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
           >
             <BookOpen className="w-5 h-5 group-hover:scale-110 transition-transform" />
             <span className="font-medium">Courses</span>
-          </Link>
+          </Link> */}
           <Link
             href="/"
             className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
           >
             <List className="w-5 h-5 group-hover:scale-110 transition-transform" />
-            <span className="font-medium">Lists</span>
+            <span className="font-medium">Friend Lists</span>
           </Link>
           <Link
             href="/"

@@ -75,7 +75,7 @@ const Feed = async ({ username }: { username?: string }) => {
     <div className="flex flex-col bg-transparent">
       {posts.length ? (
         posts.map(post => (
-          <div key={post.id} className="mb-4 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl overflow-hidden shadow-md dark:shadow-zinc-800/20">
+          <div key={post.id} className="mb-4 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl shadow-md dark:shadow-zinc-800/20">
             <Post post={post}/>
           </div>
         ))
