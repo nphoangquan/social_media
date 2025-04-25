@@ -1,4 +1,4 @@
-# Introvertia - Social Network for Introverts
+# Introvertia - Social Network 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ![React Version](https://img.shields.io/badge/React-19-61DAFB?logo=react)
@@ -10,7 +10,7 @@
 A social media platform focused on quality connections and refined user experience.
 
 ## 📑 Table of Contents
-- [Introvertia - Social Network for Introverts](#introvertia---social-network-for-introverts)
+- [Introvertia - Social Network](#introvertia---social-network)
   - [📑 Table of Contents](#-table-of-contents)
   - [✨ Key Features](#-key-features)
   - [🛠 Tech Stack](#-tech-stack)
@@ -104,4 +104,4 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_..."
 [![Powered by Vercel](https://img.shields.io/badge/Powered%20by-Vercel-000000?logo=vercel)](https://vercel.com)
 [![Database by Railway](https://img.shields.io/badge/Database%20by-Railway-0B0D0E?logo=railway)](https://railway.app)
 
-📧 **Contact**: hq16101971@gmail.com | 🌐 **Website**: 
+**Contact**: hq16101971@gmail.com |
