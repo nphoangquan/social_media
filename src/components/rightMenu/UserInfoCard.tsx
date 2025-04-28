@@ -18,7 +18,7 @@ import {
 const UserInfoCard = async ({ user }: { user: User }) => {
   const createdAtDate = new Date(user.createdAt);
 
-  const formattedDate = createdAtDate.toLocaleDateString("en-US", {
+  const formattedDate = createdAtDate.toLocaleDateString("vi-VN", {
     year: "numeric",
     month: "long",
     day: "numeric",

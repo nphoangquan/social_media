@@ -5,6 +5,7 @@ import { FollowRequest, User } from "@prisma/client";
 import Image from "next/image";
 import { useOptimistic, useState } from "react";
 import { Check, X } from "lucide-react";
+import Link from "next/link";
 
 type RequestWithUser = FollowRequest & {
   sender: User;
@@ -45,7 +46,10 @@ const FriendRequestList = ({ requests }: { requests: RequestWithUser[] }) => {
           className="flex items-center justify-between bg-zinc-100/80 dark:bg-zinc-800/50 rounded-xl p-3 group hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all" 
           key={request.id}
         >
-          <div className="flex items-center gap-3">
+          <Link 
+            href={`/profile/${request.sender.username}`}
+            className="flex items-center gap-3"
+          >
             <div className="relative w-10 h-10 rounded-full overflow-hidden ring-2 ring-white dark:ring-zinc-900 shadow-md">
               <Image
                 src={request.sender.avatar || "/noAvatar.png"}
@@ -60,7 +64,8 @@ const FriendRequestList = ({ requests }: { requests: RequestWithUser[] }) => {
                 ? request.sender.name + " " + request.sender.surname
                 : request.sender.username}
             </span>
-          </div>
+          </Link>
+          
           <div className="flex gap-2">
             <form action={() => accept(request.id, request.sender.id)}>
               <button

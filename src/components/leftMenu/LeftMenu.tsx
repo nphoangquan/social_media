@@ -28,7 +28,7 @@ const LeftMenu = ({ type }: { type: "home" | "profile" }) => {
             <span className="font-medium">My Posts</span>
           </Link>
           <Link
-            href="/"
+            href="/activity"
             className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
           >
             <Activity className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -77,7 +77,7 @@ const LeftMenu = ({ type }: { type: "home" | "profile" }) => {
             <span className="font-medium">Courses</span>
           </Link> */}
           <Link
-            href="/"
+            href="/friends"
             className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
           >
             <List className="w-5 h-5 group-hover:scale-110 transition-transform" />

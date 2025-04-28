@@ -5,10 +5,26 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import CommentList from "./CommentList";
 import Link from "next/link";
+import { useEffect, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
+import { getPostComments } from "@/lib/actions/comment";
+import PostInteraction from "./PostInteraction";
+
+type CommentWithUser = Comment & {
+  user: User;
+  likes?: number;
+  replies?: CommentWithUser[];
+};
+
+type LikeType = {
+  userId: string;
+};
 
 type PostWithUserAndComments = Post & {
   user: User;
-  comments: (Comment & { user: User })[];
+  comments: CommentWithUser[];
+  likes?: LikeType[];
+  currentUserId?: string;
 };
 
 export default function PostDetail({
@@ -18,8 +34,50 @@ export default function PostDetail({
   post: PostWithUserAndComments;
   onClose: () => void;
 }) {
-  return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+  const [mounted, setMounted] = useState(false);
+  const [comments, setComments] = useState<CommentWithUser[]>(post.comments || []);
+  const [postLikes, setPostLikes] = useState<string[]>(post.likes?.map(like => like.userId) || []);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  // Function to reload comments
+  const refreshComments = useCallback(async () => {
+    try {
+      const updatedComments = await getPostComments(post.id);
+      if (updatedComments) {
+        setComments(updatedComments);
+      }
+    } catch (error) {
+      console.error("Error refreshing comments:", error);
+    }
+  }, [post.id]);
+
+  // Cập nhật likes từ prop post khi có thay đổi
+  useEffect(() => {
+    if (post.likes) {
+      const likeUserIds = post.likes.map(like => like.userId);
+      setPostLikes(likeUserIds);
+    }
+  }, [post.likes]);
+
+  // Sử dụng useEffect để lắng nghe sự thay đổi của postId và cập nhật dữ liệu
+  useEffect(() => {
+    refreshComments();
+  }, [post.id, refreshComments]);
+
+  if (!mounted) return null;
+
+  // Create a version of the post with updated comments
+  const postWithUpdatedComments = {
+    ...post,
+    comments: comments,
+  };
+
+  const modalContent = (
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[9999]">
       <div className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-3xl max-h-[90vh] shadow-lg dark:shadow-zinc-800/20 border border-zinc-100/50 dark:border-zinc-800/50 flex flex-col relative">
         {/* Header */}
         <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between shrink-0">
@@ -61,7 +119,11 @@ export default function PostDetail({
                   </span>
                 </Link>
                 <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {new Date(post.createdAt).toLocaleDateString()}
+                  {new Date(post.createdAt).toLocaleDateString("vi-VN", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric"
+                  })}
                 </div>
               </div>
             </div>
@@ -97,12 +159,30 @@ export default function PostDetail({
             )}
           </div>
 
+          {/* Post Interaction */}
+          <div className="p-4 border-b border-zinc-100 dark:border-zinc-800">
+            <PostInteraction
+              postId={post.id}
+              likes={postLikes}
+              commentNumber={comments.length}
+              post={postWithUpdatedComments}
+            />
+          </div>
+
           {/* Comments Section */}
           <div className="p-4 pb-8">
-            <CommentList comments={post.comments} postId={post.id} showAll={true} post={post} />
+            <CommentList 
+              comments={comments} 
+              postId={post.id} 
+              showAll={true} 
+              post={postWithUpdatedComments}
+              onCommentAdded={refreshComments}
+            />
           </div>
         </div>
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 } 

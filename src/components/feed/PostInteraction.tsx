@@ -6,6 +6,7 @@ import { useOptimistic, useState, useEffect } from "react";
 import { Heart, MessageCircle, Share2 } from "lucide-react";
 import PostDetail from "./PostDetail";
 import { Post, User, Comment } from "@prisma/client";
+import { useRouter } from "next/navigation";
 
 const PostInteraction = ({
   postId,
@@ -16,21 +17,26 @@ const PostInteraction = ({
   postId: number;
   likes: string[];
   commentNumber: number;
-  post: Post & { user: User; comments: (Comment & { user: User })[] };
+  post: Post & { user: User; comments: (Comment & { user: User })[]; currentUserId?: string };
 }) => {
   const { userId } = useAuth();
   const [showPostDetail, setShowPostDetail] = useState(false);
+  const router = useRouter();
+  
+  const currentUserId = userId || post.currentUserId || '';
+  
   const [likeState, setLikeState] = useState({
     likeCount: likes.length,
-    isLiked: userId ? likes.includes(userId) : false,
+    isLiked: currentUserId ? likes.includes(currentUserId) : false,
   });
 
+  // Update likeState when likes prop changes
   useEffect(() => {
     setLikeState({
       likeCount: likes.length,
-      isLiked: userId ? likes.includes(userId) : false,
+      isLiked: currentUserId ? likes.includes(currentUserId) : false,
     });
-  }, [likes, userId]);
+  }, [likes, currentUserId]);
 
   const [optimisticLike, switchOptimisticLike] = useOptimistic(
     likeState,
@@ -43,19 +49,33 @@ const PostInteraction = ({
   );
 
   const likeAction = async () => {
-    if (!userId) return;
+    if (!currentUserId) return;
     
+    // Apply optimistic update for immediate UI feedback
     switchOptimisticLike("");
+    
     try {
-      switchLike(postId);
-      setLikeState((state) => ({
-        likeCount: state.isLiked ? state.likeCount - 1 : state.likeCount + 1,
-        isLiked: !state.isLiked,
-      }));
+      // Call the server action
+      const result = await switchLike(postId);
+
+      // Update state with the actual result from server
+      setLikeState({
+        likeCount: result.likeCount,
+        isLiked: result.isLiked
+      });
+      
+      // Refresh the feed to get updated likes
+      router.refresh();
     } catch (err) {
-      console.log(err);
+      console.error("Error liking post:", err);
+      // Revert optimistic update if there was an error
+      setLikeState({
+        likeCount: likes.length,
+        isLiked: likes.includes(currentUserId)
+      });
     }
   };
+
   return (
     <div className="flex items-center justify-between text-sm">
       <div className="flex gap-4">

@@ -2,10 +2,11 @@
 
 import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Image as ImageIcon, Video } from "lucide-react";
 import { Post, User } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
 
 interface CloudinaryResult {
   secure_url: string;
@@ -24,6 +25,12 @@ export default function EditPostWidget({ post, onClose }: EditPostWidgetProps) {
   const [mediaType, setMediaType] = useState<"image" | "video">();
   const [desc, setDesc] = useState(post.desc);
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,8 +59,10 @@ export default function EditPostWidget({ post, onClose }: EditPostWidgetProps) {
     }
   };
 
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center p-4 pt-15">
+  if (!mounted) return null;
+
+  const modalContent = (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-start justify-center p-4 pt-15">
       <div className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-lg shadow-xl">
         <div className="p-6 space-y-4">
           {/* Header */}
@@ -238,4 +247,6 @@ export default function EditPostWidget({ post, onClose }: EditPostWidgetProps) {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 } 

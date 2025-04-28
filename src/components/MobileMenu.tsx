@@ -30,10 +30,11 @@ const MobileMenu = () => {
       {isOpen && (
         <div className="absolute left-0 top-24 w-full h-[calc(100vh-96px)] bg-zinc-900/95 backdrop-blur-sm flex flex-col items-center justify-center gap-8 font-medium text-xl z-10">
           <Link href="/" className="text-zinc-400 hover:text-zinc-100 transition-colors">Home</Link>
-          <Link href="/" className="text-zinc-400 hover:text-zinc-100 transition-colors">Friends</Link>
+          <Link href="/activity" className="text-zinc-400 hover:text-zinc-100 transition-colors">Activity</Link>
+          <Link href="/friends" className="text-zinc-400 hover:text-zinc-100 transition-colors">Friends</Link>
           <Link href="/" className="text-zinc-400 hover:text-zinc-100 transition-colors">Groups</Link>
-          <Link href="/" className="text-zinc-400 hover:text-zinc-100 transition-colors">Stories</Link>
-          <Link href="/" className="text-zinc-400 hover:text-zinc-100 transition-colors">Login</Link>
+          <Link href="/stories" className="text-zinc-400 hover:text-zinc-100 transition-colors">Stories</Link>
+          <Link href="/sign-in" className="text-zinc-400 hover:text-zinc-100 transition-colors">Login</Link>
         </div>
       )}
     </div>

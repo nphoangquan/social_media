@@ -6,7 +6,6 @@ import { Comment, User, Post } from "@prisma/client";
 import Image from "next/image";
 import { useOptimistic, useState, useEffect } from "react";
 import { Send, MessageCircle, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import PostDetail from "./PostDetail";
 import dynamic from "next/dynamic";
 
@@ -23,25 +22,46 @@ function CommentList({
   postId,
   showAll = false,
   post,
+  onCommentAdded,
+  highlightCommentId,
 }: {
   comments: CommentWithUser[];
   postId: number;
   showAll?: boolean;
   post: Post & { user: User };
+  onCommentAdded?: () => void;
+  highlightCommentId?: number;
 }) {
   const { user } = useUser();
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [optimisticComments, addOptimisticComment] = useOptimistic(comments);
   const [showPostDetail, setShowPostDetail] = useState(false);
-  const router = useRouter();
-
-  // Sort comments by likes and get the most liked comment
+  
+  // If highlightCommentId is provided, scroll to that comment
+  useEffect(() => {
+    if (highlightCommentId) {
+      // Find highlighted comment element after render
+      setTimeout(() => {
+        const commentElement = document.getElementById(`comment-${highlightCommentId}`);
+        if (commentElement) {
+          commentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 500);
+    }
+  }, [highlightCommentId]);
+  
+  // Sort comments by likes and get the most recent/popular ones
   const sortedComments = [...optimisticComments].sort((a, b) => 
     (b.likes || 0) - (a.likes || 0)
   );
-  const mostLikedComment = sortedComments[0];
   
-  const displayedComments = showAll ? sortedComments : (mostLikedComment ? [mostLikedComment] : []);
+  // Show all comments in sortedComments when in "showAll" mode
+  // Otherwise, show the most recent comment or most liked comment if available
+  const displayedComments = showAll 
+    ? sortedComments 
+    : (sortedComments.length > 0 
+        ? [sortedComments[0]] 
+        : []);
 
   async function handleSubmit(formData: FormData) {
     if (!user) return;
@@ -50,18 +70,20 @@ function CommentList({
     const parentId = formData.get("parentId") as string;
     if (!desc?.trim()) return;
 
+    // Create optimistic comment with current timestamp
+    const now = new Date();
     const optimisticComment: CommentWithUser = {
       id: Math.random(),
       desc: desc.trim(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: now,
+      updatedAt: now,
       userId: user.id,
       postId,
       parentId: parentId ? parseInt(parentId) : null,
       likes: 0,
       user: {
         id: user.id,
-        username: user.username || "Sending...",
+        username: user.username || "You",
         avatar: user.imageUrl || "/noavatar.png",
         cover: "",
         description: "",
@@ -71,17 +93,22 @@ function CommentList({
         work: "",
         school: "",
         website: "",
-        createdAt: new Date(),
+        createdAt: now,
       },
     };
 
+    // Add new comment to the beginning of the list for immediate display
     addOptimisticComment([optimisticComment, ...optimisticComments]);
 
     try {
       await addComment(postId, desc.trim(), parentId ? parseInt(parentId) : null);
       (document.getElementById(`comment-form-${parentId || "root"}`) as HTMLFormElement)?.reset();
       setReplyingTo(null);
-      router.refresh();
+      
+      // Call the callback to refresh comments from server
+      if (onCommentAdded) {
+        onCommentAdded();
+      }
     } catch (err) {
       console.error("Failed to add comment:", err);
     }
@@ -91,13 +118,15 @@ function CommentList({
     const { user } = useUser();
     const isReplying = replyingTo === comment.id;
     const [showAllReplies, setShowAllReplies] = useState(false);
-    const router = useRouter();
     const [isClient, setIsClient] = useState(false);
     const [formattedDate, setFormattedDate] = useState("");
     
+    // Check if this comment is the one to highlight
+    const isHighlighted = highlightCommentId === comment.id;
+    
     useEffect(() => {
       setIsClient(true);
-      setFormattedDate(new Intl.DateTimeFormat("en-US", {
+      setFormattedDate(new Intl.DateTimeFormat("vi-VN", {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
@@ -109,14 +138,20 @@ function CommentList({
     const handleDeleteComment = async () => {
       try {
         await deleteComment(comment.id);
-        router.refresh();
+        // Call the callback to refresh comments from server
+        if (onCommentAdded) {
+          onCommentAdded();
+        }
       } catch (err) {
         console.error("Failed to delete comment:", err);
       }
     };
 
     return (
-      <div className="space-y-2">
+      <div 
+        id={`comment-${comment.id}`} 
+        className={`space-y-2 ${isHighlighted ? 'animate-pulse bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-lg' : ''}`}
+      >
         <div className="flex gap-2">
           <div className="relative w-8 h-8 rounded-full overflow-hidden ring-1 ring-zinc-200 dark:ring-zinc-700 shrink-0">
             <Image
@@ -127,7 +162,7 @@ function CommentList({
             />
           </div>
           <div className="flex-1">
-            <div className="bg-zinc-100 dark:bg-zinc-800/50 rounded-lg px-3 py-2">
+            <div className={`bg-zinc-100 dark:bg-zinc-800/50 rounded-lg px-3 py-2 ${isHighlighted ? 'ring-2 ring-emerald-500 dark:ring-emerald-400' : ''}`}>
               <div className="font-medium text-sm text-zinc-800 dark:text-zinc-200 mb-1">
                 {comment.user.name && comment.user.surname
                   ? `${comment.user.name} ${comment.user.surname}`

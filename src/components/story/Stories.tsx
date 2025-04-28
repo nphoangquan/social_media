@@ -21,12 +21,17 @@ export default function Stories({ stories }: { stories: StoryWithUser[] }) {
         <div className="shrink-0">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="w-28 h-40 rounded-xl bg-zinc-900 border border-zinc-800 overflow-hidden relative group cursor-pointer hover:border-emerald-500/50 transition-colors"
+            className="w-28 h-40 rounded-xl overflow-hidden relative group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden"
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50" />
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center">
-                <Plus className="w-6 h-6 text-white" />
+            {/* Background with neon emerald color */}
+            <div className="absolute inset-0 bg-emerald-600"></div>
+            
+            {/* Shimmer effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-300/20 to-transparent -translate-x-full animate-shimmer group-hover:animate-[shimmer_1.5s_infinite]"></div>
+            
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 z-10">
+              <div className="w-10 h-10 rounded-full bg-emerald-800/80 backdrop-blur-sm flex items-center justify-center shadow-lg border border-emerald-400/30">
+                <Plus className="w-5 h-5 text-emerald-100" />
               </div>
               <span className="text-sm font-medium text-white">Create Story</span>
             </div>

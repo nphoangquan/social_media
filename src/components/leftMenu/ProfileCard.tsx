@@ -36,28 +36,32 @@ const ProfileCard = async () => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
       </div>
       {/* AVATAR */}
-      <div className="relative flex flex-col items-center -mt-14 mb-4">
-        <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-white dark:ring-zinc-900 mb-3">
-          <Image
-            src={user.avatar || "/noAvatar.png"}
-            alt=""
-            fill
-            className="object-cover"
-          />
-        </div>
-        <div className="text-center">
-          <h2 className="font-semibold text-zinc-800 dark:text-zinc-200 mb-1">
-            {user.name && user.surname
-              ? user.name + " " + user.surname
-              : user.username}
-          </h2>
-          <span className="text-sm text-zinc-500 dark:text-zinc-400">
-            {user._count.followers} Followers
-          </span>
-        </div>
-        <Link href={`/profile/${user.username}`} className="mt-4">
-          <button className="bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white text-sm font-medium px-6 py-2 rounded-xl transition-colors cursor-pointer">
-            View Profile
+      <div className="flex justify-center -mt-14 mb-4">
+        <Link href={`/profile/${user.username}`} className="block">
+          <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-white dark:ring-zinc-900 group cursor-pointer">
+            <Image
+              src={user.avatar || "/noAvatar.png"}
+              alt=""
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+          </div>
+        </Link>
+      </div>
+      <div className="text-center">
+        <h2 className="font-semibold text-zinc-800 dark:text-zinc-200 mb-1">
+          {user.name && user.surname
+            ? user.name + " " + user.surname
+            : user.username}
+        </h2>
+        <span className="text-sm text-zinc-500 dark:text-zinc-400">
+          {user._count.followers} Followers
+        </span>
+      </div>
+      <div className="flex justify-center mt-6">
+        <Link href={`/profile/${user.username}`}>
+          <button className="w-full bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white text-sm font-medium px-8 py-2 rounded-xl transition-colors cursor-pointer">
+            Profile
           </button>
         </Link>
       </div>

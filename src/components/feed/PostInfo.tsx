@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { deletePost } from "@/lib/actions";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { MoreVertical, Eye, Trash2, Edit } from "lucide-react";
 import EditPostWidget from "./EditPostWidget";
 import PostDetail from "./PostDetail";
@@ -17,6 +17,8 @@ const PostInfo = ({ post }: { post: PostWithUserAndComments }) => {
   const [open, setOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showPostDetail, setShowPostDetail] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
 
   const handleDeleteClick = async () => {
@@ -28,11 +30,34 @@ const PostInfo = ({ post }: { post: PostWithUserAndComments }) => {
       console.error("Error deleting post:", error);
     }
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        menuRef.current && 
+        buttonRef.current && 
+        !menuRef.current.contains(e.target as Node) && 
+        !buttonRef.current.contains(e.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [open]);
   
   return (
     <>
       <div className="relative">
         <button
+          ref={buttonRef}
           type="button"
           onClick={() => setOpen((prev) => !prev)}
           className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors cursor-pointer"
@@ -42,7 +67,11 @@ const PostInfo = ({ post }: { post: PostWithUserAndComments }) => {
         </button>
         
         {open && (
-          <div className="absolute top-8 right-0 bg-zinc-900 p-4 w-40 rounded-xl flex flex-col gap-3 text-sm shadow-lg border border-zinc-800 z-30">
+          <div 
+            ref={menuRef}
+            className="absolute top-8 right-0 bg-zinc-900 p-4 w-40 rounded-xl flex flex-col gap-3 text-sm shadow-lg border border-zinc-800 z-50"
+            style={{ position: 'absolute', zIndex: 999 }}
+          >
             <button 
               className="flex items-center gap-2 group cursor-pointer"
               onClick={() => {

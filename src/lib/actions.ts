@@ -216,12 +216,27 @@ export const switchLike = async (postId: number) => {
       },
     });
 
+    // Get the current like count for the post
+    const likeCount = await prisma.like.count({
+      where: {
+        postId,
+      },
+    });
+
     if (existingLike) {
       await prisma.like.delete({
         where: {
           id: existingLike.id,
         },
       });
+      
+      // Return the like state after deletion
+      revalidatePath('/');
+      return { 
+        isLiked: false,
+        likeCount: likeCount - 1,
+        userId
+      };
     } else {
       await prisma.like.create({
         data: {
@@ -229,6 +244,14 @@ export const switchLike = async (postId: number) => {
           userId,
         },
       });
+      
+      // Return the like state after creation
+      revalidatePath('/');
+      return { 
+        isLiked: true,
+        likeCount: likeCount + 1,
+        userId
+      };
     }
   } catch (err) {
     console.log(err);
@@ -400,3 +423,31 @@ export async function createStory(formData: FormData) {
     throw new Error('Failed to create story');
   }
 }
+
+export const deleteStory = async (storyId: number) => {
+  const { userId } = await auth();
+
+  if (!userId) throw new Error("User is not authenticated!");
+
+  try {
+    const story = await prisma.story.findUnique({
+      where: {
+        id: storyId,
+      },
+    });
+
+    if (!story) throw new Error("Story not found!");
+    if (story.userId !== userId) throw new Error("Unauthorized!");
+
+    await prisma.story.delete({
+      where: {
+        id: storyId,
+      },
+    });
+
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};

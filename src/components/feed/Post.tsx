@@ -1,61 +1,54 @@
+"use client";
+
 import Image from "next/image";
 import Comments from "./Comments";
 import { Post as PostType, User, Comment } from "@prisma/client";
 import PostInteraction from "./PostInteraction";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import PostInfo from "./PostInfo";
-import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
-import prisma from "@/lib/client";
+import { getPostDetails } from "@/lib/actions/post";
 
 export type FeedPostType = PostType & { 
   user: User;
-  likes: [{ userId: string }];
-  _count: { comments: number };
+  likes: { userId: string }[];
+  _count: { comments: number; likes?: number };
   video?: string | null;
   comments: (Comment & { user: User })[];
+  currentUserId?: string;
 };
 
-const Post = async ({ post }: { post: FeedPostType }) => {
-  const { userId } = await auth();
+type PostDetailsType = {
+  comments: (Comment & { 
+    user: User;
+    likes: number;
+    replies: (Comment & { 
+      user: User;
+      likes: number;
+    })[];
+  })[];
+  currentUserId: string | null;
+};
 
-  // Fetch comments with their users
-  const comments = await prisma.comment.findMany({
-    where: {
-      postId: post.id,
-      parentId: null,
-    },
-    include: {
-      user: true,
-      likes: true,
-      replies: {
-        include: {
-          user: true,
-          likes: true,
-        },
-        orderBy: {
-          createdAt: 'asc',
-        },
-      },
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
+const Post = ({ post }: { post: FeedPostType }) => {
+  const [postData, setPostData] = useState<PostDetailsType>({
+    comments: [],
+    currentUserId: null,
   });
 
-  // Transform comments to include like count
-  const commentsWithLikes = comments.map(comment => ({
-    ...comment,
-    likes: comment.likes.length,
-    replies: comment.replies.map(reply => ({
-      ...reply,
-      likes: reply.likes.length,
-    })),
-  }));
+  useEffect(() => {
+    const loadPostDetails = async () => {
+      const details = await getPostDetails(post.id);
+      if (details) {
+        setPostData(details);
+      }
+    };
+    loadPostDetails();
+  }, [post.id]);
 
   const postWithComments = {
     ...post,
-    comments: commentsWithLikes,
+    comments: postData.comments,
   };
 
   return (
@@ -85,7 +78,7 @@ const Post = async ({ post }: { post: FeedPostType }) => {
             </span>
           </Link>
         </div>
-        {userId === post.user.id && <PostInfo post={postWithComments} />}
+        {postData.currentUserId === post.user.id && <PostInfo post={postWithComments} />}
       </div>
       {/* DESC */}
       <div className="flex flex-col gap-4">

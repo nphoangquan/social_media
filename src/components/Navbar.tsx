@@ -44,11 +44,11 @@ const Navbar = ({ logoFont }: NavbarProps) => {
             <Home className="w-4 h-4" />
             <span>Homepage</span>
           </Link>
-          <Link href="/" className="flex items-center gap-2 hover:text-zinc-100 transition-colors">
+          <Link href="/friends" className="flex items-center gap-2 hover:text-zinc-100 transition-colors">
             <Users className="w-4 h-4" />
             <span>Friends</span>
           </Link>
-          <Link href="/" className="flex items-center gap-2 hover:text-zinc-100 transition-colors">
+          <Link href="/stories" className="flex items-center gap-2 hover:text-zinc-100 transition-colors">
             <BookOpen className="w-4 h-4" />
             <span>Stories</span>
           </Link>
@@ -69,9 +69,9 @@ const Navbar = ({ logoFont }: NavbarProps) => {
         </ClerkLoading>
         <ClerkLoaded>
           <SignedIn>
-            <div className="cursor-pointer text-zinc-400 hover:text-zinc-100 transition-colors">
+            <Link href="/friend-requests" className="cursor-pointer text-zinc-400 hover:text-zinc-100 transition-colors">
               <UserPlus className="w-6 h-6" />
-            </div>
+            </Link>
             <div className="cursor-pointer text-zinc-400 hover:text-zinc-100 transition-colors">
               <MessageSquare className="w-5 h-5" />
             </div>

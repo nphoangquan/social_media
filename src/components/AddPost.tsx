@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useState, useTransition } from "react";
 import AddPostButton from "./AddPostButton";
 import { addPost } from "@/lib/actions";
-import { Smile, Image as ImageIcon, Video, BarChart2, Calendar, X } from "lucide-react";
+import { Smile, Image as ImageIcon, Video, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface CloudinaryResult {
@@ -176,14 +176,14 @@ const AddPost = () => {
               </div>
             )}
           </CldUploadWidget>
-          <div className="flex items-center gap-2 cursor-pointer hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors group">
+          {/* <div className="flex items-center gap-2 cursor-pointer hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors group">
             <BarChart2 className="w-5 h-5" />
             <span className="text-sm font-medium">Poll</span>
           </div>
           <div className="flex items-center gap-2 cursor-pointer hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors group">
             <Calendar className="w-5 h-5" />
             <span className="text-sm font-medium">Event</span>
-          </div>
+          </div> */}
         </div>
 
         {/* Preview Media */}
