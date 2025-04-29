@@ -23,7 +23,7 @@ A social media platform focused on quality connections and refined user experien
   - [🚀 Deployment](#-deployment)
 
 ## ✨ Key Features
-- 💬 Real-time chat with Socket.io
+- 💬 Real-time chat with Socket.io (under development - Toi Sap Khoc Roi Cuu Voi)
 - 📸 Cloudinary image uploads
 - 🔐 Two-factor authentication with Clerk
 - 🎨 Minimalist UI with TailwindCSS
