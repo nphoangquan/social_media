@@ -5,6 +5,7 @@ import prisma from "./client";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { uploadFile } from "./uploadFile";
+import { createLikeNotification, createCommentNotification, createFollowNotification, createNewPostNotification } from "./actions/notifications";
 
 export const switchFollow = async (userId: string) => {
   const { userId: currentUserId } = await auth();
@@ -48,8 +49,13 @@ export const switchFollow = async (userId: string) => {
             receiverId: userId,
           },
         });
+
+        // Tạo thông báo khi có người gửi lời mời kết bạn/follow
+        await createFollowNotification(currentUserId, userId);
       }
     }
+    
+    revalidatePath('/profile/[username]', 'page');
   } catch (err) {
     console.log(err);
     throw new Error("Something went wrong!");
@@ -119,7 +125,12 @@ export const acceptFollowRequest = async (userId: string) => {
           followingId: currentUserId,
         },
       });
+
+      // Tạo thông báo cho người gửi lời mời kết bạn
+      await createFollowNotification(currentUserId, userId);
     }
+
+    revalidatePath('/friend-requests');
   } catch (err) {
     console.log(err);
     throw new Error("Something went wrong!");
@@ -206,19 +217,14 @@ export const updateProfile = async (
 export const switchLike = async (postId: number) => {
   const { userId } = await auth();
 
-  if (!userId) throw new Error("User is not authenticated!");
+  if (!userId) {
+    throw new Error("User is not authenticated!!");
+  }
 
   try {
     const existingLike = await prisma.like.findFirst({
       where: {
-        postId,
         userId,
-      },
-    });
-
-    // Get the current like count for the post
-    const likeCount = await prisma.like.count({
-      where: {
         postId,
       },
     });
@@ -229,91 +235,124 @@ export const switchLike = async (postId: number) => {
           id: existingLike.id,
         },
       });
-      
-      // Return the like state after deletion
-      revalidatePath('/');
-      return { 
-        isLiked: false,
-        likeCount: likeCount - 1,
-        userId
-      };
     } else {
       await prisma.like.create({
         data: {
-          postId,
           userId,
+          postId,
+        },
+      });
+
+      // Lấy thông tin người đăng bài
+      const post = await prisma.post.findUnique({
+        where: {
+          id: postId,
+        },
+        select: {
+          userId: true, // ID của người đăng bài
         },
       });
       
-      // Return the like state after creation
-      revalidatePath('/');
-      return { 
-        isLiked: true,
-        likeCount: likeCount + 1,
-        userId
-      };
+      // Tạo thông báo khi like bài viết (chỉ khi người like khác người đăng bài)
+      if (post && post.userId !== userId) {
+        await createLikeNotification(userId, post.userId, postId);
+      }
     }
+
+    revalidatePath("/post/[id]", "page");
+    return { success: true };
   } catch (err) {
     console.log(err);
-    throw new Error("Something went wrong");
+    throw new Error("Something went wrong!");
   }
 };
 
 export const addComment = async (postId: number, desc: string, parentId?: number | null) => {
   const { userId } = await auth();
 
-  if (!userId) throw new Error("User is not authenticated!");
+  if (!userId) {
+    throw new Error("User is not authenticated!!");
+  }
 
   try {
-    const createdComment = await prisma.comment.create({
+    const comment = await prisma.comment.create({
       data: {
         desc,
         userId,
         postId,
-        parentId,
-      },
-      include: {
-        user: true,
+        parentId: parentId || null,
       },
     });
 
-    return createdComment;
+    // Nếu đây là comment gốc (không phải reply)
+    if (!parentId) {
+      // Lấy thông tin người đăng bài
+      const post = await prisma.post.findUnique({
+        where: {
+          id: postId,
+        },
+        select: {
+          userId: true, // ID của người đăng bài
+        },
+      });
+
+      // Tạo thông báo khi comment bài viết (chỉ khi người comment khác người đăng bài)
+      if (post && post.userId !== userId) {
+        await createCommentNotification(userId, post.userId, postId, comment.id);
+      }
+    } else {
+      // Đây là reply, lấy thông tin comment gốc
+      const parentComment = await prisma.comment.findUnique({
+        where: {
+          id: parentId,
+        },
+        select: {
+          userId: true, // ID của người comment gốc
+        },
+      });
+
+      // Tạo thông báo khi reply comment (chỉ khi người reply khác người comment gốc)
+      if (parentComment && parentComment.userId !== userId) {
+        await createCommentNotification(userId, parentComment.userId, postId, comment.id);
+      }
+    }
+    
+    revalidatePath(`/post/${postId}`);
+    return { success: true };
   } catch (err) {
     console.log(err);
     throw new Error("Something went wrong!");
   }
 };
+
 //add cac bai post
 export const addPost = async (formData: FormData, media: string, mediaType?: "image" | "video") => {
-  const desc = formData.get("desc") as string;
-
-  const Desc = z.string().min(1).max(255);
-
-  const validatedDesc = Desc.safeParse(desc);
-
-  if (!validatedDesc.success) {
-    //TODO
-    console.log("description is not valid");
-    return;
-  }
   const { userId } = await auth();
 
-  if (!userId) throw new Error("User is not authenticated!");
+  if (!userId) {
+    throw new Error("User is not Authenticated!");
+  }
+
+  const desc = formData.get("desc")?.toString() || "";
 
   try {
-    await prisma.post.create({
+    const post = await prisma.post.create({
       data: {
-        desc: validatedDesc.data,
+        desc,
         userId,
-        ...(mediaType === "image" ? { img: media } : {}),
-        ...(mediaType === "video" ? { video: media } : {}),
+        ...(mediaType === "image" && { img: media }),
+        ...(mediaType === "video" && { video: media }),
       },
     });
 
+    // Tạo thông báo cho followers khi có bài viết mới
+    await createNewPostNotification(userId, post.id);
+
     revalidatePath("/");
+    return post;
   } catch (err) {
     console.log(err);
-    throw err;
+    throw new Error("Something went wrong!");
   }
 };
 

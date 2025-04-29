@@ -36,6 +36,8 @@ model User {
   blocks                 Block[]         @relation("BlocksSent")
   blockedBy              Block[]         @relation("BlocksReceived")
   stories                Story[]
+  notificationsReceived  Notification[]  @relation("NotificationsReceived")
+  notificationsSent      Notification[]  @relation("NotificationsSent")
 }
 
 model Post {
@@ -116,4 +118,27 @@ model Story {
   video     String?
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  type      String   // "LIKE", "COMMENT", "FOLLOW", "POST"
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  // Người nhận thông báo
+  receiver  User     @relation("NotificationsReceived", fields: [receiverId], references: [id], onDelete: Cascade)
+  receiverId String
+  
+  // Người tạo thông báo (người like, comment, follow, đăng bài)
+  sender    User     @relation("NotificationsSent", fields: [senderId], references: [id], onDelete: Cascade)
+  senderId  String
+  
+  // Liên kết đến đối tượng tương ứng
+  postId    Int?     // ID của bài post liên quan (nếu là thông báo về post)
+  commentId Int?     // ID của comment liên quan (nếu là thông báo về comment)
+  
+  // URL để redirect khi nhấp vào thông báo
+  link      String?
 }

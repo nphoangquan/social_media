@@ -56,12 +56,12 @@ const PostInteraction = ({
     
     try {
       // Call the server action
-      const result = await switchLike(postId);
+      await switchLike(postId);
 
-      // Update state with the actual result from server
+      // Update state with our calculated values
       setLikeState({
-        likeCount: result.likeCount,
-        isLiked: result.isLiked
+        likeCount: likes.includes(currentUserId) ? likes.length - 1 : likes.length + 1,
+        isLiked: !likes.includes(currentUserId)
       });
       
       // Refresh the feed to get updated likes

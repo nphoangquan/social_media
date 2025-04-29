@@ -7,8 +7,9 @@ import {
   SignedOut,
   UserButton,
 } from "@clerk/nextjs";
-import { Home, Users, BookOpen, Search, UserPlus, MessageSquare, Bell, LogIn } from "lucide-react";
+import { Home, Users, BookOpen, Search, UserPlus, MessageSquare, LogIn } from "lucide-react";
 import Image from "next/image";
+import NotificationBell from "./notifications/NotificationBell";
 
 interface NavbarProps {
   logoFont: string;
@@ -75,9 +76,7 @@ const Navbar = ({ logoFont }: NavbarProps) => {
             <div className="cursor-pointer text-zinc-400 hover:text-zinc-100 transition-colors">
               <MessageSquare className="w-5 h-5" />
             </div>
-            <div className="cursor-pointer text-zinc-400 hover:text-zinc-100 transition-colors">
-              <Bell className="w-5 h-5" />
-            </div>
+            <NotificationBell />
             <UserButton />
           </SignedIn>
           <SignedOut>

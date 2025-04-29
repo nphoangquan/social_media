@@ -3,7 +3,7 @@
 import { User } from "@prisma/client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 type FriendsListProps = {
   initialFriends: User[];
@@ -18,30 +18,7 @@ export default function FriendsList({ initialFriends, selectedUsername }: Friend
   const [isLoading, setIsLoading] = useState(false);
   const loaderRef = useRef<HTMLDivElement>(null);
 
-  // Set up intersection observer for infinite scroll
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting && hasMore && !isLoading) {
-          loadMoreFriends();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (loaderRef.current) {
-      observer.observe(loaderRef.current);
-    }
-
-    return () => {
-      if (loaderRef.current) {
-        observer.unobserve(loaderRef.current);
-      }
-    };
-  }, [loaderRef, hasMore, isLoading]);
-
-  const loadMoreFriends = async () => {
+  const loadMoreFriends = useCallback(async () => {
     try {
       setIsLoading(true);
       const nextPage = page + 1;
@@ -65,7 +42,32 @@ export default function FriendsList({ initialFriends, selectedUsername }: Friend
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [page]);
+
+  // Set up intersection observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting && hasMore && !isLoading) {
+          loadMoreFriends();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentLoaderRef = loaderRef.current;
+    
+    if (currentLoaderRef) {
+      observer.observe(currentLoaderRef);
+    }
+
+    return () => {
+      if (currentLoaderRef) {
+        observer.unobserve(currentLoaderRef);
+      }
+    };
+  }, [loaderRef, hasMore, isLoading, loadMoreFriends]);
 
   const handleFriendClick = (username: string) => {
     router.push(`/friends?username=${username}`);

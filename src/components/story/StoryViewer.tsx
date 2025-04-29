@@ -91,12 +91,7 @@ export default function StoryViewer({ story, allStories }: { story: StoryWithUse
     }
   };
 
-  const togglePlayPause = () => {
-    setIsPaused(prev => !prev);
-    showControlsTemporarily();
-  };
-
-  const showControlsTemporarily = () => {
+  const showControlsTemporarily = useCallback(() => {
     setShowControls(true);
     
     if (controlsTimeoutRef.current) {
@@ -106,7 +101,12 @@ export default function StoryViewer({ story, allStories }: { story: StoryWithUse
     controlsTimeoutRef.current = setTimeout(() => {
       setShowControls(false);
     }, 3000); // Hide controls after 3 seconds
-  };
+  }, []);
+
+  const togglePlayPause = useCallback(() => {
+    setIsPaused(prev => !prev);
+    showControlsTemporarily();
+  }, [showControlsTemporarily]);
 
   const handleStoryClick = (e: React.MouseEvent) => {
     // Prevent the click from triggering navigation if clicking on a button
