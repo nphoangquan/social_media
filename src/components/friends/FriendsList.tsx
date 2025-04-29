@@ -70,7 +70,7 @@ export default function FriendsList({ initialFriends, selectedUsername }: Friend
   }, [loaderRef, hasMore, isLoading, loadMoreFriends]);
 
   const handleFriendClick = (username: string) => {
-    router.push(`/friends?username=${username}`);
+    router.push(`/profile/${username}`);
   };
 
   if (initialFriends.length === 0 && friends.length === 0) {
