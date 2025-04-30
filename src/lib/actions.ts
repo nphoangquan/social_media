@@ -176,10 +176,18 @@ export const updateProfile = async (
     Object.entries(fields).filter(([, value]) => value !== "")
   );
 
+  // Convert birthDate string to Date object if it exists
+  let birthDateValue: Date | undefined;
+  if (filteredFields.birthDate && typeof filteredFields.birthDate === 'string') {
+    birthDateValue = new Date(filteredFields.birthDate);
+    delete filteredFields.birthDate; // Remove from filtered fields as we'll add it properly later
+  }
+
   const Profile = z.object({
     cover: z.string().optional(),
     name: z.string().max(60).optional(),
     surname: z.string().max(60).optional(),
+    birthDate: z.date().optional(),
     description: z.string().max(255).optional(),
     city: z.string().max(60).optional(),
     school: z.string().max(60).optional(),
@@ -187,7 +195,11 @@ export const updateProfile = async (
     website: z.string().max(60).optional(),
   });
 
-  const validatedFields = Profile.safeParse({ cover, ...filteredFields });
+  const validatedFields = Profile.safeParse({ 
+    cover, 
+    ...filteredFields,
+    ...(birthDateValue && { birthDate: birthDateValue })
+  });
 
   if (!validatedFields.success) {
     console.log(validatedFields.error.flatten().fieldErrors);
@@ -488,5 +500,108 @@ export const deleteStory = async (storyId: number) => {
   } catch (err) {
     console.log(err);
     return false;
+  }
+};
+
+// Search for users and posts
+export const searchContent = async (query: string) => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("User is not authenticated!");
+  }
+
+  try {
+    // Search for users by username or name
+    const users = await prisma.user.findMany({
+      where: {
+        OR: [
+          { username: { contains: query, mode: 'insensitive' } },
+          { name: { contains: query, mode: 'insensitive' } },
+          { surname: { contains: query, mode: 'insensitive' } },
+        ],
+        // Don't show blocked users or users that have blocked the current user
+        AND: [
+          {
+            NOT: {
+              blocks: {
+                some: {
+                  blockedId: userId,
+                }
+              }
+            }
+          },
+          {
+            NOT: {
+              blockedBy: {
+                some: {
+                  blockerId: userId,
+                }
+              }
+            }
+          }
+        ]
+      },
+      select: {
+        id: true,
+        username: true,
+        name: true,
+        surname: true,
+        avatar: true,
+      },
+      take: 5, // Limit results
+    });
+
+    // Search for posts by description
+    const posts = await prisma.post.findMany({
+      where: {
+        desc: {
+          contains: query,
+          mode: 'insensitive',
+        },
+        // Don't show posts from blocked users or users that have blocked the current user
+        user: {
+          AND: [
+            {
+              NOT: {
+                blocks: {
+                  some: {
+                    blockedId: userId,
+                  }
+                }
+              }
+            },
+            {
+              NOT: {
+                blockedBy: {
+                  some: {
+                    blockerId: userId,
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            name: true,
+            avatar: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 5, // Limit results
+    });
+
+    return { users, posts };
+  } catch (err) {
+    console.log(err);
+    throw new Error("Something went wrong with the search!");
   }
 };

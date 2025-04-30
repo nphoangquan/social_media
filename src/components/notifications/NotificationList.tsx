@@ -7,7 +7,7 @@ import { NotificationPayload } from "@/lib/socket";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import Link from "next/link";
-import { Bell, Heart, MessageCircle, UserPlus, FileText, CheckCheck, Trash2, X } from "lucide-react";
+import { Bell, Heart, MessageCircle, UserPlus, FileText, CheckCheck, Trash2, X, Cake } from "lucide-react";
 
 const NotificationItem = ({ notification }: { notification: NotificationPayload }) => {
   const { markAsRead, deleteNotification } = useNotifications();
@@ -40,6 +40,8 @@ const NotificationItem = ({ notification }: { notification: NotificationPayload 
         return <UserPlus className="w-4 h-4 text-green-400" />;
       case 'POST':
         return <FileText className="w-4 h-4 text-yellow-400" />;
+      case 'BIRTHDAY':
+        return <Cake className="w-4 h-4 text-pink-400" />;
       default:
         return <Bell className="w-4 h-4 text-zinc-400" />;
     }

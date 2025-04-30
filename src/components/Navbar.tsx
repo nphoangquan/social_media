@@ -10,6 +10,7 @@ import {
 import { Home, Users, BookOpen, Search, UserPlus, MessageSquare, LogIn } from "lucide-react";
 import Image from "next/image";
 import NotificationBell from "./notifications/NotificationBell";
+import SearchBar from "./SearchBar";
 
 interface NavbarProps {
   logoFont: string;
@@ -54,13 +55,8 @@ const Navbar = ({ logoFont }: NavbarProps) => {
             <span>Stories</span>
           </Link>
         </div>
-        <div className='hidden xl:flex p-2.5 bg-zinc-800/50 items-center rounded-xl border border-zinc-700/50 hover:bg-zinc-800/70 transition-colors group'>
-          <input 
-            type="text" 
-            placeholder="Search..." 
-            className="bg-transparent outline-none text-zinc-300 placeholder-zinc-500 w-48"
-          />
-          <Search className="w-4 h-4 text-zinc-500 group-hover:text-zinc-400 transition-colors" />
+        <div className='hidden xl:block'>
+          <SearchBar />
         </div>
       </div>
       {/* RIGHT */}
@@ -70,6 +66,11 @@ const Navbar = ({ logoFont }: NavbarProps) => {
         </ClerkLoading>
         <ClerkLoaded>
           <SignedIn>
+            <div className="xl:hidden cursor-pointer text-zinc-400 hover:text-zinc-100 transition-colors">
+              <Link href="/search">
+                <Search className="w-5 h-5" />
+              </Link>
+            </div>
             <Link href="/friend-requests" className="cursor-pointer text-zinc-400 hover:text-zinc-100 transition-colors">
               <UserPlus className="w-6 h-6" />
             </Link>

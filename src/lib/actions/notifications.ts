@@ -405,4 +405,80 @@ export const deleteNotification = async (notificationId: number) => {
     console.error('Error deleting notification:', error);
     return null;
   }
+};
+
+export const createBirthdayWishNotification = async (senderId: string, receiverId: string) => {
+  try {
+    // Nếu người gửi và người nhận là cùng một người, không tạo thông báo
+    if (senderId === receiverId) return null;
+    
+    // Get sender info for notification message
+    const sender = await prisma.user.findUnique({
+      where: { id: senderId },
+      select: { 
+        id: true,
+        username: true,
+        name: true,
+        surname: true,
+        avatar: true
+      }
+    });
+
+    if (!sender) {
+      throw new Error("Sender not found");
+    }
+
+    // Tạo message
+    const senderName = sender.name && sender.surname 
+      ? `${sender.name} ${sender.surname}`
+      : sender.username;
+    
+    const message = `${senderName} wished you a happy birthday!`;
+    const link = `/profile/${sender.username}`;
+
+    // Create notification in database
+    const notification = await prisma.notification.create({
+      data: {
+        type: "BIRTHDAY",
+        message,
+        link,
+        isRead: false,
+        sender: { connect: { id: senderId } },
+        receiver: { connect: { id: receiverId } }
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            username: true,
+            name: true,
+            surname: true,
+            avatar: true
+          }
+        }
+      }
+    });
+    
+    // Tạo payload để gửi qua socket
+    const payload: NotificationPayload = {
+      id: notification.id,
+      type: notification.type,
+      message: notification.message,
+      isRead: notification.isRead,
+      senderId: notification.senderId,
+      senderName: senderName,
+      senderAvatar: sender.avatar || undefined,
+      receiverId: notification.receiverId,
+      link: notification.link || undefined,
+      createdAt: notification.createdAt
+    };
+    
+    // Gửi thông báo qua socket
+    await sendNotification(payload);
+    
+    return notification;
+  } catch (error) {
+    console.error("Error creating birthday wish notification:", error);
+    return null;
+  }
 }; 

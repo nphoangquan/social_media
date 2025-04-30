@@ -26,7 +26,7 @@ export default function RootLayout({
           <div className="w-full bg-zinc-900/80 backdrop-blur-sm border-b border-zinc-800/50 px-4 md:px-8 lg:px-24 xl:px-40 2xl:px-80 sticky top-0 z-50">
             <Navbar logoFont={orbitron.className} />
           </div>
-          <div className="bg-zinc-950 px-4 md:px-8 lg:px-24 xl:px-40 2xl:px-80">
+          <div className="bg-zinc-950 px-4 md:px-8 lg:px-24 xl:px-40 2xl:px-80 pt-4">
             {children}
           </div>
           </NotificationProvider>

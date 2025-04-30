@@ -61,7 +61,7 @@ const AddPost = () => {
         {/* TEXT INPUT */}
         <form action={handleSubmit} className="flex gap-4">
           <textarea
-            placeholder="What's on your mind?"
+            placeholder="Nguyen Phan Hoang Quan - 2280602604 - 22DTHH2 - HUTECH"
             className="flex-1 bg-zinc-100 dark:bg-zinc-800/50 rounded-xl p-3 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 text-zinc-600 dark:text-zinc-300 outline-none resize-none border border-transparent focus:border-emerald-500/20 dark:focus:border-emerald-500/10 transition-colors"
             name="desc"
           ></textarea>

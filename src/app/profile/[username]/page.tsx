@@ -6,6 +6,7 @@ import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { Camera, MapPin, GraduationCap, Briefcase, Link as LinkIcon } from "lucide-react";
 
 type PageProps = {
   params: Promise<{ username: string }>;
@@ -35,6 +36,7 @@ const ProfilePage = async ({ params }: PageProps) => {
   }
 
   let isBlocked;
+  const isCurrentUser = userId === user.id;
 
   if (userId) {
     const res = await prisma.block.findFirst({
@@ -58,8 +60,37 @@ const ProfilePage = async ({ params }: PageProps) => {
       </div>
       <div className="w-full lg:w-[70%] xl:w-[50%]">
         <div className="flex flex-col gap-8">
-          <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-zinc-800/20 p-6 border border-zinc-100/50 dark:border-zinc-800/50">
-            <div className="mb-6">
+          {/* Profile Cover and Info Section */}
+          <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-zinc-800/20 border border-zinc-100/50 dark:border-zinc-800/50 overflow-hidden">
+            {/* Cover Image Section */}
+            <div className="relative h-64 w-full bg-gradient-to-r from-zinc-800 to-zinc-900">
+              {user.cover ? (
+                <Image
+                  src={user.cover}
+                  alt="Cover"
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-r from-zinc-800 to-zinc-900 flex items-center justify-center">
+                  <span className="text-zinc-600 dark:text-zinc-500 text-lg">No cover photo</span>
+                </div>
+              )}
+              
+              {/* Edit Cover Button (only for current user) */}
+              {isCurrentUser && (
+                <Link
+                  href="/settings"
+                  className="absolute bottom-4 right-4 bg-zinc-200/80 dark:bg-zinc-800/80 backdrop-blur-sm text-zinc-800 dark:text-zinc-200 p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
+                  aria-label="Edit cover photo"
+                >
+                  <Camera className="w-5 h-5" />
+                </Link>
+              )}
+            </div>
+            
+            {/* Back Link */}
+            {/* <div className="px-6 pt-4">
               <Link
                 href="/friends"
                 className="inline-flex items-center gap-2 text-zinc-600 dark:text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400"
@@ -69,10 +100,12 @@ const ProfilePage = async ({ params }: PageProps) => {
                 </svg>
                 <span>Back to friends</span>
               </Link>
-            </div>
+            </div> */}
 
-            <div className="flex flex-col md:flex-row gap-6 items-start">
-              <div className="relative w-32 h-32 rounded-full overflow-hidden ring-4 ring-white dark:ring-zinc-800 shadow-xl mx-auto md:mx-0">
+            {/* Profile Info Section */}
+            <div className="relative px-6 pb-6">
+              {/* Avatar - positioned to overlap with cover */}
+              <div className="relative w-32 h-32 rounded-full overflow-hidden ring-4 ring-white dark:ring-zinc-800 shadow-xl mt-[-64px] mb-4 mx-auto md:mx-0">
                 <Image
                   src={user.avatar || "/noAvatar.png"}
                   alt={user.username}
@@ -81,33 +114,58 @@ const ProfilePage = async ({ params }: PageProps) => {
                 />
               </div>
 
-              <div className="flex-1 text-center md:text-left">
-                <h1 className="text-2xl font-semibold text-zinc-800 dark:text-zinc-200 mb-2">
-                  {user.name && user.surname 
-                    ? `${user.name} ${user.surname}` 
-                    : user.username}
-                </h1>
-                
-                <div className="text-zinc-500 dark:text-zinc-400 mb-4">
-                  @{user.username}
-                </div>
-
-                {user.description && (
-                  <div className="text-zinc-600 dark:text-zinc-300 mb-6 max-w-lg">
-                    {user.description}
+              <div className="flex flex-col md:flex-row gap-4 mt-2">
+                <div className="flex-1 text-center md:text-left">
+                  <h1 className="text-2xl font-semibold text-zinc-800 dark:text-zinc-200 mb-2">
+                    {user.name && user.surname 
+                      ? `${user.name} ${user.surname}` 
+                      : user.username}
+                  </h1>
+                  
+                  <div className="text-zinc-500 dark:text-zinc-400 mb-4">
+                    @{user.username}
                   </div>
-                )}
 
-                <div className="flex flex-wrap gap-3 mb-6 justify-center md:justify-start">
-                  {user.city && (
-                    <div className="flex items-center gap-1 text-sm text-zinc-600 dark:text-zinc-400">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                      </svg>
-                      <span>{user.city}</span>
+                  {user.description && (
+                    <div className="text-zinc-600 dark:text-zinc-300 mb-6 max-w-lg">
+                      {user.description}
                     </div>
                   )}
+
+                  <div className="flex flex-wrap gap-4 mb-6 justify-center md:justify-start text-sm">
+                    {user.city && (
+                      <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
+                        <MapPin className="w-4 h-4" />
+                        <span>{user.city}</span>
+                      </div>
+                    )}
+                    
+                    {user.school && (
+                      <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
+                        <GraduationCap className="w-4 h-4" />
+                        <span>{user.school}</span>
+                      </div>
+                    )}
+                    
+                    {user.work && (
+                      <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
+                        <Briefcase className="w-4 h-4" />
+                        <span>{user.work}</span>
+                      </div>
+                    )}
+                    
+                    {user.website && (
+                      <div className="flex items-center gap-1">
+                        <LinkIcon className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
+                        <Link 
+                          href={user.website} 
+                          className="text-emerald-600 dark:text-emerald-400 hover:underline"
+                        >
+                          {user.website.replace(/(^\w+:|^)\/\//, '')}
+                        </Link>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

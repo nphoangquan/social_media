@@ -139,6 +139,17 @@ const UpdateUser = ({ user }: { user: User }) => {
                   </div>
                 );
               })}
+              <div className="flex flex-col gap-1 w-full md:w-[48%]">
+                <label htmlFor="birthDate" className="text-xs text-zinc-600 dark:text-zinc-300">
+                  Birth Date
+                </label>
+                <input
+                  type="date"
+                  name="birthDate"
+                  defaultValue={user.birthDate ? new Date(user.birthDate).toISOString().slice(0, 10) : ''}
+                  className="ring-1 ring-zinc-300 dark:ring-zinc-600 p-[13px] rounded-md text-sm bg-transparent text-zinc-800 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:outline-none transition-colors"
+                />
+              </div>
             </div>
             <UpdateButton />
             {state.success && (
