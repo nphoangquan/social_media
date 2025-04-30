@@ -37,6 +37,21 @@ export default function PostDetail({
   const [mounted, setMounted] = useState(false);
   const [comments, setComments] = useState<CommentWithUser[]>(post.comments || []);
   const [postLikes, setPostLikes] = useState<string[]>(post.likes?.map(like => like.userId) || []);
+  // State to track whether the full description is shown
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  // Configure the character limit for truncation
+  const MAX_CHARS = 150;
+  
+  // Determine if the description needs truncation
+  const needsTruncation = post.desc && post.desc.length > MAX_CHARS;
+  
+  // Get the truncated or full description depending on expanded state
+  const getDisplayedDesc = () => {
+    if (!post.desc) return "";
+    if (isExpanded || !needsTruncation) return post.desc;
+    return post.desc.substring(0, MAX_CHARS) + "...";
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -129,7 +144,19 @@ export default function PostDetail({
             </div>
 
             {post.desc && (
-              <p className="text-zinc-600 dark:text-zinc-300 mb-4">{post.desc}</p>
+              <div className="mb-4">
+                <p className="text-zinc-600 dark:text-zinc-300 whitespace-pre-line">
+                  {getDisplayedDesc()}
+                </p>
+                {needsTruncation && (
+                  <button 
+                    onClick={() => setIsExpanded(!isExpanded)} 
+                    className="text-emerald-600 dark:text-emerald-500 font-medium text-sm mt-1 hover:underline focus:outline-none"
+                  >
+                    {isExpanded ? "See less" : "See more"}
+                  </button>
+                )}
+              </div>
             )}
 
             {post.img && (
