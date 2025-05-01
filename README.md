@@ -1,4 +1,4 @@
-# Introvertia - Social Network 
+# Introvertia - Social Network - ĐỒ ÁN CƠ SỞ
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ![React Version](https://img.shields.io/badge/React-19-61DAFB?logo=react)
@@ -7,10 +7,10 @@
 
 <!-- ![Introvertia Banner](https://placeholder.co/1920x400.png?text=Introvertia+Social+Media+%E2%80%93+Connect+Deeply+%F0%9F%8C%8D) -->
 
-A social media platform focused on quality connections and refined user experience.
+A social media platform made by Nguyen Phan Hoang Quan
 
 ## 📑 Table of Contents
-- [Introvertia - Social Network](#introvertia---social-network)
+- [Introvertia - Social Network - ĐỒ ÁN CƠ SỞ](#introvertia---social-network---đồ-án-cơ-sở)
   - [📑 Table of Contents](#-table-of-contents)
   - [✨ Key Features](#-key-features)
   - [🛠 Tech Stack](#-tech-stack)
@@ -29,6 +29,14 @@ A social media platform focused on quality connections and refined user experien
 - 🎨 Minimalist UI with TailwindCSS
 - 📱 Responsive Design
 - 🔄 Real-time Notifications
+- 📚 Stories feature with expiration (24h expiration)
+- 👥 Friend requests and friend management
+- 🔍 Advanced search functionality for people and posts
+- 🎂 Birthday celebrations and reminders (events)
+- 📝 Post creation with text, images, and videos
+- 🔔 Activity feed to track interactions
+- 👤 Customizable user profiles
+- 🛡️ User blocking
 
 ## 🛠 Tech Stack
 
@@ -79,6 +87,8 @@ Create a `.env` file following this template:
 ```env
 DATABASE_URL="postgresql://..."
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="your_cloud_name"
+NEXT_PUBLIC_CLOUDINARY_API_KEY=""
+CLOUDINARY_API_SECRECT=""
 CLERK_SECRET_KEY="sk_..."
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_..."
 ```
