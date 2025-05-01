@@ -7,38 +7,38 @@
 
 A social media platform made by Nguyen Phan Hoang Quan
 
-## 📑 Table of Contents
+## Table of Contents
 - [Introvertia - Social Network - ĐỒ ÁN CƠ SỞ](#introvertia---social-network---đồ-án-cơ-sở)
-  - [📑 Table of Contents](#-table-of-contents)
-  - [✨ Key Features](#-key-features)
-  - [🛠 Tech Stack](#-tech-stack)
-    - [🎨 Frontend](#-frontend)
-    - [⚙️ Backend](#️-backend)
-    - [🔧 Development Tools](#-development-tools)
-    - [🗄 Database](#-database)
-  - [📥 Installation](#-installation)
-  - [⚙️ Configuration](#️-configuration)
-  - [🚀 Deployment](#-deployment)
+  - [Table of Contents](#table-of-contents)
+  - [Key Features](#key-features)
+  - [Tech Stack](#tech-stack)
+    - [Frontend](#frontend)
+    - [Backend](#backend)
+    - [Development Tools](#development-tools)
+    - [Database](#database)
+  - [Installation](#installation)
+  - [Configuration](#configuration)
+  - [Deployment](#deployment)
 
-## ✨ Key Features
-- 💬 Real-time chat with Socket.io (under development - Toi Sap Khoc Roi Cuu Voi)
-- 📸 Cloudinary image uploads
-- 🔐 Two-factor authentication with Clerk
-- 🎨 Minimalist UI with TailwindCSS
-- 📱 Responsive Design
-- 🔄 Real-time Notifications
-- 📚 Stories feature with expiration (24h expiration)
-- 👥 Friend requests and friend management
-- 🔍 Advanced search functionality for people and posts
-- 🎂 Birthday celebrations and reminders (events)
-- 📝 Post creation with text, images, and videos
-- 🔔 Activity feed to track interactions
-- 👤 Customizable user profiles
-- 🛡️ User blocking
+## Key Features
+- Real-time chat with Socket.io (under development - Toi Sap Khoc Roi Cuu Voi)
+- Cloudinary image uploads
+- Two-factor authentication with Clerk
+- Minimalist UI with TailwindCSS
+- Responsive Design
+- Real-time Notifications
+- Stories feature with expiration (24h expiration)
+- Friend requests and friend management
+- Advanced search functionality for people and posts
+- Birthday celebrations and reminders (events)
+- Post creation with text, images, and videos
+- Activity feed to track interactions
+- Customizable user profiles
+- User blocking
 
-## 🛠 Tech Stack
+## Tech Stack
 
-### 🎨 Frontend
+### Frontend
 - **React 19** - JavaScript UI library
 - **Next.js 15.2.4** - React framework for SSR and routing
 - **TypeScript** - Type-safe programming language
@@ -46,23 +46,23 @@ A social media platform made by Nguyen Phan Hoang Quan
 - **Lucide React** - Icon library
 - **Next Cloudinary** - Cloudinary media integration
 
-### ⚙️ Backend
+### Backend
 - **Next.js API Routes** - API endpoints handler
 - **Prisma 6.5.0** - Database ORM
 - **Clerk 6.13.0** - Authentication & User Management
 - **Zod** - Schema validation
 - **Svix** - Webhook infrastructure
 
-### 🔧 Development Tools
+### Development Tools
 - **ESLint** - Code linting
 - **PostCSS** - CSS processing
 - **Turbopack** - High-speed bundler
 
-### 🗄 Database
+### Database
 - **PostgreSQL** - Relational database system
 - **Prisma ORM** - Type-safe database queries
 
-## 📥 Installation
+## Installation
 
 1. Clone repository
 ```bash
@@ -79,7 +79,7 @@ npm install
 npm run dev
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 Create a `.env` file following this template:
 ```env
@@ -91,7 +91,7 @@ CLERK_SECRET_KEY="sk_..."
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_..."
 ```
 
-## 🚀 Deployment
+## Deployment
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
