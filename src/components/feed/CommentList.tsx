@@ -25,6 +25,7 @@ function CommentList({
   post,
   onCommentAdded,
   highlightCommentId,
+  onViewAllCommentsClick,
 }: {
   comments: CommentWithUser[];
   postId: number;
@@ -32,6 +33,7 @@ function CommentList({
   post: Post & { user: User };
   onCommentAdded?: () => void;
   highlightCommentId?: number;
+  onViewAllCommentsClick?: () => void;
 }) {
   const { user } = useUser();
   const { avatarUrl } = useUserAvatar();
@@ -375,7 +377,13 @@ function CommentList({
       {/* View All Comments Button */}
       {!showAll && totalCommentsCount > 1 && (
         <button
-          onClick={() => setShowPostDetail(true)}
+          onClick={() => {
+            if (onViewAllCommentsClick) {
+              onViewAllCommentsClick();
+            } else {
+              setShowPostDetail(true);
+            }
+          }}
           className="flex items-center gap-2 text-sm text-zinc-500 hover:text-emerald-500 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors mt-2 cursor-pointer"
         >
           <MessageCircle className="w-4 h-4" />

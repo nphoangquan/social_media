@@ -7,7 +7,7 @@ import { useEffect, useState, useCallback } from "react";
 import { getPostComments } from "@/lib/actions/comment";
 import PostInteraction from "../feed/PostInteraction";
 import CommentList from "../feed/CommentList";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import PostDetailModal from "../feed/PostDetail";
 
@@ -43,6 +43,8 @@ export default function PostDetail({
   const [isExpanded, setIsExpanded] = useState(false);
   // State to control PostDetail modal visibility
   const [showPostDetail, setShowPostDetail] = useState(false);
+  // State to control whether to show all comments
+  const [showAllComments, setShowAllComments] = useState(false);
   
   // Configure the character limit for truncation
   const MAX_CHARS = 150;
@@ -204,13 +206,25 @@ export default function PostDetail({
 
       {/* Comments Section */}
       <div className={standalone ? '' : 'p-4 pb-8'}>
+        {showAllComments && (
+          <div className="mb-4">
+            <button 
+              onClick={() => setShowAllComments(false)}
+              className="flex items-center gap-2 text-sm text-zinc-500 hover:text-emerald-500 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors cursor-pointer"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>Hide comments</span>
+            </button>
+          </div>
+        )}
         <CommentList 
           comments={comments} 
           postId={post.id} 
-          showAll={true} 
+          showAll={showAllComments} 
           post={postWithUpdatedComments}
           onCommentAdded={refreshComments}
           highlightCommentId={highlightCommentId}
+          onViewAllCommentsClick={() => setShowAllComments(true)}
         />
       </div>
       

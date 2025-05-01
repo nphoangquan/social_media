@@ -39,6 +39,8 @@ model User {
   stories                Story[]
   notificationsReceived  Notification[]  @relation("NotificationsReceived")
   notificationsSent      Notification[]  @relation("NotificationsSent")
+  chatParticipations     ChatParticipant[]
+  sentMessages           Message[]
 }
 
 model Post {
@@ -142,4 +144,38 @@ model Notification {
   
   // URL để redirect khi nhấp vào thông báo
   link      String?
+}
+
+model Chat {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  participants ChatParticipant[]
+  messages     Message[]
+}
+
+model ChatParticipant {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  chatId    Int
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, chatId])
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  img     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  sender    User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  senderId  String
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  chatId    Int
 }

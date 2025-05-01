@@ -44,10 +44,10 @@ const Ad = ({ size }: { size: "sm" | "md" | "lg" }) => {
           {/* Description */}
           <p className={`px-4 ${size === "sm" ? "text-xs" : "text-sm"} text-zinc-300 leading-relaxed`}>
             {size === "sm"
-              ? "Introvertia - The social network for introverts."
+              ? "Introvertia - Bạn hướng ngoại, tôi không phải."
               : size === "md"
               ? "Introvertia - Tôi hướng nội, bạn cũng thế."
-              : "Introvertia - The social network designed for introverts. Connect meaningfully without the social pressure."}
+              : "Introvertia - Bạn hướng ngoại, tôi không phải."}
           </p>
           
           {/* Button */}

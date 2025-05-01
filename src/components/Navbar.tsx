@@ -11,6 +11,7 @@ import { Home, Users, BookOpen, Search, UserPlus, MessageSquare, LogIn } from "l
 import Image from "next/image";
 import NotificationBell from "./notifications/NotificationBell";
 import SearchBar from "./SearchBar";
+import MessagesBadge from "./messages/MessagesBadge";
 
 interface NavbarProps {
   logoFont: string;
@@ -139,6 +140,7 @@ const Navbar = ({ logoFont }: NavbarProps) => {
               <div className="relative">
                 <MessageSquare className="w-5 h-5 text-white transition-opacity duration-200 cursor-pointer" />
                 <MessageSquare className="w-5 h-5 absolute inset-0 text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer" />
+                <MessagesBadge />
               </div>
               
               {/* Hover highlight with shimmer */}

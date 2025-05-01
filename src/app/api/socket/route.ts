@@ -3,8 +3,14 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // Khởi tạo Socket.IO với mock
-    initSocket(null);
+    // Initialize Socket.IO server 
+    const io = initSocket(null);
+    
+    // Ensure the server is ready to accept connections
+    if (io) {
+      console.log();
+    }
+    
     return NextResponse.json({ success: true, message: "Socket.IO server initialized" });
   } catch (error) {
     console.error("Socket initialization error:", error);
