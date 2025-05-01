@@ -8,6 +8,7 @@ import { useOptimistic, useState, useEffect } from "react";
 import { Send, MessageCircle, Trash2 } from "lucide-react";
 import PostDetail from "./PostDetail";
 import dynamic from "next/dynamic";
+import { useUserAvatar } from "@/lib/hooks/useUserAvatar";
 
 type CommentWithUser = Comment & { 
   user: User;
@@ -33,6 +34,7 @@ function CommentList({
   highlightCommentId?: number;
 }) {
   const { user } = useUser();
+  const { avatarUrl } = useUserAvatar();
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [optimisticComments, addOptimisticComment] = useOptimistic(comments);
   const [showPostDetail, setShowPostDetail] = useState(false);
@@ -50,13 +52,27 @@ function CommentList({
     }
   }, [highlightCommentId]);
   
+  // Calculate total number of comments including replies
+  const calculateTotalCommentsCount = (commentsList: CommentWithUser[]) => {
+    let totalCount = commentsList.length;
+    commentsList.forEach(comment => {
+      if (comment.replies && Array.isArray(comment.replies)) {
+        totalCount += comment.replies.length;
+      }
+    });
+    return totalCount;
+  };
+  
+  // Get total count of all comments including replies
+  const totalCommentsCount = calculateTotalCommentsCount(optimisticComments);
+  
   // Sort comments by likes and get the most recent/popular ones
   const sortedComments = [...optimisticComments].sort((a, b) => 
     (b.likes || 0) - (a.likes || 0)
   );
   
   // Show all comments in sortedComments when in "showAll" mode
-  // Otherwise, show the most recent comment or most liked comment if available
+  // Otherwise, show only the first comment when total count > 1
   const displayedComments = showAll 
     ? sortedComments 
     : (sortedComments.length > 0 
@@ -84,7 +100,7 @@ function CommentList({
       user: {
         id: user.id,
         username: user.username || "You",
-        avatar: user.imageUrl || "/noavatar.png",
+        avatar: avatarUrl || "/noavatar.png",
         cover: "",
         description: "",
         name: user.firstName || "",
@@ -102,9 +118,22 @@ function CommentList({
     addOptimisticComment([optimisticComment, ...optimisticComments]);
 
     try {
-      await addComment(postId, desc.trim(), parentId ? parseInt(parentId) : null);
+      const newComment = await addComment(postId, desc.trim(), parentId ? parseInt(parentId) : null);
       (document.getElementById(`comment-form-${parentId || "root"}`) as HTMLFormElement)?.reset();
       setReplyingTo(null);
+      
+      // Dispatch a custom event to notify other components about the new comment
+      if (newComment) {
+        const commentUpdateEvent = new CustomEvent('commentUpdate', {
+          detail: { 
+            postId, 
+            comment: newComment, 
+            action: 'add',
+            parentId: newComment.parentId 
+          }
+        });
+        window.dispatchEvent(commentUpdateEvent);
+      }
       
       // Call the callback to refresh comments from server
       if (onCommentAdded) {
@@ -115,15 +144,31 @@ function CommentList({
     }
   }
 
-  const CommentItem = ({ comment }: { comment: CommentWithUser }) => {
+  const CommentItem = ({ comment, isOnlyVisibleComment = false }: { comment: CommentWithUser, isOnlyVisibleComment?: boolean }) => {
     const { user } = useUser();
+    const { avatarUrl: replyAvatarUrl } = useUserAvatar();
     const isReplying = replyingTo === comment.id;
-    const [showAllReplies, setShowAllReplies] = useState(false);
+    const [showAllReplies, setShowAllReplies] = useState(isOnlyVisibleComment);
     const [isClient, setIsClient] = useState(false);
     const [formattedDate, setFormattedDate] = useState("");
+    // State to track if comment text is expanded
+    const [isCommentExpanded, setIsCommentExpanded] = useState(false);
     
     // Check if this comment is the one to highlight
     const isHighlighted = highlightCommentId === comment.id;
+    
+    // Configure the character limit for comment truncation
+    const COMMENT_MAX_CHARS = 120;
+    
+    // Determine if the comment needs truncation
+    const needsCommentTruncation = comment.desc && comment.desc.length > COMMENT_MAX_CHARS;
+    
+    // Get the truncated or full comment text depending on expanded state
+    const getDisplayedCommentText = () => {
+      if (!comment.desc) return "";
+      if (isCommentExpanded || !needsCommentTruncation) return comment.desc;
+      return comment.desc.substring(0, COMMENT_MAX_CHARS) + "...";
+    };
     
     useEffect(() => {
       setIsClient(true);
@@ -139,6 +184,17 @@ function CommentList({
     const handleDeleteComment = async () => {
       try {
         await deleteComment(comment.id);
+        
+        // Dispatch an event for the comment deletion
+        const commentUpdateEvent = new CustomEvent('commentUpdate', {
+          detail: { 
+            postId, 
+            action: 'delete',
+            parentId: comment.parentId
+          }
+        });
+        window.dispatchEvent(commentUpdateEvent);
+        
         // Call the callback to refresh comments from server
         if (onCommentAdded) {
           onCommentAdded();
@@ -170,7 +226,15 @@ function CommentList({
                   : comment.user.username}
               </div>
               <div className="text-sm text-zinc-600 dark:text-zinc-300">
-                {comment.desc}
+                <span className="whitespace-pre-line">{getDisplayedCommentText()}</span>
+                {needsCommentTruncation && (
+                  <button 
+                    onClick={() => setIsCommentExpanded(!isCommentExpanded)} 
+                    className="text-emerald-600 dark:text-emerald-500 font-medium text-xs ml-1 hover:underline focus:outline-none inline-flex items-center"
+                  >
+                    <span>{isCommentExpanded ? "See less" : "See more"}</span>
+                  </button>
+                )}
               </div>
             </div>
             <div className="flex gap-4 mt-1 px-3">
@@ -182,7 +246,13 @@ function CommentList({
               </button>
               <button
                 type="button"
-                onClick={() => setReplyingTo(comment.id)}
+                onClick={() => {
+                  setReplyingTo(comment.id);
+                  // Reset expanded state when replying
+                  if (isCommentExpanded) {
+                    setIsCommentExpanded(false);
+                  }
+                }}
                 className="text-xs text-zinc-500 hover:text-emerald-500 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors"
               >
                 Reply
@@ -205,7 +275,7 @@ function CommentList({
               <div className="flex gap-2 mt-2">
                 <div className="relative w-8 h-8 rounded-full overflow-hidden ring-1 ring-zinc-200 dark:ring-zinc-700 shrink-0">
                   <Image
-                    src={user.imageUrl || "/noavatar.png"}
+                    src={replyAvatarUrl || "/noavatar.png"}
                     alt=""
                     fill
                     className="object-cover"
@@ -235,7 +305,11 @@ function CommentList({
             {comment.replies && comment.replies.length > 0 && (
               <div className="ml-8 mt-2 space-y-2 max-h-[300px] overflow-y-auto scrollbar-none">
                 {displayedReplies?.map((reply) => (
-                  <CommentItem key={reply.id} comment={reply} />
+                  <CommentItem 
+                    key={reply.id} 
+                    comment={reply}
+                    isOnlyVisibleComment={false} 
+                  />
                 ))}
                 {!showAllReplies && comment.replies && comment.replies.length > 1 && (
                   <button
@@ -260,7 +334,7 @@ function CommentList({
         <div className="flex gap-2">
           <div className="relative w-8 h-8 rounded-full overflow-hidden ring-1 ring-zinc-200 dark:ring-zinc-700 shrink-0">
             <Image
-              src={user.imageUrl || "/noavatar.png"}
+              src={avatarUrl || "/noavatar.png"}
               alt=""
               fill
               className="object-cover"
@@ -290,18 +364,22 @@ function CommentList({
       {/* Comments */}
       <div className="space-y-4">
         {displayedComments.map((comment) => (
-          <CommentItem key={comment.id} comment={comment} />
+          <CommentItem 
+            key={comment.id} 
+            comment={comment} 
+            isOnlyVisibleComment={!showAll && displayedComments.length === 1 && totalCommentsCount > 1}
+          />
         ))}
       </div>
 
       {/* View All Comments Button */}
-      {!showAll && optimisticComments.length > 1 && (
+      {!showAll && totalCommentsCount > 1 && (
         <button
           onClick={() => setShowPostDetail(true)}
           className="flex items-center gap-2 text-sm text-zinc-500 hover:text-emerald-500 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors mt-2 cursor-pointer"
         >
           <MessageCircle className="w-4 h-4" />
-          <span>View all {optimisticComments.length} comments</span>
+          <span>View all {totalCommentsCount} comments</span>
         </button>
       )}
 

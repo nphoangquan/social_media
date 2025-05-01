@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "./client";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
@@ -294,6 +294,9 @@ export const addComment = async (postId: number, desc: string, parentId?: number
         postId,
         parentId: parentId || null,
       },
+      include: {
+        user: true,
+      }
     });
 
     // Nếu đây là comment gốc (không phải reply)
@@ -330,7 +333,7 @@ export const addComment = async (postId: number, desc: string, parentId?: number
     }
     
     revalidatePath(`/post/${postId}`);
-    return { success: true };
+    return comment;
   } catch (err) {
     console.log(err);
     throw new Error("Something went wrong!");
@@ -355,13 +358,31 @@ export const addPost = async (formData: FormData, media: string, mediaType?: "im
         ...(mediaType === "image" && { img: media }),
         ...(mediaType === "video" && { video: media }),
       },
+      include: {
+        user: true,
+        likes: {
+          select: {
+            userId: true,
+          }
+        },
+        _count: {
+          select: {
+            comments: true,
+            likes: true,
+          }
+        }
+      }
     });
 
     // Tạo thông báo cho followers khi có bài viết mới
     await createNewPostNotification(userId, post.id);
 
     revalidatePath("/");
-    return post;
+    return {
+      ...post,
+      comments: [],
+      currentUserId: userId
+    };
   } catch (err) {
     console.log(err);
     throw new Error("Something went wrong!");
@@ -419,9 +440,11 @@ export const deletePost = async (postId: number) => {
         userId,
       },
     });
-    revalidatePath("/")
+    revalidatePath("/");
+    return { success: true, postId };
   } catch (err) {
     console.log(err);
+    return { success: false, error: "Failed to delete post" };
   }
 };
 
@@ -608,3 +631,37 @@ export const searchContent = async (query: string) => {
     throw new Error("Something went wrong with the search!");
   }
 };
+
+// Add this function to synchronize user avatar from Clerk to the database
+export async function synchronizeUserAvatar() {
+  const { userId } = await auth();
+  
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+  
+  try {
+    // Get current user from Clerk
+    const user = await currentUser();
+    
+    if (!user) {
+      throw new Error("User not found");
+    }
+    
+    // Update the avatar in the database with the current imageUrl from Clerk
+    await prisma.user.update({
+      where: { id: userId },
+      data: { avatar: user.imageUrl }
+    });
+    
+    // Revalidate all pages where the avatar might be displayed
+    revalidatePath("/", "layout");
+    revalidatePath("/profile/[username]", "layout");
+    revalidatePath("/settings", "layout");
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to sync user avatar:", error);
+    return { success: false, error: "Failed to synchronize avatar" };
+  }
+}

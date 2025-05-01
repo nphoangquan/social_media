@@ -46,7 +46,7 @@ const Ad = ({ size }: { size: "sm" | "md" | "lg" }) => {
             {size === "sm"
               ? "Introvertia - The social network for introverts."
               : size === "md"
-              ? "Introvertia - Connect with others who understand your energy needs."
+              ? "Introvertia - Tôi hướng nội, bạn cũng thế."
               : "Introvertia - The social network designed for introverts. Connect meaningfully without the social pressure."}
           </p>
           

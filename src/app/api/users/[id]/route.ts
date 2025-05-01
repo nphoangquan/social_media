@@ -2,29 +2,35 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/client";
 
+type RouteContext = {
+  params: Promise<{ id: string }>;
+};
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+  context: RouteContext
+): Promise<NextResponse> {
   const { userId } = await auth();
 
   if (!userId) {
-    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+    return Promise.resolve(new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
-    });
+    }));
   }
 
+  const { id } = await context.params;
+
   // Only allow users to fetch their own data (for security)
-  if (userId !== params.id) {
-    return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
+  if (userId !== id) {
+    return Promise.resolve(new NextResponse(JSON.stringify({ error: "Forbidden" }), {
       status: 403,
-    });
+    }));
   }
 
   try {
     const user = await prisma.user.findUnique({
       where: {
-        id: params.id,
+        id: id,
       },
       select: {
         id: true,
@@ -42,16 +48,16 @@ export async function GET(
     });
 
     if (!user) {
-      return new NextResponse(JSON.stringify({ error: "User not found" }), {
+      return Promise.resolve(new NextResponse(JSON.stringify({ error: "User not found" }), {
         status: 404,
-      });
+      }));
     }
 
-    return NextResponse.json(user);
+    return Promise.resolve(NextResponse.json(user));
   } catch (error) {
     console.error("Error fetching user:", error);
-    return new NextResponse(JSON.stringify({ error: "Internal server error" }), {
+    return Promise.resolve(new NextResponse(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
-    });
+    }));
   }
 } 

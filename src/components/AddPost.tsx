@@ -4,12 +4,16 @@ import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { useState } from "react";
 import CreatePostModal from "./CreatePostModal";
+import { useUserAvatar } from "@/lib/hooks/useUserAvatar";
 
 const AddPost = () => {
-  const { user, isLoaded } = useUser();
+  // Use Clerk to check if user is loaded
+  const { isLoaded: clerkLoaded } = useUser();
+  // Use our custom hook for avatar
+  const { avatarUrl } = useUserAvatar();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  if (!isLoaded) {
+  if (!clerkLoaded) {
     return "Loading...";
   }
 
@@ -19,10 +23,11 @@ const AddPost = () => {
         {/* AVATAR */}
         <div className="relative w-10 h-10 rounded-full overflow-hidden ring-2 ring-zinc-100 dark:ring-zinc-800">
           <Image
-            src={user?.imageUrl || "/noAvatar.png"}
+            src={avatarUrl || "/noAvatar.png"}
             alt=""
             fill
             className="object-cover"
+            priority
           />
         </div>
         {/* Post Input Trigger */}

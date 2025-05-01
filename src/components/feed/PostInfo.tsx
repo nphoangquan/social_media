@@ -24,7 +24,16 @@ const PostInfo = ({ post }: { post: PostWithUserAndComments }) => {
   const handleDeleteClick = async () => {
     try {
       setOpen(false);
-      await deletePost(post.id);
+      const result = await deletePost(post.id);
+      
+      if (result && result.success) {
+        // Dispatch một event để thông báo cho các component khác biết bài viết đã bị xóa
+        const deletePostEvent = new CustomEvent('deletePost', {
+          detail: { postId: post.id }
+        });
+        window.dispatchEvent(deletePostEvent);
+      }
+      
       router.refresh();
     } catch (error) {
       console.error("Error deleting post:", error);

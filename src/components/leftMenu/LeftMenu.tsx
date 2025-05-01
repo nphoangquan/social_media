@@ -100,7 +100,7 @@ const LeftMenu = async ({ type }: { type: "home" | "profile" }) => {
             <span className="font-medium">Friend Lists</span>
           </Link>
           <Link
-            href="/"
+            href="/settings"
             className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
           >
             <Settings className="w-5 h-5 group-hover:scale-110 transition-transform" />

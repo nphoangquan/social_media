@@ -59,7 +59,7 @@ export default function SearchBar() {
         setIsLoading(false);
       }
     }, 500),
-    []
+    [searchContent, setSearchResults, setIsLoading]
   );
 
   // Handle input change

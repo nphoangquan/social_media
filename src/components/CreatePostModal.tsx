@@ -44,11 +44,25 @@ const CreatePostModal = ({ onClose }: CreatePostModalProps) => {
         const formData = new FormData();
         formData.append("desc", desc);
         
-        await addPost(formData, media?.secure_url || "", mediaType);
+        const newPost = await addPost(formData, media?.secure_url || "", mediaType);
+        
+        // Reset form state
         setMedia(undefined);
         setMediaType(undefined);
         setDesc("");
+        
+        // Dispatch a custom event to notify other components about the new post
+        if (newPost) {
+          const newPostEvent = new CustomEvent('newPost', {
+            detail: { post: newPost }
+          });
+          window.dispatchEvent(newPostEvent);
+        }
+        
+        // Force data refresh to ensure new post appears
         router.refresh();
+        
+        // Close modal after successful post
         onClose();
       } catch (error) {
         console.error("Error posting:", error);

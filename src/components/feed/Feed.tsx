@@ -17,6 +17,63 @@ const Feed = ({ username }: FeedProps) => {
   const loadingRef = useRef(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Handler for new post event
+  const handleNewPost = useCallback((event: Event) => {
+    const { post } = (event as CustomEvent).detail;
+    // Add the new post to the beginning of the list
+    if (post) {
+      setPosts(prevPosts => {
+        // Check if post already exists to avoid duplicates
+        if (!prevPosts.some(p => p.id === post.id)) {
+          return [post, ...prevPosts];
+        }
+        return prevPosts;
+      });
+    }
+  }, []);
+
+  // Handler for delete post event
+  const handleDeletePost = useCallback((event: Event) => {
+    const { postId } = (event as CustomEvent).detail;
+    // Remove the deleted post from the list
+    if (postId) {
+      setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+    }
+  }, []);
+
+  // Handler for post update event
+  const handlePostUpdate = useCallback((event: Event) => {
+    const { postId, updatedPost } = (event as CustomEvent).detail;
+    // Update the modified post in the list
+    if (postId && updatedPost) {
+      setPosts(prevPosts => prevPosts.map(post => 
+        post.id === postId 
+          ? { 
+              ...post, 
+              desc: updatedPost.desc,
+              img: updatedPost.img,
+              video: updatedPost.video
+            } 
+          : post
+      ));
+    }
+  }, []);
+
+  // Add event listeners for posts
+  useEffect(() => {
+    // Add event listeners
+    window.addEventListener('newPost', handleNewPost);
+    window.addEventListener('deletePost', handleDeletePost);
+    window.addEventListener('postUpdate', handlePostUpdate);
+    
+    // Clean up event listeners
+    return () => {
+      window.removeEventListener('newPost', handleNewPost);
+      window.removeEventListener('deletePost', handleDeletePost);
+      window.removeEventListener('postUpdate', handlePostUpdate);
+    };
+  }, [handleNewPost, handleDeletePost, handlePostUpdate]);
+
   // Debounced fetch function
   const debouncedFetch = useCallback(() => {
     if (timerRef.current) {

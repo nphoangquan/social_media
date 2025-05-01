@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { ClerkProvider } from "@clerk/nextjs";
 import { NotificationProvider } from "@/lib/contexts/NotificationContext";
+import AvatarRefresh from "@/components/AvatarRefresh";
 
 const inter = Inter({ subsets: ["latin"] });
 const orbitron = Orbitron({ subsets: ["latin"] });
@@ -23,6 +24,9 @@ export default function RootLayout({
       <html lang="en" className="dark">
         <body suppressHydrationWarning className={`${inter.className} bg-zinc-950 text-zinc-100`}>
           <NotificationProvider>
+            {/* Avatar refresh component to handle data synchronization */}
+            <AvatarRefresh />
+            
             {/* Navbar with emerald gradient */}
             <div className="relative w-full sticky top-0 z-50">
               {/* Emerald gradient background */}

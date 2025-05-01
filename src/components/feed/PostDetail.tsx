@@ -39,24 +39,87 @@ export default function PostDetail({
   const [postLikes, setPostLikes] = useState<string[]>(post.likes?.map(like => like.userId) || []);
   // State to track whether the full description is shown
   const [isExpanded, setIsExpanded] = useState(false);
+  // State to track post content for updates
+  const [postContent, setPostContent] = useState({
+    desc: post.desc,
+    img: post.img,
+    video: post.video
+  });
+  
+  // Calculate initial comment count including replies
+  const calculateTotalComments = useCallback((commentList: CommentWithUser[]) => {
+    let total = 0;
+    commentList.forEach(comment => {
+      total++; // Count the parent comment
+      if (comment.replies && Array.isArray(comment.replies)) {
+        total += comment.replies.length; // Add reply count
+      }
+    });
+    return total;
+  }, []);
+  
+  // State to track comment count
+  const [commentCount, setCommentCount] = useState(calculateTotalComments(comments));
   
   // Configure the character limit for truncation
   const MAX_CHARS = 150;
   
   // Determine if the description needs truncation
-  const needsTruncation = post.desc && post.desc.length > MAX_CHARS;
+  const needsTruncation = postContent.desc && postContent.desc.length > MAX_CHARS;
   
   // Get the truncated or full description depending on expanded state
   const getDisplayedDesc = () => {
-    if (!post.desc) return "";
-    if (isExpanded || !needsTruncation) return post.desc;
-    return post.desc.substring(0, MAX_CHARS) + "...";
+    if (!postContent.desc) return "";
+    if (isExpanded || !needsTruncation) return postContent.desc;
+    return postContent.desc.substring(0, MAX_CHARS) + "...";
   };
 
-  useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
+  // Handle post update events
+  const handlePostUpdate = useCallback((event: Event) => {
+    const { postId, updatedPost } = (event as CustomEvent).detail;
+    
+    if (postId === post.id && updatedPost) {
+      // Update post content with the new data
+      setPostContent({
+        desc: updatedPost.desc || "",
+        img: updatedPost.img || null,
+        video: updatedPost.video || null
+      });
+      
+      // Reset expanded state when description changes
+      setIsExpanded(false);
+    }
+  }, [post.id]);
+
+  // Handle like update events
+  const handleLikeUpdate = useCallback((event: Event) => {
+    const { postId, userId, isLiked } = (event as CustomEvent).detail;
+    
+    if (postId === post.id) {
+      setPostLikes(prevLikes => {
+        if (isLiked) {
+          // Add like if not already present
+          if (!prevLikes.includes(userId)) {
+            return [...prevLikes, userId];
+          }
+        } else {
+          // Remove like
+          return prevLikes.filter(likeId => likeId !== userId);
+        }
+        return prevLikes;
+      });
+    }
+  }, [post.id]);
+
+  // Thêm handleDeletePost để xử lý sự kiện khi bài viết bị xóa
+  const handleDeletePost = useCallback((event: Event) => {
+    const { postId } = (event as CustomEvent).detail;
+    
+    if (postId === post.id) {
+      // Đóng modal khi bài viết bị xóa
+      onClose();
+    }
+  }, [post.id, onClose]);
 
   // Function to reload comments
   const refreshComments = useCallback(async () => {
@@ -64,11 +127,50 @@ export default function PostDetail({
       const updatedComments = await getPostComments(post.id);
       if (updatedComments) {
         setComments(updatedComments);
+        setCommentCount(calculateTotalComments(updatedComments));
       }
     } catch (error) {
       console.error("Error refreshing comments:", error);
     }
-  }, [post.id]);
+  }, [post.id, calculateTotalComments]);
+
+  // Thêm handleCommentUpdate để xử lý sự kiện khi comment được thêm/xóa
+  const handleCommentUpdate = useCallback((event: Event) => {
+    const { postId: eventPostId, action } = (event as CustomEvent).detail;
+    
+    if (eventPostId === post.id) {
+      // Cập nhật số lượng comment tức thì
+      setCommentCount(prevCount => {
+        if (action === 'add') {
+          return prevCount + 1;
+        } else if (action === 'delete') {
+          return Math.max(0, prevCount - 1);
+        }
+        return prevCount;
+      });
+      
+      // Sau đó cập nhật toàn bộ danh sách comments
+      refreshComments();
+    }
+  }, [post.id, refreshComments]);
+
+  useEffect(() => {
+    setMounted(true);
+    
+    // Add event listeners
+    window.addEventListener('likeUpdate', handleLikeUpdate);
+    window.addEventListener('deletePost', handleDeletePost);
+    window.addEventListener('commentUpdate', handleCommentUpdate);
+    window.addEventListener('postUpdate', handlePostUpdate);
+    
+    return () => {
+      setMounted(false);
+      window.removeEventListener('likeUpdate', handleLikeUpdate);
+      window.removeEventListener('deletePost', handleDeletePost);
+      window.removeEventListener('commentUpdate', handleCommentUpdate);
+      window.removeEventListener('postUpdate', handlePostUpdate);
+    };
+  }, [handleLikeUpdate, handleDeletePost, handleCommentUpdate, handlePostUpdate]);
 
   // Cập nhật likes từ prop post khi có thay đổi
   useEffect(() => {
@@ -78,17 +180,38 @@ export default function PostDetail({
     }
   }, [post.likes]);
 
+  // Cập nhật comments từ prop post khi có thay đổi
+  useEffect(() => {
+    if (post.comments) {
+      setComments(post.comments);
+      setCommentCount(calculateTotalComments(post.comments));
+    }
+  }, [post.comments, calculateTotalComments]);
+
   // Sử dụng useEffect để lắng nghe sự thay đổi của postId và cập nhật dữ liệu
   useEffect(() => {
     refreshComments();
   }, [post.id, refreshComments]);
 
+  // Update commentCount whenever comments change
+  useEffect(() => {
+    setCommentCount(calculateTotalComments(comments));
+  }, [comments, calculateTotalComments]);
+
   if (!mounted) return null;
 
-  // Create a version of the post with updated comments
-  const postWithUpdatedComments = {
+  // Create a version of the post with updated comments and likes
+  const postWithUpdatedData = {
     ...post,
+    desc: postContent.desc,
+    img: postContent.img,
+    video: postContent.video,
     comments: comments,
+    likes: postLikes.map(userId => ({ userId })),
+    _count: {
+      comments: commentCount,
+      likes: postLikes.length
+    }
   };
 
   const modalContent = (
@@ -143,7 +266,7 @@ export default function PostDetail({
               </div>
             </div>
 
-            {post.desc && (
+            {postContent.desc && (
               <div className="mb-4">
                 <p className="text-zinc-600 dark:text-zinc-300 whitespace-pre-line">
                   {getDisplayedDesc()}
@@ -159,10 +282,10 @@ export default function PostDetail({
               </div>
             )}
 
-            {post.img && (
+            {postContent.img && (
               <div className="rounded-xl overflow-hidden mb-4">
                 <Image
-                  src={post.img}
+                  src={postContent.img}
                   width={1200}
                   height={800}
                   alt=""
@@ -171,10 +294,10 @@ export default function PostDetail({
               </div>
             )}
 
-            {post.video && (
+            {postContent.video && (
               <div className="rounded-xl overflow-hidden mb-4 bg-zinc-900">
                 <video
-                  src={post.video}
+                  src={postContent.video}
                   controls
                   playsInline
                   preload="metadata"
@@ -191,8 +314,8 @@ export default function PostDetail({
             <PostInteraction
               postId={post.id}
               likes={postLikes}
-              commentNumber={comments.length}
-              post={postWithUpdatedComments}
+              commentNumber={commentCount}
+              post={postWithUpdatedData}
             />
           </div>
 
@@ -202,7 +325,7 @@ export default function PostDetail({
               comments={comments} 
               postId={post.id} 
               showAll={true} 
-              post={postWithUpdatedComments}
+              post={postWithUpdatedData}
               onCommentAdded={refreshComments}
             />
           </div>

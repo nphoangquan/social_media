@@ -1,6 +1,6 @@
 import prisma from "@/lib/client";
 import { auth } from "@clerk/nextjs/server";
-import { redirect, notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import PostDetail from "@/components/post/PostDetail";
 import LeftMenu from "@/components/leftMenu/LeftMenu";
 import RightMenu from "@/components/rightMenu/RightMenu";
@@ -19,8 +19,8 @@ export default async function PostPage({
   
   const { userId } = await auth();
   
+  // Redirect to login if no user ID
   if (!userId) {
-    // Redirect to sign in if not authenticated
     redirect("/sign-in");
   }
   

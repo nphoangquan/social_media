@@ -4,7 +4,7 @@ import Image from "next/image";
 import Comments from "./Comments";
 import { Post as PostType, User, Comment } from "@prisma/client";
 import PostInteraction from "./PostInteraction";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import PostInfo from "./PostInfo";
 import Link from "next/link";
 import { getPostDetails } from "@/lib/actions/post";
@@ -40,19 +40,121 @@ const Post = ({ post }: { post: FeedPostType }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   // State to control PostDetail modal visibility
   const [showPostDetail, setShowPostDetail] = useState(false);
+  // State to keep track of post likes
+  const [currentLikes, setCurrentLikes] = useState<{ userId: string }[]>(post.likes || []);
+  // State to track if post has been deleted
+  const [isDeleted, setIsDeleted] = useState(false);
+  // State to track comment count
+  const [commentCount, setCommentCount] = useState(post._count.comments);
+  // State to track post content for updates
+  const [postContent, setPostContent] = useState({
+    desc: post.desc,
+    img: post.img,
+    video: post.video
+  });
   
   // Configure the character limit for truncation
   const MAX_CHARS = 150;
   
   // Determine if the description needs truncation
-  const needsTruncation = post.desc && post.desc.length > MAX_CHARS;
+  const needsTruncation = postContent.desc && postContent.desc.length > MAX_CHARS;
   
   // Get the truncated or full description depending on expanded state
   const getDisplayedDesc = () => {
-    if (!post.desc) return "";
-    if (isExpanded || !needsTruncation) return post.desc;
-    return post.desc.substring(0, MAX_CHARS) + "...";
+    if (!postContent.desc) return "";
+    if (isExpanded || !needsTruncation) return postContent.desc;
+    return postContent.desc.substring(0, MAX_CHARS) + "...";
   };
+
+  const handleLikeUpdate = useCallback((event: Event) => {
+    const { postId, userId, isLiked } = (event as CustomEvent).detail;
+    
+    if (postId === post.id) {
+      setCurrentLikes(prevLikes => {
+        if (isLiked) {
+          // Add like if not already present
+          if (!prevLikes.some(like => like.userId === userId)) {
+            return [...prevLikes, { userId }];
+          }
+        } else {
+          // Remove like
+          return prevLikes.filter(like => like.userId !== userId);
+        }
+        return prevLikes;
+      });
+    }
+  }, [post.id]);
+
+  // Handler for delete post events
+  const handleDeletePost = useCallback((event: Event) => {
+    const { postId } = (event as CustomEvent).detail;
+    
+    if (postId === post.id) {
+      // Mark this post as deleted
+      setIsDeleted(true);
+      // Close modal if open
+      setShowPostDetail(false);
+    }
+  }, [post.id]);
+
+  // Handler for comment update events
+  const handleCommentUpdate = useCallback((event: Event) => {
+    const { postId: eventPostId, action } = (event as CustomEvent).detail;
+    
+    if (eventPostId === post.id) {
+      setCommentCount(prevCount => {
+        if (action === 'add') {
+          return prevCount + 1;
+        } else if (action === 'delete') {
+          return Math.max(0, prevCount - 1);
+        }
+        return prevCount;
+      });
+    }
+  }, [post.id]);
+
+  // Handler for post update events
+  const handlePostUpdate = useCallback((event: Event) => {
+    const { postId, updatedPost } = (event as CustomEvent).detail;
+    
+    if (postId === post.id && updatedPost) {
+      // Update post content with the new data
+      setPostContent({
+        desc: updatedPost.desc || "",
+        img: updatedPost.img || null,
+        video: updatedPost.video || null
+      });
+      
+      // Reset expanded state when description changes
+      setIsExpanded(false);
+    }
+  }, [post.id]);
+
+  useEffect(() => {
+    // Add event listeners
+    window.addEventListener('likeUpdate', handleLikeUpdate);
+    window.addEventListener('deletePost', handleDeletePost);
+    window.addEventListener('commentUpdate', handleCommentUpdate);
+    window.addEventListener('postUpdate', handlePostUpdate);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('likeUpdate', handleLikeUpdate);
+      window.removeEventListener('deletePost', handleDeletePost);
+      window.removeEventListener('commentUpdate', handleCommentUpdate);
+      window.removeEventListener('postUpdate', handlePostUpdate);
+    };
+  }, [handleLikeUpdate, handleDeletePost, handleCommentUpdate, handlePostUpdate]);
+
+  // Update when post likes change from props
+  useEffect(() => {
+    setCurrentLikes(post.likes || []);
+  }, [post.likes]);
+
+  // Update comment count from props
+  useEffect(() => {
+    setCommentCount(post._count.comments);
+  }, [post._count.comments]);
 
   useEffect(() => {
     const loadPostDetails = async () => {
@@ -66,8 +168,19 @@ const Post = ({ post }: { post: FeedPostType }) => {
 
   const postWithComments = {
     ...post,
+    desc: postContent.desc,
+    img: postContent.img,
+    video: postContent.video,
     comments: postData.comments,
+    likes: currentLikes,
+    _count: {
+      ...post._count,
+      comments: commentCount
+    }
   };
+
+  // Don't render anything if the post has been deleted
+  if (isDeleted) return null;
 
   return (
     <>
@@ -102,7 +215,7 @@ const Post = ({ post }: { post: FeedPostType }) => {
         {/* DESC */}
         <div className="flex flex-col gap-4">
           {/* Hiển thị mô tả trước media */}
-          {post.desc && (
+          {postContent.desc && (
             <div>
               <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed whitespace-pre-line">
                 {getDisplayedDesc()}
@@ -119,14 +232,14 @@ const Post = ({ post }: { post: FeedPostType }) => {
           )}
           
           {/* Hiển thị ảnh hoặc video có thể bấm vào */}
-          {post.img ? (
+          {postContent.img ? (
             <div 
               className="mx-[-16px] my-2 cursor-pointer relative overflow-hidden"
               onClick={() => setShowPostDetail(true)}
             >
               <div className="transition-transform duration-300 hover:scale-[1.01]">
                 <Image
-                  src={post.img}
+                  src={postContent.img}
                   width={1200}
                   height={800}
                   className="w-full h-auto"
@@ -135,14 +248,14 @@ const Post = ({ post }: { post: FeedPostType }) => {
                 />
               </div>
             </div>
-          ) : post.video && (
+          ) : postContent.video && (
             <div 
               className="mx-[-16px] my-2 bg-zinc-900 rounded-xl overflow-hidden cursor-pointer relative"
               onClick={() => setShowPostDetail(true)}
             >
               <div className="transition-transform duration-300 hover:scale-[1.01]">
                 <video
-                  src={post.video}
+                  src={postContent.video}
                   className="w-full"
                   controls
                   playsInline
@@ -162,8 +275,8 @@ const Post = ({ post }: { post: FeedPostType }) => {
         }>
           <PostInteraction
             postId={post.id}
-            likes={post.likes.map((like) => like.userId)}
-            commentNumber={post._count.comments}
+            likes={currentLikes.map((like) => like.userId)}
+            commentNumber={commentCount}
             post={postWithComments}
           />
         </Suspense>

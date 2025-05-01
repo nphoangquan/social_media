@@ -2,24 +2,35 @@ import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/client";
 import Image from "next/image";
 import Link from "next/link";
+import { unstable_cache } from "next/cache";
+
+// Cache result for a short time but revalidate frequently
+const getUser = unstable_cache(
+  async (userId: string) => {
+    return prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        _count: {
+          select: {
+            followers: true,
+          },
+        },
+      },
+    });
+  },
+  ['user-profile-card'],
+  { revalidate: 5 } // Revalidate every 5 seconds
+);
 
 const ProfileCard = async () => {
   const { userId } = await auth();
 
   if (!userId) return null;
 
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-    include: {
-      _count: {
-        select: {
-          followers: true,
-        },
-      },
-    },
-  });
+  // Use the cached function to get user data
+  const user = await getUser(userId);
 
   if (!user) return null;
 
@@ -32,6 +43,7 @@ const ProfileCard = async () => {
           alt=""
           fill
           className="object-cover rounded-t-2xl"
+          priority
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
       </div>
@@ -44,6 +56,7 @@ const ProfileCard = async () => {
               alt=""
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-110"
+              priority
             />
           </div>
         </Link>

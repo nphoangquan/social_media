@@ -52,6 +52,22 @@ export default function EditPostWidget({ post, onClose }: EditPostWidgetProps) {
         throw new Error("Failed to update post");
       }
 
+      const updatedPost = await response.json();
+      
+      // Dispatch a custom event to notify other components about the post update
+      const postUpdateEvent = new CustomEvent('postUpdate', {
+        detail: { 
+          postId: post.id,
+          updatedPost: {
+            ...post,
+            desc: updatedPost.desc,
+            img: updatedPost.img,
+            video: updatedPost.video
+          }
+        }
+      });
+      window.dispatchEvent(postUpdateEvent);
+
       router.refresh();
       onClose();
     } catch (error) {
