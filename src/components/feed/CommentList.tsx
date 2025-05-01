@@ -93,6 +93,7 @@ function CommentList({
         work: "",
         school: "",
         website: "",
+        birthDate: null,
         createdAt: now,
       },
     };

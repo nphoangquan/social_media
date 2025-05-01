@@ -9,12 +9,28 @@ import {
   Image as ImageIcon, 
   Video, 
   // Newspaper, 
-  // BookOpen, 
+  BookOpen, 
   List, 
   Settings 
 } from "lucide-react";
+import { auth } from "@clerk/nextjs/server";
+import prisma from "@/lib/client";
 
-const LeftMenu = ({ type }: { type: "home" | "profile" }) => {
+const LeftMenu = async ({ type }: { type: "home" | "profile" }) => {
+  const { userId } = await auth();
+  let username = "";
+  
+  if (userId) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { username: true }
+    });
+    
+    if (user) {
+      username = user.username;
+    }
+  }
+  
   return (
     <div className="flex flex-col gap-6">
       {type === "home" && <ProfileCard />}
@@ -69,13 +85,13 @@ const LeftMenu = ({ type }: { type: "home" | "profile" }) => {
             <Newspaper className="w-5 h-5 group-hover:scale-110 transition-transform" />
             <span className="font-medium">News</span>
           </Link> */}
-          {/* <Link
-            href="/"
+          {<Link
+            href={username ? `/profile/${username}` : "/"}
             className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"
           >
             <BookOpen className="w-5 h-5 group-hover:scale-110 transition-transform" />
-            <span className="font-medium">Courses</span>
-          </Link> */}
+            <span className="font-medium">Profile</span>
+          </Link>}
           <Link
             href="/friends"
             className="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all group"

@@ -3,8 +3,8 @@
 import { Story, User } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
-import { Plus } from "lucide-react";
-import { useState } from "react";
+import { Plus, Video as VideoIcon } from "lucide-react";
+import { useState, useEffect } from "react";
 import CreateStoryModal from "./CreateStoryModal";
 
 type StoryWithUser = Story & {
@@ -13,6 +13,12 @@ type StoryWithUser = Story & {
 
 export default function Stories({ stories }: { stories: StoryWithUser[] }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Set mounted to true after initial render to prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <>
@@ -21,7 +27,7 @@ export default function Stories({ stories }: { stories: StoryWithUser[] }) {
         <div className="shrink-0">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="w-28 h-40 rounded-xl overflow-hidden relative group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden"
+            className="w-28 h-40 rounded-xl relative group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden"
           >
             {/* Background with neon emerald color */}
             <div className="absolute inset-0 bg-emerald-600"></div>
@@ -46,7 +52,7 @@ export default function Stories({ stories }: { stories: StoryWithUser[] }) {
             className="shrink-0"
           >
             <div className="w-28 h-40 rounded-xl bg-zinc-900 border border-zinc-800 overflow-hidden relative group cursor-pointer hover:border-emerald-500/50 transition-colors">
-              {story.img && (
+              {story.img && !story.video && (
                 <Image
                   src={story.img}
                   alt=""
@@ -55,14 +61,19 @@ export default function Stories({ stories }: { stories: StoryWithUser[] }) {
                 />
               )}
               {story.video && (
-                <video
-                  src={story.video}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  autoPlay
-                  playsInline
-                  muted
-                  loop
-                />
+                <>
+                  <video
+                    src={story.video}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    autoPlay={mounted}
+                    playsInline
+                    muted
+                    loop
+                  />
+                  <div className="absolute top-2 right-2 bg-black/50 rounded-full p-1">
+                    <VideoIcon className="w-3 h-3 text-white" />
+                  </div>
+                </>
               )}
               <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent" />
               

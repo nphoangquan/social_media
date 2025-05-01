@@ -33,11 +33,15 @@ const NotificationBell = () => {
   return (
     <Link 
       href="/notifications" 
-      className="relative cursor-pointer text-zinc-400 hover:text-zinc-100 transition-colors"
+      className="relative cursor-pointer"
     >
-      <Bell className={`w-5 h-5 ${isAnimating ? 'animate-[wiggle_0.5s_ease-in-out_infinite]' : ''}`} />
+      <div className="relative z-10">
+        <Bell className={`w-5 h-5 text-white transition-opacity duration-200 cursor-pointer ${isAnimating ? 'animate-[wiggle_0.5s_ease-in-out_infinite]' : ''}`} />
+        <Bell className={`w-5 h-5 absolute inset-0 text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer ${isAnimating ? 'animate-[wiggle_0.5s_ease-in-out_infinite]' : ''}`} />
+      </div>
+      
       {unreadCount > 0 && (
-        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 min-w-4 flex items-center justify-center px-1">
+        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 min-w-4 flex items-center justify-center px-1 shadow-lg z-10">
           {unreadCount > 99 ? "99+" : unreadCount}
         </span>
       )}

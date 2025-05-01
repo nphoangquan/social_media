@@ -245,6 +245,21 @@ export default function StoryViewer({ story, allStories }: { story: StoryWithUse
           </button>
         )}
 
+        {/* Pause/Play button for videos - show next to delete button */}
+        {story.video && (
+          <button
+            onClick={togglePlayPause}
+            className={`absolute top-4 ${user?.id === story.userId ? 'right-28' : 'right-16'} z-50 p-2 hover:bg-zinc-800/50 rounded-full transition-colors`}
+            title={isPaused ? "Play video" : "Pause video"}
+          >
+            {isPaused ? (
+              <Play className="w-6 h-6 text-white" />
+            ) : (
+              <Pause className="w-6 h-6 text-white" />
+            )}
+          </button>
+        )}
+
         {/* Navigation buttons */}
         {currentIndex > 0 && (
           <button
@@ -345,6 +360,15 @@ export default function StoryViewer({ story, allStories }: { story: StoryWithUse
               muted
               loop
               controls={false}
+              ref={(videoEl) => {
+                if (videoEl) {
+                  if (isPaused) {
+                    videoEl.pause();
+                  } else {
+                    videoEl.play().catch(e => console.error("Video play error:", e));
+                  }
+                }
+              }}
             />
           )}
         </div>

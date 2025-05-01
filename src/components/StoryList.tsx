@@ -7,7 +7,7 @@ import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
 import Link from "next/link";
 import { useOptimistic, useState, useEffect } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Video } from "lucide-react";
 
 interface CloudinaryResult {
   secure_url: string;
@@ -33,6 +33,7 @@ const StoryList = ({
     return stories.filter(story => new Date(story.expiresAt) > now);
   });
   const [img, setImg] = useState<CloudinaryResult | null>(null);
+  const [resourceType, setResourceType] = useState<string>("image");
 
   const { user } = useUser();
 
@@ -57,8 +58,8 @@ const StoryList = ({
 
     addOptimisticStory({
       id: Date.now(),
-      img: img.secure_url,
-      video: null,
+      img: resourceType === "video" ? null : img.secure_url,
+      video: resourceType === "video" ? img.secure_url : null,
       createdAt: new Date(Date.now()),
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
       userId: userId,
@@ -74,12 +75,13 @@ const StoryList = ({
         work: "",
         school: "",
         website: "",
+        birthDate: null,
         createdAt: new Date(Date.now()),
       },
     });
 
     try {
-      const createdStory = await addStory(img.secure_url);
+      const createdStory = await addStory(img.secure_url, resourceType);
       setStoryList((prev) => [createdStory!, ...prev]);
       setImg(null);
       window.location.reload();
@@ -98,12 +100,14 @@ const StoryList = ({
       <CldUploadWidget
         uploadPreset="social-media"
         onSuccess={(result, { widget }) => {
-          setImg(result.info as CloudinaryResult);
+          const info = result.info as CloudinaryResult;
+          setImg(info);
+          setResourceType(info.resource_type);
           widget.close();
         }}
         options={{
-          resourceType: "image",
-          clientAllowedFormats: ["jpg", "jpeg", "png", "gif"],
+          resourceType: "auto",
+          clientAllowedFormats: ["jpg", "jpeg", "png", "gif", "mp4", "mov", "avi"],
           maxFileSize: 10000000,
           styles: {
             palette: {
@@ -137,24 +141,36 @@ const StoryList = ({
       >
         {({ open }) => {
           return (
-            <div className="cursor-pointer group mr-2">
+            <div className="cursor-pointer mr-2">
               <div 
-                className="relative w-28 h-48 rounded-xl overflow-hidden shadow-md bg-zinc-900 transition-transform duration-500 group-hover:scale-105"
+                className="relative w-28 h-48 rounded-xl overflow-hidden shadow-md transition-all duration-300"
                 onClick={() => open()}
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-black to-black/50" />
+                {/* Black gradient background */}
+                <div className="absolute inset-0 bg-gradient-to-b from-zinc-800 to-black" />
+                
+                {/* Content container with direct hover effects */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <div className="bg-white dark:bg-zinc-800 rounded-full w-10 h-10 flex items-center justify-center shadow-md">
-                    <Plus className="w-6 h-6 text-zinc-800 dark:text-zinc-200" />
+                  {/* Plus icon with emerald gradient background */}
+                  <div className="bg-gradient-to-r from-emerald-500 to-emerald-700 rounded-full w-12 h-12 flex items-center justify-center mb-3 transition-all duration-300 hover:scale-110 hover:shadow-[0_0_15px_rgba(16,185,129,0.7)] relative overflow-hidden group">
+                    {/* Shimmer effect on hover */}
+                    <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
+                    <Plus className="w-6 h-6 text-zinc-800 transition-transform duration-300 group-hover:scale-110" />
                   </div>
-                  <span className="text-white font-medium text-sm mt-2">Create story</span>
+                  
+                  {/* Text with direct effect on hover */}
+                  <span className="text-white font-medium text-sm relative">
+                    Create story
+                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-emerald-500 scale-x-0 transition-transform duration-300 hover:scale-x-100"></span>
+                  </span>
                 </div>
               </div>
+              
               {img && (
                 <form action={add} className="mt-2 flex justify-center">
                   <button 
                     type="submit"
-                    className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 px-4 py-1.5 text-xs rounded-full hover:bg-emerald-100 dark:hover:bg-emerald-800/20 hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors font-medium shadow-sm hover:shadow-md"
+                    className="bg-emerald-600 text-white px-5 py-2 text-sm rounded-lg transition-colors duration-300 hover:bg-emerald-500 font-medium"
                   >
                     Share
                   </button>
@@ -173,14 +189,34 @@ const StoryList = ({
           className="cursor-pointer group relative mr-2"
         >
           <div className="relative w-28 h-48 rounded-xl overflow-hidden shadow-md transition-transform duration-500 group-hover:scale-105">
-            {/* Story image with zoom effect */}
+            {/* Story content - conditionally render image or video */}
             <div className="w-full h-full overflow-hidden">
-              <Image
-                src={story.img || "/noImage.png"}
-                alt=""
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-              />
+              {story.video ? (
+                <>
+                  <video
+                    src={story.video}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    playsInline
+                    muted
+                    preload="metadata"
+                  />
+                  <div className="absolute top-2 right-2 bg-black/50 rounded-full p-1">
+                    <Video className="w-3 h-3 text-white" />
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-10 h-10 bg-black/40 rounded-full flex items-center justify-center">
+                      <div className="w-0 h-0 border-y-[6px] border-y-transparent border-l-[10px] border-l-white ml-1"></div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <Image
+                  src={story.img || "/noAvatar.png"}
+                  alt=""
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+              )}
             </div>
             
             {/* User avatar at top */}

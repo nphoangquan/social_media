@@ -153,7 +153,7 @@ export default function StoryList({ stories: initialStories, currentStoryId }: {
   // Handle empty stories
   if (!stories || stories.length === 0) {
     return (
-      <div className="w-80 h-full bg-zinc-900/95 backdrop-blur-sm border-r border-zinc-800/50 overflow-y-auto">
+      <div className="w-80 h-full bg-zinc-900/95 backdrop-blur-sm border-r border-zinc-800/50 overflow-y-auto rounded-lg">
         <div className="p-4">
           <h2 className="text-xl font-semibold text-zinc-100 mb-4">Stories</h2>
           
@@ -219,13 +219,13 @@ export default function StoryList({ stories: initialStories, currentStoryId }: {
 
   return (
     <div 
-      className="w-80 h-full bg-zinc-900/95 backdrop-blur-sm border-r border-zinc-800/50 overflow-hidden"
+      className="w-80 h-full bg-zinc-900/95 backdrop-blur-sm border-r border-zinc-800/50 overflow-hidden rounded-lg"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <div 
         ref={storyListRef}
-        className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent p-4"
+        className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent p-4 rounded-lg"
       >
         <h2 className="text-xl font-semibold text-zinc-100 mb-4">Stories</h2>
         
@@ -290,7 +290,10 @@ export default function StoryList({ stories: initialStories, currentStoryId }: {
                     ? `${userStories.user.name} ${userStories.user.surname}`
                     : userStories.user.username || "Anonymous"}
                 </div>
-                <div className="text-xs text-zinc-400">
+                <div className="flex items-center text-xs text-zinc-400">
+                  {userStories.latestStory.video && (
+                    <div className="mr-1 text-emerald-400">Video</div>
+                  )}
                   {mounted ? (
                     new Date(userStories.latestStory.createdAt).toLocaleTimeString([], {
                       hour: '2-digit',

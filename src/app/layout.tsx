@@ -23,12 +23,20 @@ export default function RootLayout({
       <html lang="en" className="dark">
         <body suppressHydrationWarning className={`${inter.className} bg-zinc-950 text-zinc-100`}>
           <NotificationProvider>
-          <div className="w-full bg-zinc-900/80 backdrop-blur-sm border-b border-zinc-800/50 px-4 md:px-8 lg:px-24 xl:px-40 2xl:px-80 sticky top-0 z-50">
-            <Navbar logoFont={orbitron.className} />
-          </div>
-          <div className="bg-zinc-950 px-4 md:px-8 lg:px-24 xl:px-40 2xl:px-80 pt-4">
-            {children}
-          </div>
+            {/* Navbar with emerald gradient */}
+            <div className="relative w-full sticky top-0 z-50">
+              {/* Emerald gradient background */}
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/20 via-emerald-900/10 to-emerald-950/20"></div>
+              
+              {/* Navbar container */}
+              <div className="relative w-full bg-zinc-900/80 backdrop-blur-sm border-b border-zinc-800/50 px-4 md:px-8 lg:px-24 xl:px-40 2xl:px-80">
+                <Navbar logoFont={orbitron.className} />
+              </div>
+            </div>
+            
+            <div className="bg-zinc-950 px-4 md:px-8 lg:px-24 xl:px-40 2xl:px-80 pt-4">
+              {children}
+            </div>
           </NotificationProvider>
         </body>
       </html>

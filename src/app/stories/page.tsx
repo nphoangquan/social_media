@@ -1,7 +1,7 @@
 import { getAllStories } from "@/lib/actions/story";
 import StoryList from "@/components/story/StoryList";
 import Link from "next/link";
-import { Plus, Sparkles, Clock } from "lucide-react";
+import { Plus, Sparkles, Clock, Film } from "lucide-react";
 import Image from "next/image";
 
 export default async function StoriesPage() {
@@ -9,7 +9,7 @@ export default async function StoriesPage() {
 
   if (!stories || stories.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-zinc-900 to-zinc-950">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-zinc-900 to-zinc-950 rounded-lg">
         <div className="relative p-8 bg-zinc-900/30 backdrop-blur-md rounded-3xl max-w-md w-full border border-zinc-800/50 shadow-xl">
           <div className="absolute -top-6 -right-6 w-12 h-12 bg-gradient-to-br from-blue-500 to-violet-500 rounded-xl transform rotate-12"></div>
           <div className="absolute -bottom-4 -left-4 w-8 h-8 bg-gradient-to-tr from-emerald-500 to-cyan-500 rounded-lg transform -rotate-12"></div>
@@ -37,7 +37,7 @@ export default async function StoriesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-900 to-zinc-950 flex">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-900 to-zinc-950 flex rounded-lg">
       <div className="hidden md:block">
         <StoryList stories={stories} />
       </div>
@@ -63,12 +63,30 @@ export default async function StoriesPage() {
               <div className="mb-8 relative group">
                 <div className="w-full h-48 rounded-xl overflow-hidden mb-3 relative group-hover:shadow-lg group-hover:shadow-blue-500/10 transition-all">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
-                  <Image 
-                    src={stories[0].img || "/placeholder.png"}
-                    alt="Featured story"
-                    fill
-                    className="object-cover transition-transform group-hover:scale-105 duration-500"
-                  />
+                  
+                  {stories[0].video ? (
+                    <div className="relative w-full h-full">
+                      <video 
+                        src={stories[0].video}
+                        muted
+                        loop
+                        autoPlay
+                        playsInline
+                        className="object-cover w-full h-full transition-transform group-hover:scale-105 duration-500"
+                      />
+                      <div className="absolute top-3 right-3 z-20">
+                        <Film className="w-5 h-5 text-white/80" />
+                      </div>
+                    </div>
+                  ) : (
+                    <Image 
+                      src={stories[0].img || "/placeholder.png"}
+                      alt="Featured story"
+                      fill
+                      className="object-cover transition-transform group-hover:scale-105 duration-500"
+                    />
+                  )}
+                  
                   <div className="absolute bottom-3 left-3 z-10 flex items-center">
                     <div className="w-8 h-8 rounded-full overflow-hidden mr-2 ring-2 ring-white/20">
                       <Image 

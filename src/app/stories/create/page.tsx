@@ -82,7 +82,7 @@ export default function CreateStoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 rounded-lg">
       <div className="max-w-md w-full bg-zinc-900/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-xl p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-xl font-semibold text-zinc-100">Create Story</h1>

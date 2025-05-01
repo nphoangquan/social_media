@@ -368,7 +368,7 @@ export const addPost = async (formData: FormData, media: string, mediaType?: "im
   }
 };
 
-export const addStory = async (img: string) => {
+export const addStory = async (media: string, resourceType?: string) => {
   const { userId } = await auth();
 
   if (!userId) throw new Error("User is not authenticated!");
@@ -387,10 +387,13 @@ export const addStory = async (img: string) => {
         },
       });
     }
+    
     const createdStory = await prisma.story.create({
       data: {
         userId,
-        img,
+        ...(resourceType === "video" 
+          ? { video: media } 
+          : { img: media }),
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
       },
       include: {

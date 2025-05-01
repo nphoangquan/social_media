@@ -9,6 +9,7 @@ import PostInteraction from "../feed/PostInteraction";
 import CommentList from "../feed/CommentList";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import PostDetailModal from "../feed/PostDetail";
 
 type CommentWithUser = Comment & {
   user: User;
@@ -40,6 +41,8 @@ export default function PostDetail({
   const [postLikes, setPostLikes] = useState<string[]>(post.likes?.map(like => like.userId) || []);
   // State to track whether the full description is shown
   const [isExpanded, setIsExpanded] = useState(false);
+  // State to control PostDetail modal visibility
+  const [showPostDetail, setShowPostDetail] = useState(false);
   
   // Configure the character limit for truncation
   const MAX_CHARS = 150;
@@ -153,28 +156,38 @@ export default function PostDetail({
         )}
 
         {post.img && (
-          <div className="rounded-xl overflow-hidden mb-4">
-            <Image
-              src={post.img}
-              width={1200}
-              height={800}
-              alt=""
-              className="w-full h-auto"
-            />
+          <div 
+            className="rounded-xl overflow-hidden mb-4 cursor-pointer relative"
+            onClick={() => setShowPostDetail(true)}
+          >
+            <div className="transition-transform duration-300 hover:scale-[1.01]">
+              <Image
+                src={post.img}
+                width={1200}
+                height={800}
+                alt=""
+                className="w-full h-auto"
+              />
+            </div>
           </div>
         )}
 
         {post.video && (
-          <div className="rounded-xl overflow-hidden mb-4 bg-zinc-900">
-            <video
-              src={post.video}
-              controls
-              playsInline
-              preload="metadata"
-              className="w-full"
-            >
-              Your browser does not support the video tag.
-            </video>
+          <div 
+            className="rounded-xl overflow-hidden mb-4 bg-zinc-900 cursor-pointer relative"
+            onClick={() => setShowPostDetail(true)}
+          >
+            <div className="transition-transform duration-300 hover:scale-[1.01]">
+              <video
+                src={post.video}
+                controls
+                playsInline
+                preload="metadata"
+                className="w-full"
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
           </div>
         )}
       </div>
@@ -200,6 +213,14 @@ export default function PostDetail({
           highlightCommentId={highlightCommentId}
         />
       </div>
+      
+      {/* Post Detail Modal */}
+      {showPostDetail && (
+        <PostDetailModal
+          post={postWithUpdatedComments}
+          onClose={() => setShowPostDetail(false)}
+        />
+      )}
     </div>
   );
 } 
