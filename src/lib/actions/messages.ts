@@ -256,4 +256,71 @@ export async function getUnreadCount(): Promise<number> {
   });
 
   return count;
+}
+
+/**
+ * Delete a message
+ */
+export async function deleteMessage(messageId: number) {
+  const { userId } = await auth();
+  
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  // Check if the message belongs to the user
+  const message = await prisma.message.findUnique({
+    where: {
+      id: messageId
+    },
+    include: {
+      chat: true
+    }
+  });
+
+  if (!message) {
+    throw new Error("Message not found");
+  }
+
+  if (message.senderId !== userId) {
+    throw new Error("You can only delete your own messages");
+  }
+
+  // Delete the message
+  await prisma.message.delete({
+    where: {
+      id: messageId
+    }
+  });
+
+  // Update chat timestamps if needed
+  if (message.chat) {
+    revalidatePath(`/messages/${message.chat.id}`, "page");
+    revalidatePath("/messages", "page");
+  }
+
+  // Send realtime delete notification if needed
+  try {
+    const otherParticipants = await prisma.chatParticipant.findMany({
+      where: {
+        chatId: message.chatId,
+        userId: { not: userId }
+      },
+      select: {
+        userId: true
+      }
+    });
+
+    for (const participant of otherParticipants) {
+      const io = initSocket(null);
+      io.to(participant.userId).emit("message_deleted", {
+        chatId: message.chatId,
+        messageId: message.id
+      });
+    }
+  } catch (error) {
+    console.error("Failed to send delete notification:", error);
+  }
+
+  return true;
 } 

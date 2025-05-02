@@ -5,7 +5,7 @@ import prisma from "./client";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { uploadFile } from "./uploadFile";
-import { createLikeNotification, createCommentNotification, createFollowNotification, createNewPostNotification } from "./actions/notifications";
+import { createLikeNotification, createCommentNotification, createFollowNotification, createNewPostNotification, createCommentLikeNotification } from "./actions/notifications";
 
 export const switchFollow = async (userId: string) => {
   const { userId: currentUserId } = await auth();
@@ -665,3 +665,57 @@ export async function synchronizeUserAvatar() {
     return { success: false, error: "Failed to synchronize avatar" };
   }
 }
+
+export const switchCommentLike = async (commentId: number) => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("User is not authenticated!!");
+  }
+
+  try {
+    const existingLike = await prisma.like.findFirst({
+      where: {
+        userId,
+        commentId,
+      },
+    });
+
+    if (existingLike) {
+      await prisma.like.delete({
+        where: {
+          id: existingLike.id,
+        },
+      });
+    } else {
+      await prisma.like.create({
+        data: {
+          userId,
+          commentId,
+        },
+      });
+
+      // Get the comment and its post info
+      const comment = await prisma.comment.findUnique({
+        where: {
+          id: commentId,
+        },
+        select: {
+          userId: true, // Comment author ID
+          postId: true, // Post ID that the comment belongs to
+        },
+      });
+      
+      // Create notification for comment like (only if liker is different from comment author)
+      if (comment && comment.userId !== userId) {
+        await createCommentLikeNotification(userId, comment.userId, comment.postId, commentId);
+      }
+    }
+
+    revalidatePath("/post/[id]", "page");
+    return { success: true };
+  } catch (err) {
+    console.log(err);
+    throw new Error("Something went wrong!");
+  }
+};

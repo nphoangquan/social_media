@@ -481,4 +481,96 @@ export const createBirthdayWishNotification = async (senderId: string, receiverI
     console.error("Error creating birthday wish notification:", error);
     return null;
   }
+};
+
+// Tạo thông báo khi có người like comment
+export const createCommentLikeNotification = async (
+  senderId: string, 
+  receiverId: string, 
+  postId: number,
+  commentId: number
+) => {
+  try {
+    // Nếu người gửi và người nhận là cùng một người, không tạo thông báo
+    if (senderId === receiverId) return null;
+    
+    // Lấy thông tin người gửi
+    const sender = await prisma.user.findUnique({
+      where: { id: senderId },
+      select: { 
+        id: true,
+        username: true,
+        name: true,
+        surname: true,
+        avatar: true
+      }
+    });
+    
+    if (!sender) return null;
+    
+    // Lấy thông tin comment
+    const comment = await prisma.comment.findUnique({
+      where: { id: commentId },
+      select: { id: true }
+    });
+    
+    if (!comment) return null;
+    
+    // Tạo message
+    const senderName = sender.name && sender.surname 
+      ? `${sender.name} ${sender.surname}`
+      : sender.username;
+    
+    const message = `${senderName} liked your comment`;
+    const link = `/post/${postId}?comment=${commentId}`;
+    
+    // Tạo thông báo trong DB
+    const notification = await prisma.notification.create({
+      data: {
+        type: 'LIKE',
+        message,
+        link,
+        isRead: false,
+        sender: { connect: { id: senderId } },
+        receiver: { connect: { id: receiverId } },
+        postId,
+        commentId
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            username: true,
+            name: true,
+            surname: true,
+            avatar: true
+          }
+        }
+      }
+    });
+    
+    // Tạo payload để gửi qua socket
+    const payload: NotificationPayload = {
+      id: notification.id,
+      type: notification.type,
+      message: notification.message,
+      isRead: notification.isRead,
+      senderId: notification.senderId,
+      senderName: senderName,
+      senderAvatar: sender.avatar || undefined,
+      receiverId: notification.receiverId,
+      postId: notification.postId || undefined,
+      commentId: notification.commentId || undefined,
+      link: notification.link || undefined,
+      createdAt: notification.createdAt
+    };
+    
+    // Gửi thông báo qua socket
+    await sendNotification(payload);
+    
+    return notification;
+  } catch (error) {
+    console.error('Error creating comment like notification:', error);
+    return null;
+  }
 }; 

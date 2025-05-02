@@ -66,10 +66,16 @@ const Post = ({ post }: { post: FeedPostType }) => {
     return postContent.desc.substring(0, MAX_CHARS) + "...";
   };
 
+  // State to track if user has interacted with likes
+  const [userLikeInteracted, setUserLikeInteracted] = useState(false);
+
   const handleLikeUpdate = useCallback((event: Event) => {
     const { postId, userId, isLiked } = (event as CustomEvent).detail;
     
     if (postId === post.id) {
+      // Mark that an interaction has happened
+      setUserLikeInteracted(true);
+      
       setCurrentLikes(prevLikes => {
         if (isLiked) {
           // Add like if not already present
@@ -146,10 +152,12 @@ const Post = ({ post }: { post: FeedPostType }) => {
     };
   }, [handleLikeUpdate, handleDeletePost, handleCommentUpdate, handlePostUpdate]);
 
-  // Update when post likes change from props
+  // Update when post likes change from props, but only if user hasn't interacted
   useEffect(() => {
-    setCurrentLikes(post.likes || []);
-  }, [post.likes]);
+    if (!userLikeInteracted) {
+      setCurrentLikes(post.likes || []);
+    }
+  }, [post.likes, userLikeInteracted]);
 
   // Update comment count from props
   useEffect(() => {

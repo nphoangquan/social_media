@@ -1,11 +1,11 @@
 "use client";
 
-import { addComment, deleteComment } from "@/lib/actions";
+import { addComment, deleteComment, switchCommentLike } from "@/lib/actions";
 import { useUser } from "@clerk/nextjs";
 import { Comment, User, Post } from "@prisma/client";
 import Image from "next/image";
-import { useOptimistic, useState, useEffect } from "react";
-import { Send, MessageCircle, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Send, MessageCircle, Trash2, Heart } from "lucide-react";
 import PostDetail from "./PostDetail";
 import dynamic from "next/dynamic";
 import { useUserAvatar } from "@/lib/hooks/useUserAvatar";
@@ -14,6 +14,8 @@ type CommentWithUser = Comment & {
   user: User;
   replies?: CommentWithUser[];
   likes?: number;
+  likedByCurrentUser?: boolean;
+  _hasLikeInteraction?: boolean;
 };
 
 export default dynamic(() => Promise.resolve(CommentList), { ssr: false });
@@ -38,8 +40,114 @@ function CommentList({
   const { user } = useUser();
   const { avatarUrl } = useUserAvatar();
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
-  const [optimisticComments, addOptimisticComment] = useOptimistic(comments);
+  const [optimisticComments, setOptimisticComments] = useState<CommentWithUser[]>(comments);
   const [showPostDetail, setShowPostDetail] = useState(false);
+  
+  // Listen for comment like updates
+  useEffect(() => {
+    const handleCommentLikeUpdate = (event: Event) => {
+      const { commentId, isLiked } = (event as CustomEvent).detail;
+      
+      // Update the comment like status
+      setOptimisticComments(prevComments => {
+        return prevComments.map(comment => {
+          // Check if this is the commented comment
+          if (comment.id === commentId) {
+            return {
+              ...comment,
+              likes: isLiked 
+                ? (typeof comment.likes === 'number' ? comment.likes + 1 : 1) 
+                : (typeof comment.likes === 'number' ? Math.max(0, comment.likes - 1) : 0),
+              likedByCurrentUser: isLiked,
+              // Add a flag to indicate this comment has been interacted with
+              _hasLikeInteraction: true
+            };
+          }
+          
+          // Check replies
+          if (comment.replies && comment.replies.length > 0) {
+            return {
+              ...comment,
+              replies: comment.replies.map(reply => {
+                if (reply.id === commentId) {
+                  return {
+                    ...reply,
+                    likes: isLiked 
+                      ? (typeof reply.likes === 'number' ? reply.likes + 1 : 1) 
+                      : (typeof reply.likes === 'number' ? Math.max(0, reply.likes - 1) : 0),
+                    likedByCurrentUser: isLiked,
+                    // Add a flag to indicate this reply has been interacted with
+                    _hasLikeInteraction: true
+                  };
+                }
+                return reply;
+              })
+            };
+          }
+          
+          return comment;
+        });
+      });
+    };
+    
+    // Add event listeners
+    window.addEventListener('commentLikeUpdate', handleCommentLikeUpdate);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('commentLikeUpdate', handleCommentLikeUpdate);
+    };
+  }, []);
+  
+  // Update optimistic comments when props change
+  useEffect(() => {
+    // Merge new comments with existing ones to preserve interaction flags
+    setOptimisticComments(prevComments => {
+      // Create a map of existing comments with their interaction flags
+      const existingCommentsMap = new Map();
+      prevComments.forEach(comment => {
+        const hasInteraction = comment._hasLikeInteraction;
+        existingCommentsMap.set(comment.id, { 
+          hasInteraction, 
+          replies: new Map(
+            (comment.replies || []).map(reply => [
+              reply.id, 
+              { hasInteraction: reply._hasLikeInteraction }
+            ])
+          ) 
+        });
+      });
+      
+      // Merge with new comments
+      return comments.map(comment => {
+        const existing = existingCommentsMap.get(comment.id);
+        // If this comment has been interacted with, preserve the like state
+        if (existing?.hasInteraction) {
+          const prevComment = prevComments.find(c => c.id === comment.id);
+          return {
+            ...comment,
+            likes: prevComment?.likes,
+            likedByCurrentUser: prevComment?.likedByCurrentUser,
+            _hasLikeInteraction: true,
+            replies: (comment.replies || []).map(reply => {
+              const replyInteraction = existing.replies.get(reply.id);
+              if (replyInteraction?.hasInteraction) {
+                const prevReply = prevComment?.replies?.find(r => r.id === reply.id);
+                return {
+                  ...reply,
+                  likes: prevReply?.likes,
+                  likedByCurrentUser: prevReply?.likedByCurrentUser,
+                  _hasLikeInteraction: true
+                };
+              }
+              return reply;
+            })
+          };
+        }
+        return comment;
+      });
+    });
+  }, [comments]);
   
   // If highlightCommentId is provided, scroll to that comment
   useEffect(() => {
@@ -117,7 +225,8 @@ function CommentList({
     };
 
     // Add new comment to the beginning of the list for immediate display
-    addOptimisticComment([optimisticComment, ...optimisticComments]);
+    const newOptimisticComments = [optimisticComment, ...optimisticComments];
+    setOptimisticComments(newOptimisticComments);
 
     try {
       const newComment = await addComment(postId, desc.trim(), parentId ? parseInt(parentId) : null);
@@ -155,6 +264,23 @@ function CommentList({
     const [formattedDate, setFormattedDate] = useState("");
     // State to track if comment text is expanded
     const [isCommentExpanded, setIsCommentExpanded] = useState(false);
+    // State to track like status
+    const [likeState, setLikeState] = useState({
+      likeCount: typeof comment.likes === 'number' ? comment.likes : 0,
+      isLiked: comment.likedByCurrentUser || false
+    });
+    // State to track if user has interacted with like
+    const [userLikeInteracted, setUserLikeInteracted] = useState(false);
+    
+    // Update like state when comment props change, but only if user hasn't interacted
+    useEffect(() => {
+      if (!userLikeInteracted) {
+        setLikeState({
+          likeCount: typeof comment.likes === 'number' ? comment.likes : 0,
+          isLiked: comment.likedByCurrentUser || false
+        });
+      }
+    }, [comment.likes, comment.likedByCurrentUser, userLikeInteracted]);
     
     // Check if this comment is the one to highlight
     const isHighlighted = highlightCommentId === comment.id;
@@ -206,6 +332,50 @@ function CommentList({
       }
     };
 
+    const handleLikeComment = async () => {
+      if (!user) return;
+
+      // Mark that user has interacted with like
+      setUserLikeInteracted(true);
+      
+      // Store previous state for potential rollback
+      const previousLikeState = {...likeState};
+      
+      // Apply optimistic update
+      setLikeState(prev => ({
+        likeCount: prev.isLiked ? Math.max(0, prev.likeCount - 1) : prev.likeCount + 1, 
+        isLiked: !prev.isLiked
+      }));
+
+      // Dispatch event immediately for real-time updates
+      const commentLikeEvent = new CustomEvent('commentLikeUpdate', {
+        detail: { 
+          commentId: comment.id, 
+          isLiked: !likeState.isLiked,
+          userId: user.id
+        }
+      });
+      window.dispatchEvent(commentLikeEvent);
+      
+      // Call the server action in background without awaiting or catching here
+      // to avoid UI flash - we'll handle errors in the Promise
+      switchCommentLike(comment.id).catch(err => {
+        console.error("Error liking comment:", err);
+        // Revert optimistic update if there was an error
+        setLikeState(previousLikeState);
+        
+        // Dispatch event to revert changes
+        const revertEvent = new CustomEvent('commentLikeUpdate', {
+          detail: { 
+            commentId: comment.id, 
+            isLiked: previousLikeState.isLiked,
+            userId: user.id
+          }
+        });
+        window.dispatchEvent(revertEvent);
+      });
+    };
+
     return (
       <div 
         id={`comment-${comment.id}`} 
@@ -242,9 +412,15 @@ function CommentList({
             <div className="flex gap-4 mt-1 px-3">
               <button
                 type="button"
-                className="text-xs text-zinc-500 hover:text-emerald-500 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors"
+                onClick={handleLikeComment}
+                className={`text-xs ${likeState.isLiked 
+                  ? "text-emerald-500 dark:text-emerald-400" 
+                  : "text-zinc-500 hover:text-emerald-500 dark:text-zinc-400 dark:hover:text-emerald-400"} 
+                  transition-colors flex items-center gap-1`}
               >
-                Like
+                <Heart className={`w-3 h-3 ${likeState.isLiked ? "fill-emerald-500 dark:fill-emerald-400" : ""}`} />
+                <span>Like</span>
+                {likeState.likeCount > 0 && <span>({likeState.likeCount})</span>}
               </button>
               <button
                 type="button"

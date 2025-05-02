@@ -1,9 +1,13 @@
 'use server';
 
 import prisma from "@/lib/client";
+import { auth } from "@clerk/nextjs/server";
 
 export async function getPostComments(postId: number) {
   try {
+    // Get current user ID
+    const { userId } = await auth();
+    
     const comments = await prisma.comment.findMany({
       where: {
         postId: postId,
@@ -27,13 +31,15 @@ export async function getPostComments(postId: number) {
       },
     });
 
-    // Transform comments to include like count
+    // Transform comments to include like count and whether current user has liked
     const commentsWithLikes = comments.map(comment => ({
       ...comment,
       likes: comment.likes.length,
+      likedByCurrentUser: userId ? comment.likes.some(like => like.userId === userId) : false,
       replies: comment.replies.map(reply => ({
         ...reply,
         likes: reply.likes.length,
+        likedByCurrentUser: userId ? reply.likes.some(like => like.userId === userId) : false,
       })),
     }));
 
