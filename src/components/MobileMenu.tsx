@@ -86,13 +86,29 @@ const MobileMenu = () => {
           </Link>
           
           <Link 
-            href="/" 
+            href="/events/birthdays" 
             className="group relative px-4 py-2"
             onClick={() => setIsOpen(false)}
           >
             <div className="relative">
-              <span className="text-white transition-opacity duration-200">Groups</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">Groups</span>
+              <span className="text-white transition-opacity duration-200">Events</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">Events</span>
+            </div>
+            
+            {/* Gradient bar and shimmer on hover */}
+            <div className="absolute -bottom-1 left-0 w-0 h-0.5 overflow-hidden bg-gradient-to-r from-emerald-600 via-emerald-400 to-[#00ffbb] rounded-full group-hover:w-full transition-all duration-300">
+              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
+            </div>
+          </Link>
+          
+          <Link 
+            href="/friend-requests" 
+            className="group relative px-4 py-2"
+            onClick={() => setIsOpen(false)}
+          >
+            <div className="relative">
+              <span className="text-white transition-opacity duration-200">Friend Requests</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">Friend Requests</span>
             </div>
             
             {/* Gradient bar and shimmer on hover */}
@@ -109,6 +125,54 @@ const MobileMenu = () => {
             <div className="relative">
               <span className="text-white transition-opacity duration-200">Stories</span>
               <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">Stories</span>
+            </div>
+            
+            {/* Gradient bar and shimmer on hover */}
+            <div className="absolute -bottom-1 left-0 w-0 h-0.5 overflow-hidden bg-gradient-to-r from-emerald-600 via-emerald-400 to-[#00ffbb] rounded-full group-hover:w-full transition-all duration-300">
+              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
+            </div>
+          </Link>
+          
+          <Link 
+            href="/photos" 
+            className="group relative px-4 py-2"
+            onClick={() => setIsOpen(false)}
+          >
+            <div className="relative">
+              <span className="text-white transition-opacity duration-200">Photos</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">Photos</span>
+            </div>
+            
+            {/* Gradient bar and shimmer on hover */}
+            <div className="absolute -bottom-1 left-0 w-0 h-0.5 overflow-hidden bg-gradient-to-r from-emerald-600 via-emerald-400 to-[#00ffbb] rounded-full group-hover:w-full transition-all duration-300">
+              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
+            </div>
+          </Link>
+
+          <Link 
+            href="/videos" 
+            className="group relative px-4 py-2"
+            onClick={() => setIsOpen(false)}
+          >
+            <div className="relative">
+              <span className="text-white transition-opacity duration-200">Videos</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">Videos</span>
+            </div>
+            
+            {/* Gradient bar and shimmer on hover */}
+            <div className="absolute -bottom-1 left-0 w-0 h-0.5 overflow-hidden bg-gradient-to-r from-emerald-600 via-emerald-400 to-[#00ffbb] rounded-full group-hover:w-full transition-all duration-300">
+              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
+            </div>
+          </Link>
+          
+          <Link 
+            href="/landing" 
+            className="group relative px-4 py-2"
+            onClick={() => setIsOpen(false)}
+          >
+            <div className="relative">
+              <span className="text-white transition-opacity duration-200">Ads</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">Ads</span>
             </div>
             
             {/* Gradient bar and shimmer on hover */}

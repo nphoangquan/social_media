@@ -1,13 +1,19 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { Smile, Image as ImageIcon, Video, X } from "lucide-react";
 import { addPost } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
+import dynamic from "next/dynamic";
+
+// Import emoji picker dynamically để tránh lỗi SSR
+const EmojiPicker = dynamic(() => import("emoji-picker-react"), { 
+  ssr: false,
+  loading: () => <div className="p-2">Loading...</div>
+});
 
 interface CloudinaryResult {
   secure_url: string;
@@ -27,12 +33,116 @@ const CreatePostModal = ({ onClose }: CreatePostModalProps) => {
   const [isPending, startTransition] = useTransition();
   const [mounted, setMounted] = useState(false);
   const [desc, setDesc] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const router = useRouter();
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
-    return () => setMounted(false);
-  }, []);
+    
+    // Xử lý click bên ngoài để đóng emoji picker
+    const handleClickOutside = (event: MouseEvent) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node) && 
+          showEmojiPicker) {
+        setShowEmojiPicker(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      setMounted(false);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showEmojiPicker]);
+
+  const uploadToCloudinary = async (file: File, resourceType: "image" | "video") => {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'social-media');
+      
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+      
+      const data = await response.json();
+      setMedia({
+        secure_url: data.secure_url,
+        public_id: data.public_id,
+        format: data.format,
+        resource_type: data.resource_type
+      });
+      setMediaType(resourceType);
+    } catch (error) {
+      console.error("Error uploading to Cloudinary:", error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Kiểm tra kích thước file (tối đa 25MB)
+    if (file.size > 25 * 1024 * 1024) {
+      alert("File quá lớn. Kích thước tối đa là 25MB");
+      return;
+    }
+    
+    uploadToCloudinary(file, "image");
+  };
+
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Kiểm tra kích thước file (tối đa 100MB)
+    if (file.size > 100 * 1024 * 1024) {
+      alert("File quá lớn. Kích thước tối đa là 100MB");
+      return;
+    }
+    
+    uploadToCloudinary(file, "video");
+  };
+
+  // Xử lý khi chọn emoji
+  const handleEmojiClick = (emojiData: { emoji: string }) => {
+    const emoji = emojiData.emoji;
+    const textarea = textareaRef.current;
+    
+    if (textarea) {
+      const start = textarea.selectionStart || 0;
+      const end = textarea.selectionEnd || 0;
+      
+      // Chèn emoji vào vị trí con trỏ hiện tại
+      const newText = desc.slice(0, start) + emoji + desc.slice(end);
+      setDesc(newText);
+      
+      // Cập nhật lại vị trí con trỏ sau khi chèn emoji
+      setTimeout(() => {
+        textarea.focus();
+        const newPosition = start + emoji.length;
+        textarea.selectionStart = newPosition;
+        textarea.selectionEnd = newPosition;
+      }, 0);
+    } else {
+      setDesc(desc + emoji);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,10 +223,10 @@ const CreatePostModal = ({ onClose }: CreatePostModalProps) => {
         <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
           <div className="p-4 flex-1 overflow-y-auto scrollbar-none">
             <textarea
+              ref={textareaRef}
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
               placeholder="Nguyen Phan Hoang Quan - 22DTHH2 - 2280602604"
-            //   placeholder="What&apos;s on your mind?"
               className="w-full bg-transparent placeholder:text-zinc-400 dark:placeholder:text-zinc-500 text-zinc-600 dark:text-zinc-300 outline-none resize-none min-h-[120px] text-lg"
               autoFocus
             />
@@ -170,119 +280,82 @@ const CreatePostModal = ({ onClose }: CreatePostModalProps) => {
                 Add to your post
               </div>
               <div className="flex items-center gap-4">
-                <CldUploadWidget
-                  uploadPreset="social-media"
-                  onSuccess={(result, { widget }) => {
-                    setMedia(result.info as CloudinaryResult);
-                    setMediaType("image");
-                    widget.close();
-                  }}
-                  options={{
-                    resourceType: "image",
-                    clientAllowedFormats: ["jpg", "jpeg", "png", "gif"],
-                    maxFileSize: 10000000,
-                    styles: {
-                      palette: {
-                        window: "#0a0a0a",
-                        windowBorder: "#a1a1aa",
-                        windowShadow: "rgba(0, 0, 0, 0.95)",
-                        tabIcon: "#10b981",
-                        menuIcons: "#10b981",
-                        textDark: "#ffffff",
-                        textLight: "#f4f4f5",
-                        link: "#10b981",
-                        action: "#10b981",
-                        inactiveTabIcon: "#a1a1aa",
-                        error: "#e11d48",
-                        inProgress: "#10b981",
-                        complete: "#10b981",
-                        sourceBg: "#0a0a0a",
-                      },
-                      fonts: {
-                        default: null,
-                        "'Inter', sans-serif": {
-                          url: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap",
-                          active: true,
-                        },
-                      },
-                      frame: {
-                        background: "rgba(0, 0, 0, 0.8)"
-                      }
-                    }
-                  }}
-                >
-                  {({ open }) => (
-                    <button 
-                      type="button"
-                      className="text-zinc-500 hover:text-emerald-500 transition-colors rounded-full p-2"
-                      onClick={() => open()}
-                      title="Add photo"
-                    >
-                      <ImageIcon className="w-6 h-6" />
-                    </button>
-                  )}
-                </CldUploadWidget>
+                {/* Hidden file inputs */}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  ref={imageInputRef}
+                  onChange={handleImageChange}
+                />
+                <input
+                  type="file"
+                  accept="video/*"
+                  className="hidden"
+                  ref={videoInputRef}
+                  onChange={handleVideoChange}
+                />
 
-                <CldUploadWidget
-                  uploadPreset="social-media"
-                  onSuccess={(result, { widget }) => {
-                    setMedia(result.info as CloudinaryResult);
-                    setMediaType("video");
-                    widget.close();
-                  }}
-                  options={{
-                    resourceType: "video",
-                    clientAllowedFormats: ["mp4", "mov", "avi", "webm"],
-                    maxFileSize: 100000000,
-                    styles: {
-                      palette: {
-                        window: "#0a0a0a",
-                        windowBorder: "#a1a1aa",
-                        windowShadow: "rgba(0, 0, 0, 0.95)",
-                        tabIcon: "#10b981",
-                        menuIcons: "#10b981",
-                        textDark: "#ffffff",
-                        textLight: "#f4f4f5",
-                        link: "#10b981",
-                        action: "#10b981",
-                        inactiveTabIcon: "#a1a1aa",
-                        error: "#e11d48",
-                        inProgress: "#10b981",
-                        complete: "#10b981",
-                        sourceBg: "#0a0a0a",
-                      },
-                      fonts: {
-                        default: null,
-                        "'Inter', sans-serif": {
-                          url: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap",
-                          active: true,
-                        },
-                      },
-                      frame: {
-                        background: "rgba(0, 0, 0, 0.8)"
-                      }
-                    }
-                  }}
-                >
-                  {({ open }) => (
-                    <button 
-                      type="button"
-                      className="text-zinc-500 hover:text-emerald-500 transition-colors rounded-full p-2"
-                      onClick={() => open()}
-                      title="Add video"
-                    >
-                      <Video className="w-6 h-6" />
-                    </button>
-                  )}
-                </CldUploadWidget>
-
+                {/* Image upload button */}
                 <button 
                   type="button"
-                  className="text-zinc-500 hover:text-emerald-500 transition-colors rounded-full p-2"
-                  title="Add emoji"
+                  className="text-zinc-500 hover:text-emerald-500 transition-colors rounded-full p-2 relative"
+                  onClick={() => imageInputRef.current?.click()}
+                  title="Add photo"
+                  disabled={uploading}
                 >
-                  <Smile className="w-6 h-6" />
+                  <ImageIcon className="w-6 h-6" />
+                  {uploading && mediaType === "image" && (
+                    <span className="absolute inset-0 flex items-center justify-center">
+                      <span className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></span>
+                    </span>
+                  )}
                 </button>
+
+                {/* Video upload button */}
+                <button 
+                  type="button"
+                  className="text-zinc-500 hover:text-emerald-500 transition-colors rounded-full p-2 relative"
+                  onClick={() => videoInputRef.current?.click()}
+                  title="Add video"
+                  disabled={uploading}
+                >
+                  <Video className="w-6 h-6" />
+                  {uploading && mediaType === "video" && (
+                    <span className="absolute inset-0 flex items-center justify-center">
+                      <span className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></span>
+                    </span>
+                  )}
+                </button>
+
+                {/* Emoji button */}
+                <div className="relative">
+                  <button 
+                    type="button"
+                    className="text-zinc-500 hover:text-emerald-500 transition-colors rounded-full p-2"
+                    title="Add emoji"
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  >
+                    <Smile className="w-6 h-6" />
+                  </button>
+
+                  {/* Emoji Picker */}
+                  {showEmojiPicker && (
+                    <div 
+                      ref={emojiPickerRef}
+                      className="absolute right-0 bottom-12 z-50 shadow-lg dark:shadow-zinc-800/30"
+                    >
+                      <EmojiPicker 
+                        onEmojiClick={handleEmojiClick}
+                        lazyLoadEmojis={true}
+                        searchDisabled={false}
+                        skinTonesDisabled={false}
+                        width={300}
+                        height={400}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -291,7 +364,7 @@ const CreatePostModal = ({ onClose }: CreatePostModalProps) => {
           <div className="p-4 border-t border-zinc-100 dark:border-zinc-800">
             <button
               type="submit"
-              disabled={isPending || (!desc.trim() && !media)}
+              disabled={isPending || uploading || (!desc.trim() && !media)}
               className="w-full rounded-lg bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/50 disabled:cursor-not-allowed text-white py-2.5 font-medium transition-colors"
             >
               {isPending ? (

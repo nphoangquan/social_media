@@ -8,7 +8,7 @@ export default function NoSelectedChat() {
       </div>
       <h2 className="text-xl font-semibold mb-2 text-white">Your Messages</h2>
       <p className="text-zinc-400 max-w-md">
-        Select a conversation or start a new one to begin messaging
+        Select a conversation - Chọn một cuộc trò chuyện
       </p>
     </div>
   );

@@ -4,8 +4,8 @@ import { Users, Shield, MessageSquare, Heart, Menu } from "lucide-react"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Introvertia - Connect Without The Noise",
-  description: "A social platform designed by for introverts. Meaningful connections without the social pressure."
+  title: "Introvertia - Connect With Us",
+  description: "A social platform designed by for introverts."
 }
 
 export default function LandingPage() {
@@ -32,7 +32,7 @@ export default function LandingPage() {
               How It Works
             </Link>
             <Link href="#testimonials" className="text-zinc-300 hover:text-emerald-400 transition-colors">
-              Testimonials
+              Connect
             </Link>
             <Link href="/" className="px-4 py-2 bg-emerald-400 hover:bg-emerald-500 text-black rounded-lg transition-colors">
               Visit Introvertia
@@ -50,7 +50,7 @@ export default function LandingPage() {
         <div className="flex flex-col md:flex-row items-center gap-12">
           <div className="flex-1 space-y-6">
             <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-              Connect Without The <span className="text-emerald-400">Noise</span>
+              Connect With <span className="text-emerald-400">Us</span>
             </h1>
             <p className="text-xl text-zinc-300">
               A social platform designed by Nguyễn Phan Hoàng Quân.
@@ -238,7 +238,7 @@ export default function LandingPage() {
                 <Heart className="h-5 w-5" />
               </div>
               <p className="text-zinc-300 mb-6">
-                &ldquo;I&apos;Quá Vip&rdquo;
+                &rdquo;Quá Vip&rdquo;
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-emerald-400/20 flex items-center justify-center">

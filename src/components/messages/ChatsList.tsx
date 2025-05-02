@@ -1,46 +1,113 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState, useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { MessageSquarePlus } from "lucide-react";
-import prisma from "@/lib/client";
-import NewChatDialog from "./NewChatDialog";
+import { MessageSquarePlus, Loader2 } from "lucide-react";
 import Image from "next/image";
+import NewChatDialog from "./NewChatDialog";
+
 interface ChatsListProps {
   userId: string;
   activeChatId?: number;
+  initialChats?: ChatWithParticipant[];
 }
 
-export default async function ChatsList({ userId, activeChatId }: ChatsListProps) {
-  // Get all chats that the user is a participant in
-  const participants = await prisma.chatParticipant.findMany({
-    where: {
-      userId: userId,
-    },
-    include: {
-      chat: {
-        include: {
-          participants: {
-            include: {
-              user: true
-            }
-          },
-          messages: {
-            orderBy: {
-              createdAt: 'desc'
-            },
-            take: 1,
-            include: {
-              sender: true
-            }
-          }
-        }
+// Move this interface outside the component
+interface ChatParticipant {
+  userId: string;
+  isRead: boolean;
+  user: {
+    id: string;
+    username: string;
+    name: string | null;
+    avatar: string | null;
+  };
+}
+
+interface Chat {
+  id: number;
+  updatedAt: Date;
+  participants: ChatParticipant[];
+  messages: {
+    id: number;
+    content: string;
+    createdAt: Date;
+    senderId: string;
+  }[];
+}
+
+interface ChatWithParticipant {
+  chat: Chat;
+  isRead: boolean;
+}
+
+export default function ChatsList({ userId, activeChatId, initialChats = [] }: ChatsListProps) {
+  const [chats, setChats] = useState<ChatWithParticipant[]>(initialChats);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(initialChats.length >= 15);
+  const [page, setPage] = useState(0);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const lastChatRef = useRef<HTMLAnchorElement | null>(null);
+
+  const loadChats = async (pageToLoad: number = 0, append: boolean = false) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/chats?page=${pageToLoad}&limit=15`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch chats');
       }
-    },
-    orderBy: {
-      chat: {
-        updatedAt: 'desc'
+      
+      const data = await response.json();
+      
+      if (append) {
+        setChats(prev => [...prev, ...data.chats]);
+      } else {
+        setChats(data.chats);
       }
+      
+      setHasMore(data.hasMore);
+      setPage(pageToLoad);
+    } catch (error) {
+      console.error('Error loading chats:', error);
+    } finally {
+      setLoading(false);
     }
-  });
+  };
+
+  // Load initial chats if not provided
+  useEffect(() => {
+    if (initialChats.length === 0) {
+      loadChats();
+    }
+  }, [initialChats.length]);
+
+  // Set up intersection observer for infinite scroll
+  useEffect(() => {
+    if (loading) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadChats(page + 1, true);
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    observerRef.current = observer;
+
+    if (lastChatRef.current) {
+      observer.observe(lastChatRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [hasMore, loading, page]);
 
   return (
     <div className="h-full flex flex-col">
@@ -50,26 +117,30 @@ export default async function ChatsList({ userId, activeChatId }: ChatsListProps
       </div>
       
       <div className="flex-1 overflow-y-auto">
-        {participants.length === 0 ? (
+        {chats.length === 0 && !loading ? (
           <div className="flex flex-col items-center justify-center h-full text-center p-4">
             <MessageSquarePlus className="w-12 h-12 text-zinc-500 mb-2" />
-            <p className="text-zinc-500 mb-1">No messages yet</p>
-            <p className="text-zinc-600 text-sm max-w-xs">Start a conversation with your friends using the + button above</p>
+            <p className="text-zinc-500 mb-1">No messages</p>
+            <p className="text-zinc-600 text-sm max-w-xs">Start a conversation - Bắt đầu cuộc trò chuyện</p>
           </div>
         ) : (
           <div className="space-y-1 py-2">
-            {participants.map((participant) => {
+            {chats.map((participant, index) => {
               const chat = participant.chat;
               // Get the other participant(s)
               const otherParticipants = chat.participants.filter(p => p.userId !== userId);
               const otherUser = otherParticipants[0]?.user;
               const lastMessage = chat.messages[0];
               
+              // Create ref for the last item
+              const isLastItem = index === chats.length - 1;
+              
               return (
                 <Link 
                   key={chat.id}
                   href={`/messages/${chat.id}`}
                   className={`block px-4 py-3 hover:bg-zinc-800/30 transition-colors ${activeChatId === chat.id ? 'bg-zinc-800/50' : ''}`}
+                  ref={isLastItem ? lastChatRef : null}
                 >
                   <div className="flex gap-3">
                     <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-zinc-800">
@@ -98,7 +169,7 @@ export default async function ChatsList({ userId, activeChatId }: ChatsListProps
                         <p className="text-sm text-zinc-400 truncate">
                           {lastMessage 
                             ? (lastMessage.senderId === userId ? 'You: ' : '') + lastMessage.content 
-                            : 'No messages yet'}
+                            : 'No messages'}
                         </p>
                         
                         {!participant.isRead && lastMessage?.senderId !== userId && (
@@ -110,6 +181,12 @@ export default async function ChatsList({ userId, activeChatId }: ChatsListProps
                 </Link>
               );
             })}
+            
+            {loading && (
+              <div className="flex justify-center py-4">
+                <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
+              </div>
+            )}
           </div>
         )}
       </div>

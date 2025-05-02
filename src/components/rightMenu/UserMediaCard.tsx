@@ -22,7 +22,7 @@ const UserMediaCard = async ({ user }: { user: User }) => {
       {/* TOP */}
       <div className="flex justify-between items-center mb-6">
         <span className="font-medium text-zinc-600 dark:text-zinc-300">User Media</span>
-        <Link href="/" className="text-emerald-500 dark:text-emerald-400 text-xs hover:text-emerald-600 dark:hover:text-emerald-500 transition-colors">
+        <Link href={`/profile/${user.username}/photos`} className="text-emerald-500 dark:text-emerald-400 text-xs hover:text-emerald-600 dark:hover:text-emerald-500 transition-colors">
           See all
         </Link>
       </div>

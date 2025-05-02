@@ -183,7 +183,7 @@ export async function sendMessage(chatId: number, content: string, img?: string)
 /**
  * Get all messages for a chat
  */
-export async function getChatMessages(chatId: number): Promise<Message[]> {
+export async function getChatMessages(chatId: number, limit: number = 15, offset: number = 0): Promise<{ messages: Message[], hasMore: boolean }> {
   const { userId } = await auth();
   
   if (!userId) {
@@ -202,16 +202,32 @@ export async function getChatMessages(chatId: number): Promise<Message[]> {
     throw new Error("Not a participant in this chat");
   }
 
+  // Get the total count for pagination info
+  const totalCount = await prisma.message.count({
+    where: {
+      chatId: chatId
+    }
+  });
+
+  // Get messages with pagination
   const messages = await prisma.message.findMany({
     where: {
       chatId: chatId
     },
     orderBy: {
-      createdAt: "asc"
-    }
+      createdAt: "desc" // Get newest messages first
+    },
+    take: limit,
+    skip: offset
   });
 
-  return messages;
+  // Reverse messages to show oldest first
+  const orderedMessages = [...messages].reverse();
+
+  return {
+    messages: orderedMessages,
+    hasMore: totalCount > offset + limit
+  };
 }
 
 /**

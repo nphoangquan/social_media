@@ -13,6 +13,7 @@ import {
   Link as LinkIcon,
   CalendarDays,
   MoreVertical,
+  Cake,
 } from "lucide-react";
 
 const UserInfoCard = async ({ user }: { user: User }) => {
@@ -23,6 +24,17 @@ const UserInfoCard = async ({ user }: { user: User }) => {
     month: "long",
     day: "numeric",
   });
+
+  // Format ngày sinh theo kiểu Việt Nam
+  let formattedBirthDate = "";
+  if (user.birthDate) {
+    const birthDate = new Date(user.birthDate);
+    formattedBirthDate = birthDate.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    });
+  }
 
   let isUserBlocked = false;
   let isFollowing = false;
@@ -118,6 +130,13 @@ const UserInfoCard = async ({ user }: { user: User }) => {
             >
               {user.website}
             </Link>
+          </div>
+        )}
+        
+        {user.birthDate && (
+          <div className="flex gap-1 items-center text-xs text-zinc-500 dark:text-zinc-400 group hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+            <Cake className="w-4 h-4 group-hover:scale-110 transition-transform" />
+            <span>Born on <b className="text-zinc-800 dark:text-zinc-200">{formattedBirthDate}</b></span>
           </div>
         )}
         

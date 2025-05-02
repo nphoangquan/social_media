@@ -3,8 +3,7 @@
 import { updateProfile } from "@/lib/actions";
 import { User } from "@prisma/client";
 import Image from "next/image";
-import { useActionState, useState } from "react";
-import { CldUploadWidget } from "next-cloudinary";
+import { useActionState, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import UpdateButton from "./UpdateButton";
 
@@ -18,6 +17,8 @@ interface CloudinaryResult {
 const UpdateUser = ({ user }: { user: User }) => {
   const [open, setOpen] = useState(false);
   const [cover, setCover] = useState<CloudinaryResult | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [state, formAction] = useActionState(updateProfile, {
     success: false,
@@ -31,6 +32,58 @@ const UpdateUser = ({ user }: { user: User }) => {
     if (state.success) {
       router.refresh();
     }
+  };
+
+  const uploadToCloudinary = async (file: File) => {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'social-media');
+      
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+      
+      const data = await response.json();
+      setCover({
+        secure_url: data.secure_url,
+        public_id: data.public_id,
+        format: data.format,
+        resource_type: 'image'
+      });
+    } catch (error) {
+      console.error("Error uploading to Cloudinary:", error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Kiểm tra kích thước file (tối đa 25MB)
+    if (file.size > 25 * 1024 * 1024) {
+      alert("File quá lớn. Kích thước tối đa là 25MB");
+      return;
+    }
+    
+    // Kiểm tra file có phải là ảnh không
+    if (!file.type.startsWith('image/')) {
+      alert("Chỉ hỗ trợ file ảnh");
+      return;
+    }
+    
+    uploadToCloudinary(file);
   };
 
   return (
@@ -54,71 +107,41 @@ const UpdateUser = ({ user }: { user: User }) => {
               Use the navbar profile to change the avatar or username.
             </div>
 
-            <CldUploadWidget
-              uploadPreset="social-media"
-              onSuccess={(result, { widget }) => {
-                setCover(result.info as CloudinaryResult);
-                widget.close();
-              }}
-              options={{
-                maxFiles: 1,
-                resourceType: "image",
-                clientAllowedFormats: ["jpg", "jpeg", "png", "gif"],
-                maxFileSize: 10000000,
-                styles: {
-                  palette: {
-                    window: "#0a0a0a",
-                    windowBorder: "#a1a1aa",
-                    windowShadow: "rgba(0, 0, 0, 0.95)",
-                    tabIcon: "#10b981",
-                    menuIcons: "#10b981",
-                    textDark: "#ffffff",
-                    textLight: "#f4f4f5",
-                    link: "#10b981",
-                    action: "#10b981",
-                    inactiveTabIcon: "#a1a1aa",
-                    error: "#e11d48",
-                    inProgress: "#10b981",
-                    complete: "#10b981",
-                    sourceBg: "#0a0a0a",
-                  },
-                  fonts: {
-                    default: null,
-                    "'Inter', sans-serif": {
-                      url: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap",
-                      active: true,
-                    },
-                  },
-                  frame: {
-                    background: "rgba(0, 0, 0, 0.8)"
-                  }
-                }
-              }}
+            {/* Hidden file input */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+
+            <div
+              className="flex flex-col gap-2 my-2 cursor-pointer group"
+              onClick={() => fileInputRef.current?.click()}
             >
-              {({ open }) => (
-                <div
-                  className="flex flex-col gap-2 my-2 cursor-pointer group"
-                  onClick={() => open()}
-                >
-                  <label className="text-xs text-zinc-600 dark:text-zinc-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                    Cover Picture
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <div className="w-12 h-8 rounded-md overflow-hidden shadow-sm relative group-hover:shadow-md transition-all">
-                      <Image
-                        src={cover?.secure_url || user.cover || "/noCover.png"}
-                        alt=""
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
+              <label className="text-xs text-zinc-600 dark:text-zinc-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                Cover Picture
+              </label>
+              <div className="flex items-center gap-2">
+                <div className="w-12 h-8 rounded-md overflow-hidden shadow-sm relative group-hover:shadow-md transition-all">
+                  <Image
+                    src={cover?.secure_url || user.cover || "/noCover.png"}
+                    alt=""
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  {uploading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                      <div className="w-4 h-4 border-2 border-white/70 border-t-transparent rounded-full animate-spin"></div>
                     </div>
-                    <span className="text-xs underline text-zinc-500 dark:text-zinc-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                      Change
-                    </span>
-                  </div>
+                  )}
                 </div>
-              )}
-            </CldUploadWidget>
+                <span className="text-xs underline text-zinc-500 dark:text-zinc-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  {uploading ? "Uploading..." : "Change"}
+                </span>
+              </div>
+            </div>
 
             <div className="flex flex-wrap justify-between gap-4">
               {["name", "surname", "description", "city", "school", "work", "website"].map((field) => {
