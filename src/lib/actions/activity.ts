@@ -31,7 +31,7 @@ export async function getUserActivity(page: number = 1, limit: number = 10): Pro
       return [];
     }
 
-    // Fetch posts created by the user
+    // Lấy các bài đăng được tạo bởi người dùng
     const posts = await prisma.post.findMany({
       where: {
         userId: userId,
@@ -53,7 +53,7 @@ export async function getUserActivity(page: number = 1, limit: number = 10): Pro
       },
     });
 
-    // Fetch posts liked by the user
+    // Lấy các bài đăng được thích bởi người dùng
     const likes = await prisma.like.findMany({
       where: {
         userId: userId,
@@ -79,7 +79,7 @@ export async function getUserActivity(page: number = 1, limit: number = 10): Pro
       },
     });
 
-    // Fetch comments made by the user
+    // Lấy các bình luận được tạo bởi người dùng
     const comments = await prisma.comment.findMany({
       where: {
         userId: userId,
@@ -105,7 +105,7 @@ export async function getUserActivity(page: number = 1, limit: number = 10): Pro
       },
     });
 
-    // Transform posts into activity items
+    // Chuyển đổi bài đăng thành các mục hoạt động
     const postActivities: ActivityItem[] = posts.map(post => ({
       id: `post-${post.id}`,
       type: 'POST_CREATED',
@@ -114,9 +114,9 @@ export async function getUserActivity(page: number = 1, limit: number = 10): Pro
       postDesc: post.desc,
     }));
 
-    // Transform likes into activity items
+    // Chuyển đổi lượt thích thành các mục hoạt động
     const likeActivities: ActivityItem[] = likes
-      .filter(like => like.post !== null) // Filter out null posts
+      .filter(like => like.post !== null) // Lọc bỏ các bài đăng null
       .map(like => ({
         id: `like-${like.id}`,
         type: 'POST_LIKED',
@@ -126,9 +126,9 @@ export async function getUserActivity(page: number = 1, limit: number = 10): Pro
         targetUser: like.post?.user,
       }));
 
-    // Transform comments into activity items
+    // Chuyển đổi bình luận thành các mục hoạt động
     const commentActivities: ActivityItem[] = comments
-      .filter(comment => comment.post !== null) // Filter out null posts
+      .filter(comment => comment.post !== null) // Lọc bỏ các bài đăng null
       .map(comment => ({
         id: `comment-${comment.id}`,
         type: 'COMMENT_ADDED',
@@ -139,11 +139,11 @@ export async function getUserActivity(page: number = 1, limit: number = 10): Pro
         targetUser: comment.post?.user.id !== userId ? comment.post?.user : undefined,
       }));
 
-    // Combine all activities and sort by createdAt (newest first)
+    // Kết hợp tất cả các hoạt động và sắp xếp theo createdAt (mới nhất trước)
     const allActivities = [...postActivities, ...likeActivities, ...commentActivities]
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
-    // Apply pagination
+    // Áp dụng phân trang
     const startIndex = (page - 1) * limit;
     return allActivities.slice(startIndex, startIndex + limit);
   } catch (error) {
@@ -166,8 +166,8 @@ export async function getActivityByDate(date: Date): Promise<ActivityItem[]> {
     const endOfDay = new Date(date);
     endOfDay.setHours(23, 59, 59, 999);
     
-    // Fetch activities for the specified date using the same approach as getUserActivity
-    // but with date filtering
+    // Lấy hoạt động cho ngày được chỉ định sử dụng cùng cách tiếp cận như getUserActivity
+    // nhưng với bộ lọc ngày tháng
     
     const posts = await prisma.post.findMany({
       where: {
@@ -249,7 +249,7 @@ export async function getActivityByDate(date: Date): Promise<ActivityItem[]> {
       },
     });
 
-    // Transform and combine the data
+    // Chuyển đổi và kết hợp dữ liệu
     const postActivities = posts.map(post => ({
       id: `post-${post.id}`,
       type: 'POST_CREATED' as ActivityType,
@@ -281,7 +281,7 @@ export async function getActivityByDate(date: Date): Promise<ActivityItem[]> {
         targetUser: comment.post?.user.id !== userId ? comment.post?.user : undefined,
       }));
 
-    // Combine all activities and sort by createdAt (newest first)
+    // Kết hợp tất cả các hoạt động và sắp xếp theo createdAt (mới nhất trước)
     return [...postActivities, ...likeActivities, ...commentActivities]
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   } catch (error) {

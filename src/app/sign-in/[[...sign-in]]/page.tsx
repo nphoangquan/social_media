@@ -21,7 +21,7 @@ export default function SignInPage() {
   const [view, setView] = useState("main"); // main, email, password
   const router = useRouter();
 
-  // For email/password sign in
+  // Email/password sign in
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoaded) return;
@@ -30,7 +30,7 @@ export default function SignInPage() {
       setLoading(true);
       setError("");
 
-      // Create a sign-in verification
+      // Tạo 1 sign-in verification
       await signIn.create({
         identifier: emailAddress,
         password,
@@ -52,7 +52,7 @@ export default function SignInPage() {
     }
   };
 
-  // For social sign in
+  // Social sign in
   const handleSocialSignIn = async (provider: 'oauth_facebook' | 'oauth_google' | 'oauth_github') => {
     if (!isLoaded) return;
 
@@ -83,10 +83,10 @@ export default function SignInPage() {
     setView("password");
   };
 
-  // Close error message
+  // Tắ error message
   const closeError = () => setError("");
 
-  // Handle back button
+  // Xử lý back button
   const handleBack = () => {
     setView("main");
     setError("");
@@ -142,7 +142,7 @@ export default function SignInPage() {
               </p>
             </div>
 
-            {/* Main View - Social Options & Email Input */}
+            {/* View Chính - Social Options & Email Input */}
             {view === "main" && (
               <>
                 {/* Social Login Buttons */}
@@ -182,7 +182,7 @@ export default function SignInPage() {
                   <div className="h-px bg-zinc-800 flex-1"></div>
                 </div>
 
-                {/* Email Input */}
+                {/* Email */}
                 <form onSubmit={(e) => { e.preventDefault(); continueWithEmail(); }} className="space-y-5">
                   <div>
                     <label htmlFor="email" className="block text-sm text-zinc-400 mb-1.5">

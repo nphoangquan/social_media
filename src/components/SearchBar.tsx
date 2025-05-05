@@ -8,7 +8,6 @@ import Image from "next/image";
 import { debounce } from "lodash";
 import { useRouter } from "next/navigation";
 
-// Define types for the search results
 interface User {
   id: string;
   username: string;
@@ -41,7 +40,7 @@ export default function SearchBar() {
   const searchRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Debounced search function
+  // Hàm tìm kiếm bị giảm thiểu
   const debouncedSearch = useCallback(
     debounce(async (searchQuery: string) => {
       if (searchQuery.trim().length < 2) {
@@ -62,7 +61,7 @@ export default function SearchBar() {
     [searchContent, setSearchResults, setIsLoading]
   );
 
-  // Handle input change
+  // Xử lý thay đổi input
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
@@ -75,7 +74,7 @@ export default function SearchBar() {
     }
   };
 
-  // Handle view all results
+  // Xử lý hiển thị tất cả kết quả
   const handleViewAllResults = () => {
     if (query.trim().length >= 2) {
       router.push(`/search/results?q=${encodeURIComponent(query)}`);
@@ -83,7 +82,7 @@ export default function SearchBar() {
     }
   };
 
-  // Close search results when clicking outside
+  // Đóng kết quả tìm kiếm khi click ngoài
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -97,7 +96,7 @@ export default function SearchBar() {
     };
   }, []);
 
-  // Close search results when pressing Escape
+  // Đóng kết quả tìm kiếm khi nhấn Escape
   useEffect(() => {
     const handleEscKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -112,7 +111,7 @@ export default function SearchBar() {
     };
   }, []);
 
-  // Determine if we should show "View all results"
+  // Xác định nếu nên hiển thị "Xem tất cả kết quả"
   const hasResults = searchResults.users.length > 0 || searchResults.posts.length > 0;
   const shouldShowViewAll = query.trim().length >= 2 && hasResults;
 
@@ -232,7 +231,7 @@ export default function SearchBar() {
                 </div>
               )}
 
-              {/* View All Results Button */}
+              {/* Nút View All Results */}
               {shouldShowViewAll && (
                 <div className="p-2 border-t border-zinc-700">
                   <button

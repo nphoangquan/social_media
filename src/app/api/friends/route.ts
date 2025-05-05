@@ -12,16 +12,16 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Get page from query params
+  // Lấy trang từ tham số truy vấn
   const { searchParams } = new URL(request.url);
   const page = parseInt(searchParams.get("page") || "1", 10);
-  const limit = parseInt(searchParams.get("limit") || "10", 10);
+  const limit = parseInt(searchParams.get("limit") || "15", 10);
   
-  // Calculate pagination
+  // Tính toán phân trang
   const skip = (page - 1) * limit;
   
   try {
-    // Get followers with pagination
+    // Lấy người theo dõi với phân trang
     const followers = await prisma.follower.findMany({
       where: {
         followingId: userId,
@@ -36,14 +36,14 @@ export async function GET(request: NextRequest) {
       take: limit,
     });
 
-    // Get total count for pagination
+    // Lấy tổng số lượng cho phân trang
     const totalCount = await prisma.follower.count({
       where: {
         followingId: userId,
       },
     });
 
-    // Map followers to user objects
+    // Chuyển đổi từ người theo dõi sang đối tượng người dùng
     const friends = followers.map(follow => follow.follower);
 
     return NextResponse.json({

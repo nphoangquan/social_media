@@ -175,11 +175,11 @@ export const updateProfile = async (
     Object.entries(fields).filter(([, value]) => value !== "")
   );
 
-  // Convert birthDate string to Date object if it exists
+  // Chuyển đổi chuỗi birthDate thành đối tượng Date nếu nó tồn tại
   let birthDateValue: Date | undefined;
   if (filteredFields.birthDate && typeof filteredFields.birthDate === 'string') {
     birthDateValue = new Date(filteredFields.birthDate);
-    delete filteredFields.birthDate; // Remove from filtered fields as we'll add it properly later
+    delete filteredFields.birthDate; // Xóa khỏi filtered fields vì chúng ta sẽ thêm nó lại sau
   }
 
   const Profile = z.object({
@@ -456,7 +456,7 @@ export const deleteComment = async (commentId: number) => {
     await prisma.comment.delete({
       where: {
         id: commentId,
-        userId, // Only allow users to delete their own comments
+        userId, // Chỉ cho phép người dùng xóa bình luận của chính họ
       },
     });
     revalidatePath("/");
@@ -476,7 +476,7 @@ export async function createStory(formData: FormData) {
   if (!file) throw new Error('No file provided');
 
   try {
-    // Upload file directly to Cloudinary
+    // Tải file trực tiếp lên Cloudinary
     const formDataForCloudinary = new FormData();
     formDataForCloudinary.append('file', file);
     formDataForCloudinary.append('upload_preset', 'social-media');
@@ -496,11 +496,11 @@ export async function createStory(formData: FormData) {
     const data = await response.json();
     const fileUrl = data.secure_url;
 
-    // Calculate expiry time (24 hours from now)
+    // Tính thời gian hết hạn (24 giờ kể từ bây giờ)
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 24);
 
-    // Create story in database
+    // Tạo story trong cơ sở dữ liệu
     await prisma.story.create({
       data: {
         userId,
@@ -554,7 +554,7 @@ export const searchContent = async (query: string) => {
   }
 
   try {
-    // Search for users by username or name
+    // Tìm kiếm người dùng theo tên người dùng hoặc tên
     const users = await prisma.user.findMany({
       where: {
         OR: [
@@ -562,7 +562,7 @@ export const searchContent = async (query: string) => {
           { name: { contains: query, mode: 'insensitive' } },
           { surname: { contains: query, mode: 'insensitive' } },
         ],
-        // Don't show blocked users or users that have blocked the current user
+        // Không hiển thị người dùng bị chặn hoặc người dùng đã chặn người dùng hiện tại
         AND: [
           {
             NOT: {
@@ -591,17 +591,17 @@ export const searchContent = async (query: string) => {
         surname: true,
         avatar: true,
       },
-      take: 5, // Limit results
+      take: 5, // Giới hạn kết quả
     });
 
-    // Search for posts by description
+    // Tìm kiếm bài đăng theo mô tả
     const posts = await prisma.post.findMany({
       where: {
         desc: {
           contains: query,
           mode: 'insensitive',
         },
-        // Don't show posts from blocked users or users that have blocked the current user
+        // Không hiển thị bài đăng từ người dùng bị chặn hoặc người dùng đã chặn người dùng hiện tại
         user: {
           AND: [
             {
@@ -638,7 +638,7 @@ export const searchContent = async (query: string) => {
       orderBy: {
         createdAt: 'desc',
       },
-      take: 5, // Limit results
+      take: 5, // Giới hạn kết quả
     });
 
     return { users, posts };
@@ -648,7 +648,7 @@ export const searchContent = async (query: string) => {
   }
 };
 
-// Add this function to synchronize user avatar from Clerk to the database
+// Thêm hàm này để đồng bộ hóa avatar người dùng từ Clerk vào cơ sở dữ liệu
 export async function synchronizeUserAvatar() {
   const { userId } = await auth();
   
@@ -657,20 +657,20 @@ export async function synchronizeUserAvatar() {
   }
   
   try {
-    // Get current user from Clerk
+    // Lấy người dùng hiện tại từ Clerk
     const user = await currentUser();
     
     if (!user) {
       throw new Error("User not found");
     }
     
-    // Update the avatar in the database with the current imageUrl from Clerk
+    // Cập nhật avatar trong cơ sở dữ liệu với imageUrl hiện tại từ Clerk
     await prisma.user.update({
       where: { id: userId },
       data: { avatar: user.imageUrl }
     });
     
-    // Revalidate all pages where the avatar might be displayed
+    // Cập nhật tất cả các trang nơi avatar có thể được hiển thị
     revalidatePath("/", "layout");
     revalidatePath("/profile/[username]", "layout");
     revalidatePath("/settings", "layout");
@@ -711,15 +711,13 @@ export const switchCommentLike = async (commentId: number) => {
         },
       });
 
-      // Get the comment and its post info
+      // Lấy thông tin bình luận và bài viết của nó
       const comment = await prisma.comment.findUnique({
-        where: {
-          id: commentId,
-        },
+        where: { id: commentId },
         select: {
-          userId: true, // Comment author ID
-          postId: true, // Post ID that the comment belongs to
-        },
+          userId: true, // ID của người viết bình luận
+          postId: true, // ID của bài viết mà bình luận thuộc về
+        }
       });
       
       // Create notification for comment like (only if liker is different from comment author)

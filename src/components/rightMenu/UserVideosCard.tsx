@@ -17,7 +17,7 @@ const UserVideosCard = async ({ user }: { user: User }) => {
   });
 
   if (postsWithVideo.length === 0) {
-    return null; // Don't show component if no videos
+    return null; // Không hiển thị component nếu không có video
   }
 
   return (

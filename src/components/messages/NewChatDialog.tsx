@@ -24,7 +24,7 @@ export default function NewChatDialog({ userId }: NewChatDialogProps) {
       const response = await fetch(`/api/users/search?query=${encodeURIComponent(searchTerm)}`);
       const data = await response.json();
       
-      // Filter out the current user
+      // Lọc ra người dùng khác
       const filteredResults = data.filter((user: UserSearchResult) => user.id !== userId);
       setSearchResults(filteredResults);
     } catch (error) {
@@ -59,7 +59,7 @@ export default function NewChatDialog({ userId }: NewChatDialogProps) {
           <Plus className="w-5 h-5 absolute inset-0 text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
         </div>
         
-        {/* Hover highlight with shimmer */}
+        {/* Hover highlight với shimmer */}
         <div className="absolute inset-0 bg-emerald-500/10 opacity-0 rounded-full group-hover:opacity-100 overflow-hidden transition-opacity duration-200 -z-10">
           <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
         </div>

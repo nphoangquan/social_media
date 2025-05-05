@@ -9,11 +9,11 @@ export default async function ActivityPage() {
   const { userId } = await auth();
   
   if (!userId) {
-    // Redirect to sign in if not authenticated
+    // Chuyển hướng đến trang đăng nhập nếu chưa xác thực
     redirect("/sign-in");
   }
   
-  // Get user's activity (server component can directly call server action)
+  // Lấy hoạt động của người dùng (server component có thể gọi trực tiếp server action)
   const activities = await getUserActivity(1, 20);
 
   return (

@@ -2,7 +2,7 @@ import { ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 /**
- * Combines class names with Tailwind CSS optimization
+ * Kết hợp các tên lớp với tối ưu hóa Tailwind CSS
  */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

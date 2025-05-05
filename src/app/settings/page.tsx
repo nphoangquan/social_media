@@ -30,7 +30,7 @@ const SettingsPage = () => {
             </div>
           </div>
           
-          {/* Additional settings sections can be added here */}
+          {/* Additional settings sections can be added here - Có thể thêm 1 số setting khác ở đây*/}
         </div>
       </div>
       

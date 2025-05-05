@@ -28,10 +28,10 @@ export type Message = {
 };
 
 /**
- * Start a new chat with a user or get existing chat
+ * Bắt đầu một cuộc trò chuyện mới với người dùng hoặc lấy cuộc trò chuyện đã tồn tại
  */
 export async function startNewChat(userId: string, otherUserId: string): Promise<number> {
-  // Check if chat already exists between these users
+  // Kiểm tra xem cuộc trò chuyện đã tồn tại giữa những người dùng này chưa
   const existingChat = await prisma.chat.findFirst({
     where: {
       participants: {
@@ -67,7 +67,7 @@ export async function startNewChat(userId: string, otherUserId: string): Promise
     return existingChat.id;
   }
 
-  // Create a new chat
+  // Tạo một cuộc trò chuyện mới
   const newChat = await prisma.chat.create({
     data: {
       participants: {
@@ -83,7 +83,7 @@ export async function startNewChat(userId: string, otherUserId: string): Promise
 }
 
 /**
- * Send a message in a chat
+ * Gửi tin nhắn trong một cuộc trò chuyện
  */
 export async function sendMessage(chatId: number, content: string, img?: string) {
   const { userId } = await auth();
@@ -92,7 +92,7 @@ export async function sendMessage(chatId: number, content: string, img?: string)
     throw new Error("Unauthorized");
   }
 
-  // Check if user is a participant in this chat
+  // Kiểm tra xem người dùng có phải là người tham gia cuộc trò chuyện này không
   const participant = await prisma.chatParticipant.findFirst({
     where: {
       chatId: chatId,
@@ -104,7 +104,7 @@ export async function sendMessage(chatId: number, content: string, img?: string)
     throw new Error("Not a participant in this chat");
   }
 
-  // Create the message
+  // Tạo tin nhắn
   const message = await prisma.message.create({
     data: {
       content,
@@ -121,13 +121,13 @@ export async function sendMessage(chatId: number, content: string, img?: string)
     }
   });
 
-  // Update the chat timestamp
+  // Cập nhật dấu thời gian của cuộc trò chuyện
   await prisma.chat.update({
     where: { id: chatId },
     data: { updatedAt: new Date() }
   });
 
-  // Mark as unread for other participants
+  // Đánh dấu là chưa đọc cho những người tham gia khác
   await prisma.chatParticipant.updateMany({
     where: {
       chatId: chatId,
@@ -139,7 +139,7 @@ export async function sendMessage(chatId: number, content: string, img?: string)
   });
 
   try {
-    // Send realtime notification
+    // Gửi thông báo thời gian thực
     const otherParticipants = await prisma.chatParticipant.findMany({
       where: {
         chatId: chatId,
@@ -181,7 +181,7 @@ export async function sendMessage(chatId: number, content: string, img?: string)
 }
 
 /**
- * Get all messages for a chat
+ * Lấy tất cả tin nhắn cho một cuộc trò chuyện
  */
 export async function getChatMessages(chatId: number, limit: number = 15, offset: number = 0): Promise<{ messages: Message[], hasMore: boolean }> {
   const { userId } = await auth();
@@ -190,7 +190,7 @@ export async function getChatMessages(chatId: number, limit: number = 15, offset
     throw new Error("Unauthorized");
   }
 
-  // Check if user is a participant in this chat
+  // Kiểm tra xem người dùng có phải là người tham gia cuộc trò chuyện này không
   const participant = await prisma.chatParticipant.findFirst({
     where: {
       chatId: chatId,
@@ -202,26 +202,26 @@ export async function getChatMessages(chatId: number, limit: number = 15, offset
     throw new Error("Not a participant in this chat");
   }
 
-  // Get the total count for pagination info
+  // Lấy tổng số lượng cho thông tin phân trang
   const totalCount = await prisma.message.count({
     where: {
       chatId: chatId
     }
   });
 
-  // Get messages with pagination
+  // Lấy tin nhắn với phân trang
   const messages = await prisma.message.findMany({
     where: {
       chatId: chatId
     },
     orderBy: {
-      createdAt: "desc" // Get newest messages first
+      createdAt: "desc" // Lấy tin nhắn mới nhất trước
     },
     take: limit,
     skip: offset
   });
 
-  // Reverse messages to show oldest first
+  // Đảo ngược tin nhắn để hiển thị tin cũ nhất trước
   const orderedMessages = [...messages].reverse();
 
   return {
@@ -231,7 +231,7 @@ export async function getChatMessages(chatId: number, limit: number = 15, offset
 }
 
 /**
- * Mark a chat as read
+ * Đánh dấu một cuộc trò chuyện đã đọc
  */
 export async function markChatAsRead(chatId: number) {
   const { userId } = await auth();
@@ -255,7 +255,7 @@ export async function markChatAsRead(chatId: number) {
 }
 
 /**
- * Get unread messages count
+ * Lấy số lượng tin nhắn chưa đọc
  */
 export async function getUnreadCount(): Promise<number> {
   const { userId } = await auth();
@@ -275,7 +275,7 @@ export async function getUnreadCount(): Promise<number> {
 }
 
 /**
- * Delete a message
+ * Xóa một tin nhắn
  */
 export async function deleteMessage(messageId: number) {
   const { userId } = await auth();
@@ -284,7 +284,7 @@ export async function deleteMessage(messageId: number) {
     throw new Error("Unauthorized");
   }
 
-  // Check if the message belongs to the user
+  // Kiểm tra xem tin nhắn có thuộc về người dùng không
   const message = await prisma.message.findUnique({
     where: {
       id: messageId
@@ -302,20 +302,20 @@ export async function deleteMessage(messageId: number) {
     throw new Error("You can only delete your own messages");
   }
 
-  // Delete the message
+  // Xóa tin nhắn
   await prisma.message.delete({
     where: {
       id: messageId
     }
   });
 
-  // Update chat timestamps if needed
+  // Cập nhật dấu thời gian trò chuyện nếu cần
   if (message.chat) {
     revalidatePath(`/messages/${message.chat.id}`, "page");
     revalidatePath("/messages", "page");
   }
 
-  // Send realtime delete notification if needed
+  // Gửi thông báo xóa thời gian thực nếu cần
   try {
     const otherParticipants = await prisma.chatParticipant.findMany({
       where: {

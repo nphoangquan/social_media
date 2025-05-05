@@ -19,13 +19,13 @@ export function useSummarize() {
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to generate summary");
+        throw new Error(errorData.error || "Không thể tạo bản tóm tắt");
       }
       
       const data = await response.json();
       return data.summary;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unknown error occurred");
+      setError(err instanceof Error ? err.message : "Đã xảy ra lỗi không xác định");
       return "";
     } finally {
       setLoading(false);

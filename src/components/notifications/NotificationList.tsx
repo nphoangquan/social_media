@@ -15,7 +15,7 @@ const NotificationItem = ({ notification }: { notification: NotificationPayload 
   const [isDeleting, setIsDeleting] = useState(false);
   
   useEffect(() => {
-    // Update relative time
+    // Update thời gian
     const updateTimeAgo = () => {
       const date = new Date(notification.createdAt);
       setTimeAgo(
@@ -24,12 +24,12 @@ const NotificationItem = ({ notification }: { notification: NotificationPayload 
     };
     
     updateTimeAgo();
-    const interval = setInterval(updateTimeAgo, 60000); // Update every minute
+    const interval = setInterval(updateTimeAgo, 60000); // Update mỗi phút
     
     return () => clearInterval(interval);
   }, [notification.createdAt]);
   
-  // Determine icon based on notification type
+  // Xác định icon dựa trên loại thông báo
   const getIcon = () => {
     switch (notification.type) {
       case 'LIKE':
@@ -54,8 +54,8 @@ const NotificationItem = ({ notification }: { notification: NotificationPayload 
   };
 
   const handleDelete = async (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent Link component activation
-    e.stopPropagation(); // Prevent event propagation
+    e.preventDefault(); // Ngăn Link component activation
+    e.stopPropagation(); // Ngăn event propagation
     
     if (isDeleting) return;
     
@@ -120,7 +120,7 @@ const NotificationList = () => {
   const { notifications, loading, unreadCount, markAllAsRead, deleteAllNotifications } = useNotifications();
   const [isDeletingAll, setIsDeletingAll] = useState(false);
   
-  // Group notifications by date
+  // Nhóm thông báo theo ngày
   const [todayNotifications, setTodayNotifications] = useState<NotificationPayload[]>([]);
   const [earlierNotifications, setEarlierNotifications] = useState<NotificationPayload[]>([]);
   

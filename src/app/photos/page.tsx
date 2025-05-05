@@ -6,7 +6,7 @@ import Link from "next/link";
 export default async function PhotosPage() {
   const { userId } = await auth();
   
-  // Return early if not authenticated
+  // Trả về sớm nếu chưa xác thực
   if (!userId) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -15,7 +15,7 @@ export default async function PhotosPage() {
     );
   }
   
-  // Fetch user photos - no username means current user's photos
+  // Lấy ảnh của người dùng - không có username nghĩa là ảnh của người dùng hiện tại
   const photos = await getUserPhotos();
   
   return (

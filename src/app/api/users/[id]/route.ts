@@ -20,7 +20,7 @@ export async function GET(
 
   const { id } = await context.params;
 
-  // Only allow users to fetch their own data (for security)
+  // Chỉ cho phép người dùng lấy dữ liệu của chính họ (vì lý do bảo mật)
   if (userId !== id) {
     return Promise.resolve(new NextResponse(JSON.stringify({ error: "Forbidden" }), {
       status: 403,

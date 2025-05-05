@@ -17,7 +17,7 @@ export default function ActivityList({
 }) {
   const observerTarget = useRef<HTMLDivElement>(null);
 
-  // Set up intersection observer for infinite scrolling
+  // Thiết lập intersection observer cho cuộn vô hạn
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {

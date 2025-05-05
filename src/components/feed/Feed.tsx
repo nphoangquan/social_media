@@ -17,13 +17,13 @@ const Feed = ({ username }: FeedProps) => {
   const loadingRef = useRef(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Handler for new post event
+  // Xử lý sự kiện bài đăng mới
   const handleNewPost = useCallback((event: Event) => {
     const { post } = (event as CustomEvent).detail;
-    // Add the new post to the beginning of the list
+    // Thêm bài đăng mới vào đầu danh sách
     if (post) {
       setPosts(prevPosts => {
-        // Check if post already exists to avoid duplicates
+        // Kiểm tra xem bài đăng đã tồn tại chưa để tránh trùng lặp
         if (!prevPosts.some(p => p.id === post.id)) {
           return [post, ...prevPosts];
         }
@@ -32,19 +32,19 @@ const Feed = ({ username }: FeedProps) => {
     }
   }, []);
 
-  // Handler for delete post event
+  // Xử lý sự kiện xóa bài đăng
   const handleDeletePost = useCallback((event: Event) => {
     const { postId } = (event as CustomEvent).detail;
-    // Remove the deleted post from the list
+    // Xóa bài đăng đã xóa khỏi danh sách
     if (postId) {
       setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
     }
   }, []);
 
-  // Handler for post update event
+  // Xử lý sự kiện cập nhật bài đăng
   const handlePostUpdate = useCallback((event: Event) => {
     const { postId, updatedPost } = (event as CustomEvent).detail;
-    // Update the modified post in the list
+    // Cập nhật bài đăng đã sửa đổi trong danh sách
     if (postId && updatedPost) {
       setPosts(prevPosts => prevPosts.map(post => 
         post.id === postId 
@@ -59,14 +59,14 @@ const Feed = ({ username }: FeedProps) => {
     }
   }, []);
 
-  // Add event listeners for posts
+  // Thêm trình nghe sự kiện cho các bài đăng
   useEffect(() => {
-    // Add event listeners
+    // Thêm trình nghe sự kiện
     window.addEventListener('newPost', handleNewPost);
     window.addEventListener('deletePost', handleDeletePost);
     window.addEventListener('postUpdate', handlePostUpdate);
     
-    // Clean up event listeners
+    // Dọn dẹp trình nghe sự kiện
     return () => {
       window.removeEventListener('newPost', handleNewPost);
       window.removeEventListener('deletePost', handleDeletePost);
@@ -74,7 +74,7 @@ const Feed = ({ username }: FeedProps) => {
     };
   }, [handleNewPost, handleDeletePost, handlePostUpdate]);
 
-  // Debounced fetch function
+  // Hàm tìm nạp được trì hoãn
   const debouncedFetch = useCallback(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -91,7 +91,7 @@ const Feed = ({ username }: FeedProps) => {
             setHasMore(false);
           } else {
             setPosts(prev => {
-              // Check for duplicates
+              // Kiểm tra trùng lặp
               const existingIds = new Set(prev.map(post => post.id));
               const uniqueNewPosts = newPosts.filter(post => !existingIds.has(post.id));
               return [...prev, ...uniqueNewPosts];
@@ -104,7 +104,7 @@ const Feed = ({ username }: FeedProps) => {
           loadingRef.current = false;
         }
       }
-    }, 500); // 500ms debounce
+    }, 500); // 500ms trì hoãn
   }, [page, hasMore, username]);
 
   const lastPostElementRef = useCallback((node: HTMLDivElement | null) => {
@@ -115,7 +115,7 @@ const Feed = ({ username }: FeedProps) => {
         setPage(prevPage => prevPage + 1);
       }
     }, {
-      rootMargin: '100px', // Start loading before reaching the end
+      rootMargin: '100px', // Bắt đầu tải trước khi đến cuối
       threshold: 0.1
     });
     if (node) observer.current.observe(node);

@@ -13,7 +13,7 @@ export async function GET(
   const { userId } = await auth();
   const url = new URL(request.url);
   
-  // Default pagination: 15 items per page, start from page 0
+  // Phân trang mặc định: 15 tin nhắn mỗi trang, bắt đầu từ trang 0
   const page = parseInt(url.searchParams.get('page') || '0');
   const limit = parseInt(url.searchParams.get('limit') || '15');
   const skip = page * limit;
@@ -26,7 +26,7 @@ export async function GET(
     const { chatId } = await context.params;
     const chatIdInt = parseInt(chatId);
 
-    // Verify user is part of this chat
+    // Xác minh người dùng là thành viên của cuộc trò chuyện này
     const participant = await prisma.chatParticipant.findFirst({
       where: {
         chatId: chatIdInt,
@@ -38,20 +38,20 @@ export async function GET(
       return Promise.resolve(NextResponse.json({ error: "Not authorized to view this chat" }, { status: 403 }));
     }
 
-    // Get total count for pagination
+    // Lấy tổng số lượng tin nhắn cho phân trang
     const totalCount = await prisma.message.count({
       where: {
         chatId: chatIdInt
       }
     });
 
-    // Get messages with pagination
+    // Lấy tin nhắn với phân trang
     const messages = await prisma.message.findMany({
       where: {
         chatId: chatIdInt
       },
       orderBy: {
-        createdAt: "desc" // Get newest messages first
+        createdAt: "desc" // Lấy tin nhắn mới nhất trước
       },
       take: limit,
       skip: skip,
@@ -67,7 +67,7 @@ export async function GET(
       }
     });
 
-    // Reverse to show oldest messages first for the UI
+    // Đảo ngược để hiển thị tin nhắn cũ nhất trước tiên cho giao diện người dùng
     const orderedMessages = [...messages].reverse();
 
     return Promise.resolve(NextResponse.json({

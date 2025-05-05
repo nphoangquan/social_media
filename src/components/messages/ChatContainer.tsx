@@ -16,7 +16,7 @@ import {
 } from "@/lib/actions/messages";
 import ChatHeader from "./ChatHeader";
 
-// Import emoji picker dynamically to avoid SSR issues
+// Import emoji picker 
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), { 
   ssr: false,
   loading: () => <div className="p-2">Loading...</div>
@@ -37,7 +37,7 @@ interface DeleteMessageEvent {
   messageId: number;
 }
 
-// Define types for API responses
+// Định nghĩa kiểu dữ liệu cho API response
 interface MessagesResponse {
   messages: Message[];
   hasMore: boolean;
@@ -73,11 +73,11 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
 
-  // Set mounted state for client-side portals
+  // Cài đặt trạng thái mounted cho các portal client-side
   useEffect(() => {
     setIsMounted(true);
     
-    // Handle clicks outside emoji picker
+    // Xử lý clicks ngoài emoji picker
     const handleClickOutside = (event: MouseEvent) => {
       if (emojiPickerRef.current && 
           !emojiPickerRef.current.contains(event.target as Node) && 
@@ -93,7 +93,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
     };
   }, [showEmojiPicker]);
 
-  // Load more messages with useCallback
+  // Tải thêm tin nhắn với useCallback
   const loadMoreMessages = useCallback(async () => {
     if (loadingMore || !hasMore) return;
     
@@ -106,7 +106,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
       
       const data = await response.json() as MessagesResponse;
       
-      // Prepend older messages to the beginning
+      // Thêm tin nhắn cũ hơn vào đầu
       setMessages(prev => [...data.messages, ...prev]);
       setHasMore(data.hasMore);
       setPage(nextPage);
@@ -118,7 +118,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
     }
   }, [chatId, hasMore, loadingMore, page]);
 
-  // Load initial messages and set up realtime updates
+  // Tải tin nhắn ban đầu và thiết lập cập nhật Realtime
   useEffect(() => {
     const loadMessages = async () => {
       try {
@@ -132,7 +132,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
         setHasMore(data.hasMore);
         setPage(0);
 
-        // Mark chat as read when opened
+        // Đánh dấu chat đã đọc khi mở
         await markChatAsRead(chatId);
       } catch (error) {
         console.error("Error loading messages:", error);
@@ -144,7 +144,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
 
     loadMessages();
 
-    // Set up socket connection
+    // Thiết lập kết nối socket
     if (!socketRef.current) {
       socketRef.current = io(window.location.origin, {
         path: "/api/socket",
@@ -161,10 +161,10 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
       socket.connect();
     }
 
-    // Join the user's room to receive messages
+    // Tham gia phòng của người dùng để nhận tin nhắn
     socket.emit("join", userId);
 
-    // Listen for new messages
+    // Hàm listen tin nhắn mới
     const handleNewMessage = (data: MessageEvent) => {
       if (data.chatId === chatId) {
         setMessages((prev) => [...prev, data.message]);
@@ -172,14 +172,14 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
       }
     };
 
-    // Listen for deleted messages
+    // Hàm listen tin nhắn đã xóa
     const handleDeletedMessage = (data: DeleteMessageEvent) => {
       if (data.chatId === chatId) {
         setMessages((prev) => prev.filter((msg) => msg.id !== data.messageId));
       }
     };
 
-    // Handle reconnection
+    // Hàm xử lý kết nối lại
     const handleReconnect = () => {
       console.log("Socket reconnected");
       socket.emit("join", userId);
@@ -196,7 +196,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
     };
   }, [chatId, userId]);
 
-  // Set up infinite scroll observer
+  // Thiết lập observer cuộn vô hạn
   useEffect(() => {
     if (loading || !hasMore) return;
 
@@ -225,14 +225,14 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
     };
   }, [hasMore, loading, loadingMore, page, loadMoreMessages]);
 
-  // Save scroll position before loading more messages
+  // Lưu vị trí cuộn trước khi tải thêm tin nhắn
   useEffect(() => {
     if (messagesContainerRef.current) {
       scrollHeightRef.current = messagesContainerRef.current.scrollHeight;
     }
   }, [loadingMore]);
 
-  // Restore scroll position after loading more messages
+  // Khôi phục vị trí cuộn sau khi tải thêm tin nhắn
   useEffect(() => {
     if (loadingMore && messagesContainerRef.current) {
       const newScrollHeight = messagesContainerRef.current.scrollHeight;
@@ -241,7 +241,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
     }
   }, [messages, loadingMore]);
 
-  // Fetch other user info
+  // Lấy thông tin người dùng khác
   useEffect(() => {
     const fetchChatInfo = async () => {
       try {
@@ -263,9 +263,9 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
     fetchChatInfo();
   }, [chatId, userId]);
 
-  // Scroll to bottom on new messages
+  // Cuộn xuống dưới khi có tin nhắn mới
   useEffect(() => {
-    // Only auto-scroll if we're near the bottom already
+    // Chỉ tự động cuộn xuống nếu chúng ta đang gần cuối
     if (messagesContainerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
       const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
@@ -280,36 +280,36 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       
-      // Clear any previous error
+      // Xóa bất kỳ lỗi trước đó
       setErrorMessage(null);
       
-      // Check file type
+      // Kiểm tra loại file
       if (!file.type.startsWith('image/')) {
         setErrorMessage('Please select an image file');
         return;
       }
       
-      // Check file size (max 5MB)
+      // Kiểm tra kích thước file (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setErrorMessage('Image size should not exceed 5MB');
         return;
       }
       
-      // Clean up previous object URL if it exists
+      // Làm sạch URL trước đó nếu tồn tại
       if (imagePreviewUrl) {
         URL.revokeObjectURL(imagePreviewUrl);
       }
       
       setSelectedImage(file);
       
-      // Create preview URL using URL.createObjectURL instead of FileReader
+      // Tạo URL preview sử dụng URL.createObjectURL thay vì FileReader
       const previewUrl = URL.createObjectURL(file);
       setImagePreviewUrl(previewUrl);
     }
   };
 
   const handleCancelImage = () => {
-    // Clean up object URL
+    // Làm sạch URL
     if (imagePreviewUrl) {
       URL.revokeObjectURL(imagePreviewUrl);
     }
@@ -321,10 +321,10 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
     }
   };
 
-  // Add useEffect for cleanup when component unmounts
+  // Thêm useEffect cho dọn dẹp khi component unmount
   useEffect(() => {
     return () => {
-      // Clean up object URL when component unmounts
+      // Làm sạch URL khi component unmount
       if (imagePreviewUrl) {
         URL.revokeObjectURL(imagePreviewUrl);
       }
@@ -350,29 +350,29 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
       const messageText = newMessage;
       let imageUrl = null;
       
-      // Create a temporary message for immediate display (optimistic update)
-      const tempId = Date.now(); // Temporary ID
+      // Tạo một tin nhắn tạm thời để hiển thị ngay lập tức (cập nhật tối ưu)
+      const tempId = Date.now(); // ID tạm thời
       
       if (selectedImage) {
         setUploadingImage(true);
         
-        // Add optimistic message with image preview right away
+        // Thêm tin nhắn tối ưu với hình ảnh preview ngay lập tức
         const optimisticMessage = {
           id: tempId,
           content: messageText || "",
-          img: imagePreviewUrl, // Use the temporary preview URL
+          img: imagePreviewUrl, // Sử dụng URL preview tạm thời
           createdAt: new Date(),
           senderId: userId,
         };
         
-        // Add optimistic message to UI immediately
+        // Thêm tin nhắn tối ưu vào UI ngay lập tức
         setMessages((prev) => [...prev, optimisticMessage]);
         
-        // Clear input fields for better UX
+        // Xóa trường nhập liệu cho UX tốt hơn
         setNewMessage("");
         
         try {
-          // Upload directly to Cloudinary
+          // Tải lên trực tiếp đến Cloudinary
           const formData = new FormData();
           formData.append('file', selectedImage);
           formData.append('upload_preset', 'social-media');
@@ -393,7 +393,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
           imageUrl = uploadData.secure_url;
         } catch (error) {
           console.error("Error uploading image:", error);
-          // Remove the optimistic message if upload failed
+          // Xóa tin nhắn tối ưu nếu tải lên thất bại
           setMessages((prev) => prev.filter((msg) => msg.id !== tempId));
           setErrorMessage("Failed to upload image. Please try again with a smaller image or check your internet connection.");
           setUploadingImage(false);
@@ -402,7 +402,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
           setUploadingImage(false);
         }
       } else {
-        // Text-only message
+        // Tin nhắn chỉ văn bản
         const optimisticMessage = {
           id: tempId,
           content: messageText,
@@ -411,24 +411,23 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
           senderId: userId,
         };
         
-        // Add optimistic message to UI immediately
+        // Thêm tin nhắn tối ưu vào UI ngay lập tức
         setMessages((prev) => [...prev, optimisticMessage]);
         
-        // Clear input field right away for better UX
         setNewMessage("");
       }
 
-      // Send the message
+      // Gửi message
       const sentMessage = await sendMessage(chatId, messageText || "", imageUrl || undefined);
 
-      // Replace the temporary message with the real one from the server
+      // Thay thế tin nhắn tạm thời với tin nhắn thực từ server
       if (sentMessage) {
         setMessages((prev) =>
           prev.map((msg) => (msg.id === tempId ? sentMessage : msg))
         );
       }
       
-      // Clear image selection
+      // Xóa lựa chọn hình ảnh
       setSelectedImage(null);
       setImagePreviewUrl(null);
       if (fileInputRef.current) {
@@ -437,7 +436,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
       
     } catch (error) {
       console.error("Error sending message:", error);
-      // Remove the optimistic message if there was an error
+      // Xóa tin nhắn tối ưu nếu có lỗi
       setMessages((prev) => prev.filter((msg) => typeof msg.id === "number"));
       setErrorMessage("Failed to send message. Please try again.");
     } finally {
@@ -458,18 +457,18 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
       setDeletingMessage(messageId);
       setMessageToDelete(null);
       
-      // Optimistic update: remove the message from UI first
+      // Cập nhật Optimistic : Xóa message từ UI trước
       setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
       
-      // Call the API to delete the message
+      // Gọi API để xóa message
       await deleteMessage(messageId);
       
-      // No need to update the messages again as we already did it optimistically
+      // Không cần cập nhật lại messages
     } catch (error) {
       console.error("Error deleting message:", error);
       setErrorMessage("Failed to delete message. Please try again.");
       
-      // Restore the message if delete failed
+      // Khôi phục message nếu xóa thất bại
       const response = await fetch(`/api/messages/${chatId}?page=0&limit=15`);
       if (response.ok) {
         const data = await response.json() as MessagesResponse;
@@ -484,17 +483,17 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
 
   const handleOpenImage = (imageUrl: string) => {
     setViewingImage(imageUrl);
-    // Find index of current image in filtered image messages array
+    // Tìm index của hình ảnh hiện tại trong mảng tin nhắn hình ảnh đã lọc
     const imageMessages = messages.filter(msg => msg.img);
     const index = imageMessages.findIndex(msg => msg.img === imageUrl);
     setCurrentImageIndex(index !== -1 ? index : 0);
-    // Prevent scrolling when modal is open
+    // Ngăn cuộn khi modal được mở
     document.body.style.overflow = 'hidden';
   };
 
   const handleCloseImage = () => {
     setViewingImage(null);
-    // Restore scrolling
+    // Khôi phục cuộn
     document.body.style.overflow = '';
   };
 
@@ -518,7 +517,6 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
     setViewingImage(imageMessages[newIndex].img || null);
   }, [messages, currentImageIndex]);
 
-  // Handle keyboard navigation for image viewer
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!viewingImage) return;
@@ -540,7 +538,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
     };
   }, [viewingImage, currentImageIndex, messages, handlePreviousImage, handleNextImage]);
 
-  // Handle emoji selection
+  // Xử lý chọn emoji
   const handleEmojiClick = (emojiData: { emoji: string }) => {
     const emoji = emojiData.emoji;
     setNewMessage(prevMessage => prevMessage + emoji);
@@ -594,7 +592,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
         </div>
       )}
 
-      {/* Image viewer modal - Using Portal to render at root level */}
+      {/* Modal Image Viewer */}
       {isMounted && viewingImage && createPortal(
         <div className="fixed inset-0 bg-black/95 z-[9999] flex flex-col">
           {/* Header */}
@@ -620,7 +618,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
             </div>
           </div>
           
-          {/* Image container with navigation arrows */}
+          {/* Image container với navigation arrows */}
           <div className="flex-1 flex items-center justify-center overflow-hidden" onClick={handleCloseImage}>
             {/* Previous button */}
             {messages.filter(msg => msg.img).length > 1 && (
@@ -659,7 +657,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
             )}
           </div>
           
-          {/* Thumbnails at bottom */}
+          {/* Thumbnails trong bottom */}
           <div className="bg-zinc-900/60 backdrop-blur-sm p-2 overflow-x-auto flex gap-2">
             {messages
               .filter(msg => msg.img)
@@ -708,7 +706,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
           </div>
         ) : (
           <>
-            {/* "Load More" section at the top */}
+            {/* "Load More" section ở top */}
             <div ref={messagesStartRef} className="h-1" />
             
             {loadingMore && (
@@ -728,7 +726,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
                     message.senderId === userId ? "justify-end" : "justify-start"
                   }`}
                 >
-                  {/* Delete button - only shown for user's own messages on hover */}
+                  {/* Delete button - chỉ hiển thị cho tin nhắn của người dùng */}
                   {message.senderId === userId && (
                     <div className="order-first flex items-start mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                       <button
@@ -747,7 +745,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
                   )}
                   
                   {isImageOnlyMessage ? (
-                    // Image-only message - Facebook style
+                    // Image messages
                     <div className={`group-hover:opacity-90 transition-opacity relative flex flex-col ${message.senderId === userId ? "items-end" : "items-start"}`}>
                       <div 
                         className="rounded-lg overflow-hidden shadow-lg cursor-pointer"
@@ -774,7 +772,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
                       </div>
                     </div>
                   ) : (
-                    // Text message or text+image message
+                    // Text message hoặc text+image message
                     <div
                       className={`group relative max-w-[70%] p-3 rounded-lg shadow-md ${
                         message.senderId === userId

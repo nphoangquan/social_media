@@ -10,7 +10,7 @@ export type NextApiResponseServerIO = NextApiResponse & {
   };
 };
 
-// Global instance of Socket.IO server
+// Instance toàn cục của Socket.IO server
 let globalSocketIO: SocketIOServer | null = null;
 
 // Định nghĩa một interface cho server có thuộc tính io

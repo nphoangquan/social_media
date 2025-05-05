@@ -22,7 +22,7 @@ export default function VideosLayout({
         {children}
       </div>
       <div className="hidden xl:block w-1/4">
-        {/* Right sidebar content if needed */}
+        {/* Sidebar content bên phải nếu cần */}
       </div>
     </div>
   );

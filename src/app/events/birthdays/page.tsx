@@ -54,14 +54,14 @@ const BirthdaysPage = () => {
     } catch (error) {
       console.error("Error celebrating birthday:", error);
     } finally {
-      // Keep the button disabled for better UX
+      // Giữ nút vô hiệu hóa để trải nghiệm người dùng tốt hơn
       setTimeout(() => {
         setCelebrating(prev => ({ ...prev, [friendId]: false }));
       }, 5000);
     }
   };
 
-  // Group birthdays by month
+  // Nhóm sinh nhật theo tháng
   const groupedByMonth = friends.reduce((acc, friend) => {
     const birthDate = new Date(friend.birthDate);
     const month = birthDate.getMonth();
@@ -74,7 +74,7 @@ const BirthdaysPage = () => {
     return acc;
   }, {} as Record<number, Friend[]>);
 
-  // Generate months array with names
+  // Tạo mảng các tháng với tên
   const months = Array.from({ length: 12 }, (_, i) => {
     const date = new Date(2000, i, 1);
     return {
@@ -87,7 +87,7 @@ const BirthdaysPage = () => {
   if (loading) {
     return (
       <div className="p-8 max-w-6xl mx-auto flex items-center justify-center min-h-[500px]">
-        <div className="text-zinc-500 dark:text-zinc-400">Loading birthdays...</div>
+        <div className="text-zinc-500 dark:text-zinc-400">Đang tải sinh nhật...</div>
       </div>
     );
   }
@@ -95,13 +95,13 @@ const BirthdaysPage = () => {
   if (friends.length === 0) {
     return (
       <div className="p-8 max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">Birthdays</h1>
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">Sinh Nhật</h1>
         <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 text-center">
           <div className="flex flex-col items-center gap-4">
             <Cake className="w-12 h-12 text-zinc-400 dark:text-zinc-500" />
-            <h2 className="text-xl text-zinc-800 dark:text-zinc-200">No birthdays found</h2>
+            <h2 className="text-xl text-zinc-800 dark:text-zinc-200">Không tìm thấy sinh nhật nào</h2>
             <p className="text-zinc-500 dark:text-zinc-400">
-              Your friends havent added their birthdays yet.
+              Bạn bè của bạn chưa thêm ngày sinh nhật.
             </p>
           </div>
         </div>
@@ -111,14 +111,14 @@ const BirthdaysPage = () => {
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">Birthdays</h1>
+      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">Sinh Nhật</h1>
       
-      {/* Today Birthdays */}
+      {/* Sinh Nhật Hôm Nay */}
       {friends.some(friend => friend.isBirthdayToday) && (
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-zinc-800 dark:text-zinc-200 mb-4 flex items-center gap-2">
             <Gift className="w-5 h-5 text-emerald-500" />
-            Today Birthdays
+            Sinh Nhật Hôm Nay
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {friends
@@ -145,7 +145,7 @@ const BirthdaysPage = () => {
                     </Link>
                     <div className="flex items-center gap-1 text-sm text-emerald-600 dark:text-emerald-400">
                       <Cake className="w-4 h-4" />
-                      <span>Birthday Today!</span>
+                      <span>Sinh Nhật Hôm Nay!</span>
                     </div>
                     <button 
                       className={`mt-2 ${
@@ -156,7 +156,7 @@ const BirthdaysPage = () => {
                       onClick={() => handleCelebrate(friend.id)}
                       disabled={celebrating[friend.id]}
                     >
-                      {celebrating[friend.id] ? "Celebrated!" : "Celebrate"}
+                      {celebrating[friend.id] ? "Đã chúc mừng!" : "Chúc mừng"}
                     </button>
                   </div>
                 </div>
@@ -165,11 +165,11 @@ const BirthdaysPage = () => {
         </div>
       )}
       
-      {/* Upcoming Birthdays */}
+      {/* Sinh Nhật Sắp Tới */}
       <div className="mb-8">
         <h2 className="text-lg font-semibold text-zinc-800 dark:text-zinc-200 mb-4 flex items-center gap-2">
           <CalendarDays className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
-          Upcoming Birthdays
+          Sinh Nhật Sắp Tới
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {friends
@@ -201,8 +201,8 @@ const BirthdaysPage = () => {
                       <Cake className="w-4 h-4" />
                       <span>
                         {friend.daysUntilBirthday === 1 
-                          ? 'Tomorrow' 
-                          : `In ${friend.daysUntilBirthday} days`}
+                          ? 'Ngày mai' 
+                          : `Còn ${friend.daysUntilBirthday} ngày`}
                       </span>
                     </div>
                     <span className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -215,11 +215,11 @@ const BirthdaysPage = () => {
         </div>
       </div>
       
-      {/* All Birthdays by Month */}
+      {/* Tất Cả Sinh Nhật Theo Tháng */}
       <div>
         <h2 className="text-lg font-semibold text-zinc-800 dark:text-zinc-200 mb-4 flex items-center gap-2">
           <CalendarDays className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
-          All Birthdays
+          Tất Cả Sinh Nhật
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -251,7 +251,7 @@ const BirthdaysPage = () => {
                         <div className="flex flex-col">
                           <Link 
                             href={`/profile/${friend.username}`}
-                            className="text-zinc-900 dark:text-zinc-100 font-medium hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                            className="text-zinc-900 dark:text-zinc-100 font-semibold hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-sm"
                           >
                             {friend.name || friend.username}
                           </Link>
@@ -265,7 +265,7 @@ const BirthdaysPage = () => {
                 </div>
               ) : (
                 <div className="p-4 text-center text-zinc-500 dark:text-zinc-400 text-sm">
-                  No birthdays
+                  Không có sinh nhật nào
                 </div>
               )}
             </div>

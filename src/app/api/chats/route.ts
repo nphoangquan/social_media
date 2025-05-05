@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   const { userId } = await auth();
   const url = new URL(request.url);
   
-  // Default pagination: 15 items per page, start from page 0
+  // Phân trang mặc định: 15 mục mỗi trang, bắt đầu từ trang 0
   const page = parseInt(url.searchParams.get('page') || '0');
   const limit = parseInt(url.searchParams.get('limit') || '15');
   const skip = page * limit;
@@ -16,14 +16,14 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Get total count for pagination
+    // Lấy tổng số lượng cho phân trang
     const totalCount = await prisma.chatParticipant.count({
       where: {
         userId: userId,
       }
     });
 
-    // Get chats with pagination
+    // Lấy cuộc trò chuyện với phân trang
     const participants = await prisma.chatParticipant.findMany({
       where: {
         userId: userId,
@@ -57,7 +57,7 @@ export async function GET(request: Request) {
       skip: skip
     });
 
-    // Transform data for frontend
+    // Chuyển đổi dữ liệu cho giao diện người dùng
     const chats = participants.map(participant => ({
       chat: participant.chat,
       isRead: participant.isRead

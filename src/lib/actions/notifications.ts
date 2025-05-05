@@ -8,7 +8,7 @@ const getApiUrl = () => {
     return process.env.NEXT_PUBLIC_SITE_URL;
   }
   
-  // Nếu đang ở môi trường client (window tồn tại)
+  // Nếu đang ở môi trường client (ý là người dùng đang truy cập trang web)
   if (typeof window !== 'undefined') {
     return window.location.origin;
   }

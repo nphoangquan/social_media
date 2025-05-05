@@ -13,7 +13,7 @@ export default function MessagesBadge() {
   useEffect(() => {
     if (!userId) return;
 
-    // Load initial unread count
+    // Load unread count
     const loadUnreadCount = async () => {
       try {
         const count = await getUnreadCount();
@@ -25,7 +25,7 @@ export default function MessagesBadge() {
 
     loadUnreadCount();
 
-    // Set up socket for real-time updates
+    // Set socket cho real-time updates
     if (!socket) {
       const newSocket = io('', {
         path: '/api/socket',
@@ -38,10 +38,9 @@ export default function MessagesBadge() {
       setSocket(newSocket);
     }
 
-    // Listen for new messages to update unread count
     if (socket) {
       const handleNewMessage = async () => {
-        // When receiving a new message, refresh the unread count
+        // Khi nhận được tin nhắn mới, cập nhật số lượng tin nhắn chưa đọc
         try {
           const count = await getUnreadCount();
           setUnreadCount(count);

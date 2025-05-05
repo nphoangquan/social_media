@@ -31,7 +31,7 @@ const UserInfoCardInteraction = ({
           !prev.following && !prev.followingRequestSent ? true : false,
       }));
     } catch {
-      // Error handling silently ignored
+      // Xử lý lỗi gì đó phát sinh
     }
   };
 
@@ -44,7 +44,7 @@ const UserInfoCardInteraction = ({
         blocked: !prev.blocked,
       }));
     } catch {
-      // Error handling silently ignored
+      // Xử lý lỗi gì đó phát sinh
     }
   };
 

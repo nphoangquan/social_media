@@ -208,6 +208,7 @@ function CommentList({
       postId,
       parentId: parentId ? parseInt(parentId) : null,
       likes: 0,
+      likedByCurrentUser: false,
       user: {
         id: user.id,
         username: user.username || "You",
@@ -226,13 +227,29 @@ function CommentList({
     };
 
     // Add new comment to the beginning of the list for immediate display
-    const newOptimisticComments = [optimisticComment, ...optimisticComments];
+    const newOptimisticComments = parentId
+      ? optimisticComments.map(comment => {
+          if (comment.id === parseInt(parentId)) {
+            // Add reply to parent comment's replies
+            return {
+              ...comment,
+              replies: [...(comment.replies || []), optimisticComment]
+            };
+          }
+          return comment;
+        })
+      : [optimisticComment, ...optimisticComments]; // Add as new top-level comment
+      
     setOptimisticComments(newOptimisticComments);
+    
+    // Reset the form immediately for better UX
+    (document.getElementById(`comment-form-${parentId || "root"}`) as HTMLFormElement)?.reset();
+    if (parentId) {
+      setReplyingTo(null);
+    }
 
     try {
       const newComment = await addComment(postId, desc.trim(), parentId ? parseInt(parentId) : null);
-      (document.getElementById(`comment-form-${parentId || "root"}`) as HTMLFormElement)?.reset();
-      setReplyingTo(null);
       
       // Dispatch a custom event to notify other components about the new comment
       if (newComment) {
@@ -245,14 +262,48 @@ function CommentList({
           }
         });
         window.dispatchEvent(commentUpdateEvent);
-      }
-      
-      // Call the callback to refresh comments from server
-      if (onCommentAdded) {
-        onCommentAdded();
+        
+        // Thay thế comment tạm bằng comment thật từ server (giữ nguyên vị trí)
+        if (parentId) {
+          // Cập nhật reply trong parent comment
+          setOptimisticComments(prevComments => prevComments.map(comment => {
+            if (comment.id === parseInt(parentId)) {
+              return {
+                ...comment,
+                replies: comment.replies?.map(reply => 
+                  reply.id === optimisticComment.id ? { ...newComment, user: newComment.user } : reply
+                )
+              };
+            }
+            return comment;
+          }));
+        } else {
+          // Cập nhật comment cấp cao nhất
+          setOptimisticComments(prevComments => 
+            prevComments.map(comment => 
+              comment.id === optimisticComment.id ? { ...newComment, user: newComment.user } : comment
+            )
+          );
+        }
       }
     } catch (err) {
       console.error("Failed to add comment:", err);
+      // Nếu có lỗi, xóa comment tạm khỏi danh sách
+      if (parentId) {
+        setOptimisticComments(prevComments => prevComments.map(comment => {
+          if (comment.id === parseInt(parentId)) {
+            return {
+              ...comment,
+              replies: comment.replies?.filter(reply => reply.id !== optimisticComment.id)
+            };
+          }
+          return comment;
+        }));
+      } else {
+        setOptimisticComments(prevComments => 
+          prevComments.filter(comment => comment.id !== optimisticComment.id)
+        );
+      }
     }
   }
 

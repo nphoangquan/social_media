@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check for existing stories from this user and delete them
+    // Kiểm tra story hiện có từ người dùng này và xóa chúng
     const existingStories = await prisma.story.findMany({
       where: {
         userId,
@@ -36,11 +36,11 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Calculate expiration time (24 hours from now)
+    // Tính thời gian hết hạn (24 giờ kể từ bây giờ)
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 24);
 
-    // Create story in database with Cloudinary URL
+    // Tạo story trong cơ sở dữ liệu với URL Cloudinary
     const story = await prisma.story.create({
       data: {
         userId,

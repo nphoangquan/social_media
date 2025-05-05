@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 
     const chatIdNumber = parseInt(chatId);
 
-    // Check if the user is a participant in this chat
+    // Kiểm tra xem người dùng có phải là thành viên trong cuộc trò chuyện này không
     const participant = await prisma.chatParticipant.findFirst({
       where: {
         chatId: chatIdNumber,
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Not a participant in this chat" }, { status: 403 });
     }
 
-    // Get chat information with participants
+    // Lấy thông tin cuộc trò chuyện với danh sách thành viên
     const chat = await prisma.chat.findUnique({
       where: {
         id: chatIdNumber

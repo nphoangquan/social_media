@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Query parameter is required" }, { status: 400 });
     }
 
-    // Get users who current user has not blocked and who have not blocked current user
+    // Lấy danh sách người dùng mà người dùng hiện tại chưa chặn và chưa bị chặn bởi người dùng hiện tại
     const users = await prisma.user.findMany({
       where: {
         AND: [
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
             ],
           },
           {
-            // Exclude users who have blocked the current user
+            // Loại trừ những người dùng đã chặn người dùng hiện tại
             blockedBy: {
               none: {
                 blockerId: userId,
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
             },
           },
           {
-            // Exclude users who are blocked by the current user
+            // Loại trừ những người dùng bị chặn bởi người dùng hiện tại
             blocks: {
               none: {
                 blockedId: userId,

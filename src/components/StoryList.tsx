@@ -26,7 +26,7 @@ const StoryList = ({
   stories: StoryWithUser[];
   userId: string;
 }) => {
-  // Initialize with filtered stories
+  // Khởi tạo với stories đã lọc
   const [storyList, setStoryList] = useState(() => {
     const now = new Date();
     return stories.filter(story => new Date(story.expiresAt) > now);
@@ -38,7 +38,7 @@ const StoryList = ({
 
   const { user } = useUser();
 
-  // Add auto-expiration check
+  // Thêm kiểm tra tự động hết hạn
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -48,7 +48,7 @@ const StoryList = ({
     return () => clearInterval(interval);
   }, []);
 
-  // Sync with stories prop when it changes
+  // Đồng bộ với stories prop khi nó thay đổi
   useEffect(() => {
     const now = new Date();
     setStoryList(stories.filter(story => new Date(story.expiresAt) > now));
@@ -136,7 +136,7 @@ const StoryList = ({
       setImg(null);
       window.location.reload();
     } catch {
-      // Error handling silently ignored
+      // Xử lý lỗi gì đó phát sinh
     }
   };
 
@@ -156,7 +156,7 @@ const StoryList = ({
         onChange={handleFileChange}
       />
 
-      {/* Create story button */}
+      {/* Nút tạo story */}
       <div className="cursor-pointer mr-2">
         <div 
           className="relative w-28 h-48 rounded-xl overflow-hidden shadow-md transition-all duration-300"
@@ -165,11 +165,11 @@ const StoryList = ({
           {/* Black gradient background */}
           <div className="absolute inset-0 bg-gradient-to-b from-zinc-800 to-black" />
           
-          {/* Content container with direct hover effects */}
+          {/* Content container với direct hover effects */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            {/* Plus icon with emerald gradient background */}
+            {/* Plus icon với emerald gradient background */}
             <div className="bg-gradient-to-r from-emerald-500 to-emerald-700 rounded-full w-12 h-12 flex items-center justify-center mb-3 transition-all duration-300 hover:scale-110 hover:shadow-[0_0_15px_rgba(16,185,129,0.7)] relative overflow-hidden group">
-              {/* Shimmer effect on hover */}
+              {/* Shimmer effect khi hover */}
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
               
               {uploading ? (
@@ -179,7 +179,7 @@ const StoryList = ({
               )}
             </div>
             
-            {/* Text with direct effect on hover */}
+            {/* Text với direct effect khi hover */}
             <span className="text-white font-medium text-sm relative">
               {uploading ? "Uploading..." : "Create story"}
               <span className="absolute bottom-0 left-0 w-full h-0.5 bg-emerald-500 scale-x-0 transition-transform duration-300 hover:scale-x-100"></span>
@@ -207,7 +207,7 @@ const StoryList = ({
           className="cursor-pointer group relative mr-2"
         >
           <div className="relative w-28 h-48 rounded-xl overflow-hidden shadow-md transition-transform duration-500 group-hover:scale-105">
-            {/* Story content - conditionally render image or video */}
+            {/* Story content - render image hoặc video */}
             <div className="w-full h-full overflow-hidden">
               {story.video ? (
                 <>
@@ -237,7 +237,7 @@ const StoryList = ({
               )}
             </div>
             
-            {/* User avatar at top */}
+            {/* User avatar ở trên */}
             <div className="absolute top-2 left-2 flex items-center gap-1">
               <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-white">
                 <Image
@@ -250,7 +250,7 @@ const StoryList = ({
               </div>
             </div>
             
-            {/* Username at bottom with dark background only behind the text */}
+            {/* Username ở dưới với background tối chỉ phía sau văn bản */}
             <div className="absolute bottom-0 left-0 right-0">
               <div className="bg-gradient-to-t from-black/80 to-transparent h-12 px-2 flex items-end pb-2">
                 <span className="text-white text-xs font-medium line-clamp-1">

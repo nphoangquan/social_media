@@ -17,9 +17,9 @@ export default function CreateStoryPage() {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
 
-    // Check file size based on file type
+    // Kiểm tra kích thước file dựa trên loại file
     const isVideo = selectedFile.type.startsWith("video/");
-    // 25MB for images, 100MB for videos
+    // 25MB cho ảnh, 100MB cho video
     const maxSize = isVideo ? 100 * 1024 * 1024 : 25 * 1024 * 1024;
     
     if (selectedFile.size > maxSize) {
@@ -27,16 +27,16 @@ export default function CreateStoryPage() {
       return;
     }
 
-    // Check file type
+    // Kiểm tra loại file
     const type = selectedFile.type.startsWith("image/") ? "image" : "video";
     setFileType(type);
     setFile(selectedFile);
 
-    // Create preview URL
+    // Tạo URL preview
     const url = URL.createObjectURL(selectedFile);
     setFilePreview(url);
     
-    // Clean up the URL when component unmounts
+    // Làm sạch URL khi component unmount
     return () => URL.revokeObjectURL(url);
   };
 
@@ -47,7 +47,7 @@ export default function CreateStoryPage() {
     try {
       setLoading(true);
       
-      // Upload directly to Cloudinary
+      // Tải lên trực tiếp đến Cloudinary
       const formData = new FormData();
       formData.append('file', file);
       formData.append('upload_preset', 'social-media');
@@ -66,12 +66,12 @@ export default function CreateStoryPage() {
       
       const uploadData = await uploadResponse.json();
       
-      // Send Cloudinary URL to our API
+      // Gửi URL Cloudinary đến API của chúng tôi
       const apiFormData = new FormData();
       apiFormData.append("fileType", fileType);
       apiFormData.append("fileData", uploadData.secure_url);
       
-      // Upload to server
+      // Tải lên đến server
       const response = await fetch("/api/stories", {
         method: "POST",
         body: apiFormData,
@@ -79,7 +79,7 @@ export default function CreateStoryPage() {
       
       if (response.ok) {
         setTimeout(() => {
-          router.refresh(); // Refresh data
+          router.refresh(); // Làm mới dữ liệu
           router.push("/stories");
         }, 0);
       } else {

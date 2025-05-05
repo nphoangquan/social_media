@@ -5,7 +5,7 @@ import Link from "next/link";
 export default async function VideosPage() {
   const { userId } = await auth();
   
-  // Return early if not authenticated
+  // Trả về sớm nếu chưa xác thực
   if (!userId) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -14,7 +14,7 @@ export default async function VideosPage() {
     );
   }
   
-  // Fetch user videos - no username means current user's videos
+  // Lấy video của người dùng - không có username nghĩa là video của người dùng hiện tại
   const videos = await getUserVideos();
   
   return (

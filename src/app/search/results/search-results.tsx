@@ -7,7 +7,6 @@ import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import { searchContent } from "@/lib/actions";
 
-// Define types for the search results
 interface User {
   id: string;
   username: string;
@@ -61,7 +60,7 @@ export function SearchResults() {
     fetchResults();
   }, [query]);
 
-  // Filter results based on active tab
+  // Lọc
   const displayUsers = activeTab === "all" || activeTab === "people" ? results.users : [];
   const displayPosts = activeTab === "all" || activeTab === "posts" ? results.posts : [];
 

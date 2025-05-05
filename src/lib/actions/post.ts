@@ -30,7 +30,7 @@ export async function getPosts(page: number = 1, limit: number = 2, username?: s
           },
         },
         comments: {
-          take: 2, // Initially load only 2 comments for preview
+          take: 2, // Ban đầu chỉ tải 2 bình luận để xem trước
           orderBy: {
             createdAt: 'desc'
           },
@@ -44,7 +44,7 @@ export async function getPosts(page: number = 1, limit: number = 2, username?: s
       },
     });
 
-    // Transform posts to include all likes and currentUserId
+    // Chuyển đổi bài đăng để bao gồm tất cả lượt thích và currentUserId
     const transformedPosts: FeedPostType[] = posts.map(post => ({
       ...post,
       _count: {
@@ -89,7 +89,7 @@ export async function getPostDetails(postId: number) {
       },
     });
 
-    // Transform comments to include like count and whether current user has liked
+    // Chuyển đổi bình luận để bao gồm số lượt thích và xem người dùng hiện tại đã thích hay chưa
     const commentsWithLikes = comments.map(comment => ({
       ...comment,
       likes: comment.likes.length,
@@ -119,7 +119,7 @@ export async function getUserPhotos(username?: string, limit: number = 20, page:
       return [];
     }
     
-    // Find all posts that have images, filtering by username or current user
+    // Tìm tất cả bài đăng có hình ảnh, lọc theo tên người dùng hoặc người dùng hiện tại
     const posts = await prisma.post.findMany({
       where: {
         img: {
@@ -145,9 +145,9 @@ export async function getUserPhotos(username?: string, limit: number = 20, page:
       },
     });
 
-    // Transform and return only the images with their postId
+    // Chuyển đổi và chỉ trả về hình ảnh với postId của chúng
     return posts
-      .filter(post => post.img) // ensure img exists
+      .filter(post => post.img) // đảm bảo img tồn tại
       .map(post => ({
         id: post.id,
         img: post.img as string,
@@ -168,7 +168,7 @@ export async function getUserVideos(username?: string, limit: number = 20, page:
       return [];
     }
     
-    // Find all posts that have videos, filtering by username or current user
+    // Tìm tất cả bài đăng có video, lọc theo tên người dùng hoặc người dùng hiện tại
     const posts = await prisma.post.findMany({
       where: {
         video: {
@@ -194,9 +194,9 @@ export async function getUserVideos(username?: string, limit: number = 20, page:
       },
     });
 
-    // Transform and return only the videos with their postId
+    // Chuyển đổi và chỉ trả về video với postId của chúng
     return posts
-      .filter(post => post.video) // ensure video exists
+      .filter(post => post.video) // đảm bảo video tồn tại
       .map(post => ({
         id: post.id,
         video: post.video as string,

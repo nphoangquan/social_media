@@ -5,9 +5,8 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import CommentList from "./CommentList";
 import Link from "next/link";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
-import { getPostComments } from "@/lib/actions/comment";
 import PostInteraction from "./PostInteraction";
 
 type CommentWithUser = Comment & {
@@ -45,6 +44,13 @@ export default function PostDetail({
     img: post.img,
     video: post.video
   });
+  
+  // States for infinite scroll
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadingRef = useRef<HTMLDivElement | null>(null);
   
   // Calculate initial comment count including replies
   const calculateTotalComments = useCallback((commentList: CommentWithUser[]) => {
@@ -121,22 +127,64 @@ export default function PostDetail({
     }
   }, [post.id, onClose]);
 
-  // Function to reload comments
-  const refreshComments = useCallback(async () => {
+  // Load initial comments
+  const loadInitialComments = useCallback(async () => {
     try {
-      const updatedComments = await getPostComments(post.id);
-      if (updatedComments) {
-        setComments(updatedComments);
-        setCommentCount(calculateTotalComments(updatedComments));
+      setIsLoadingComments(true);
+      const response = await fetch(`/api/comments?postId=${post.id}&page=1&limit=15`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch comments');
+      }
+      
+      const data = await response.json();
+      setComments(data.comments);
+      setHasMore(data.hasMore);
+      setPage(1);
+    } catch (error) {
+      console.error("Error loading initial comments:", error);
+    } finally {
+      setIsLoadingComments(false);
+    }
+  }, [post.id]);
+
+  // Load more comments
+  const loadMoreComments = useCallback(async () => {
+    try {
+      if (!hasMore || isLoadingComments) return;
+      
+      setIsLoadingComments(true);
+      const nextPage = page + 1;
+      const response = await fetch(`/api/comments?postId=${post.id}&page=${nextPage}&limit=15`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch more comments');
+      }
+      
+      const data = await response.json();
+      
+      if (data.comments.length > 0) {
+        setComments(prevComments => [...prevComments, ...data.comments]);
+        setPage(nextPage);
+        setHasMore(data.hasMore);
+      } else {
+        setHasMore(false);
       }
     } catch (error) {
-      console.error("Error refreshing comments:", error);
+      console.error("Error loading more comments:", error);
+    } finally {
+      setIsLoadingComments(false);
     }
-  }, [post.id, calculateTotalComments]);
+  }, [post.id, page, hasMore, isLoadingComments]);
 
-  // Thêm handleCommentUpdate để xử lý sự kiện khi comment được thêm/xóa
+  // Function to refresh comments after adding a new one
+  const refreshComments = useCallback(() => {
+    loadInitialComments();
+  }, [loadInitialComments]);
+
+  // Handle comment update events
   const handleCommentUpdate = useCallback((event: Event) => {
-    const { postId: eventPostId, action } = (event as CustomEvent).detail;
+    const { postId: eventPostId, action, comment } = (event as CustomEvent).detail;
     
     if (eventPostId === post.id) {
       // Cập nhật số lượng comment tức thì
@@ -149,10 +197,47 @@ export default function PostDetail({
         return prevCount;
       });
       
-      // Sau đó cập nhật toàn bộ danh sách comments
-      refreshComments();
+      // Thay vì tải lại toàn bộ comments, cập nhật trực tiếp vào state
+      if (action === 'add' && comment) {
+        // Thêm comment mới vào đầu danh sách nếu là comment gốc
+        if (!comment.parentId) {
+          setComments(prevComments => [comment, ...prevComments]);
+        }
+        // Không cần xử lý replies ở đây vì chúng sẽ hiển thị khi người dùng mở chi tiết comment
+      } else if (action === 'delete' && comment) {
+        // Xóa comment khỏi danh sách
+        setComments(prevComments => 
+          prevComments.filter(c => c.id !== comment.id)
+        );
+      }
     }
-  }, [post.id, refreshComments]);
+  }, [post.id]);
+
+  // Set up intersection observer for infinite scroll
+  useEffect(() => {
+    if (isLoadingComments) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadMoreComments();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observerRef.current = observer;
+
+    if (loadingRef.current) {
+      observer.observe(loadingRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [hasMore, isLoadingComments, loadMoreComments]);
 
   useEffect(() => {
     setMounted(true);
@@ -163,6 +248,9 @@ export default function PostDetail({
     window.addEventListener('commentUpdate', handleCommentUpdate);
     window.addEventListener('postUpdate', handlePostUpdate);
     
+    // Load initial comments
+    loadInitialComments();
+    
     return () => {
       setMounted(false);
       window.removeEventListener('likeUpdate', handleLikeUpdate);
@@ -170,7 +258,7 @@ export default function PostDetail({
       window.removeEventListener('commentUpdate', handleCommentUpdate);
       window.removeEventListener('postUpdate', handlePostUpdate);
     };
-  }, [handleLikeUpdate, handleDeletePost, handleCommentUpdate, handlePostUpdate]);
+  }, [handleLikeUpdate, handleDeletePost, handleCommentUpdate, handlePostUpdate, loadInitialComments]);
 
   // Cập nhật likes từ prop post khi có thay đổi
   useEffect(() => {
@@ -179,19 +267,6 @@ export default function PostDetail({
       setPostLikes(likeUserIds);
     }
   }, [post.likes]);
-
-  // Cập nhật comments từ prop post khi có thay đổi
-  useEffect(() => {
-    if (post.comments) {
-      setComments(post.comments);
-      setCommentCount(calculateTotalComments(post.comments));
-    }
-  }, [post.comments, calculateTotalComments]);
-
-  // Sử dụng useEffect để lắng nghe sự thay đổi của postId và cập nhật dữ liệu
-  useEffect(() => {
-    refreshComments();
-  }, [post.id, refreshComments]);
 
   // Update commentCount whenever comments change
   useEffect(() => {
@@ -265,7 +340,8 @@ export default function PostDetail({
                 </div>
               </div>
             </div>
-
+            
+            {/* Post description */}
             {postContent.desc && (
               <div className="mb-4">
                 <p className="text-zinc-600 dark:text-zinc-300 whitespace-pre-line">
@@ -274,52 +350,50 @@ export default function PostDetail({
                 {needsTruncation && (
                   <button 
                     onClick={() => setIsExpanded(!isExpanded)} 
-                    className="text-emerald-600 dark:text-emerald-500 font-medium text-sm mt-1 hover:underline focus:outline-none"
+                    className="text-emerald-600 dark:text-emerald-500 font-medium text-sm hover:underline focus:outline-none"
                   >
                     {isExpanded ? "See less" : "See more"}
                   </button>
                 )}
               </div>
             )}
-
+            
+            {/* Post Image */}
             {postContent.img && (
               <div className="rounded-xl overflow-hidden mb-4">
-                <Image
+                <Image 
                   src={postContent.img}
-                  width={1200}
-                  height={800}
+                  width={600}
+                  height={400}
                   alt=""
-                  className="w-full h-auto"
+                  className="w-full h-auto object-cover"
                 />
               </div>
             )}
-
+            
+            {/* Post Video */}
             {postContent.video && (
-              <div className="rounded-xl overflow-hidden mb-4 bg-zinc-900">
-                <video
+              <div className="rounded-xl overflow-hidden mb-4">
+                <video 
                   src={postContent.video}
                   controls
-                  playsInline
-                  preload="metadata"
-                  className="w-full"
-                >
-                  Your browser does not support the video tag.
-                </video>
+                  className="w-full h-auto"
+                ></video>
               </div>
             )}
+            
+            {/* Post Interactions */}
+            <div className="mt-2">
+              <PostInteraction 
+                postId={post.id}
+                likes={postLikes}
+                commentNumber={commentCount}
+                post={postWithUpdatedData}
+              />
+            </div>
           </div>
-
-          {/* Post Interaction */}
-          <div className="p-4 border-b border-zinc-100 dark:border-zinc-800">
-            <PostInteraction
-              postId={post.id}
-              likes={postLikes}
-              commentNumber={commentCount}
-              post={postWithUpdatedData}
-            />
-          </div>
-
-          {/* Comments Section */}
+          
+          {/* Comments */}
           <div className="p-4 pb-8">
             <CommentList 
               comments={comments} 
@@ -328,11 +402,21 @@ export default function PostDetail({
               post={postWithUpdatedData}
               onCommentAdded={refreshComments}
             />
+            
+            {/* Loader for infinite scroll */}
+            {hasMore && (
+              <div 
+                ref={loadingRef} 
+                className="py-4 text-center"
+              >
+                <div className="w-6 h-6 mx-auto border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
-
+  
   return createPortal(modalContent, document.body);
 } 

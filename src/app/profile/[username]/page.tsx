@@ -60,9 +60,9 @@ const ProfilePage = async ({ params }: PageProps) => {
       </div>
       <div className="w-full lg:w-[70%] xl:w-[50%]">
         <div className="flex flex-col gap-8">
-          {/* Profile Cover and Info Section */}
+          {/* Phần Ảnh Bìa và Thông Tin Hồ Sơ */}
           <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-zinc-800/20 border border-zinc-100/50 dark:border-zinc-800/50 overflow-hidden">
-            {/* Cover Image Section */}
+            {/* Phần Ảnh Bìa */}
             <div className="relative h-64 w-full bg-gradient-to-r from-zinc-800 to-zinc-900">
               {user.cover ? (
                 <Image
@@ -77,7 +77,7 @@ const ProfilePage = async ({ params }: PageProps) => {
                 </div>
               )}
               
-              {/* Edit Cover Button (only for current user) */}
+              {/* Nút Chỉnh Sửa Ảnh Bìa (chỉ dành cho người dùng hiện tại) */}
               {isCurrentUser && (
                 <Link
                   href="/settings"
@@ -89,7 +89,7 @@ const ProfilePage = async ({ params }: PageProps) => {
               )}
             </div>
             
-            {/* Back Link */}
+            {/* Liên kết Quay lại */}
             {/* <div className="px-6 pt-4">
               <Link
                 href="/friends"
@@ -102,9 +102,9 @@ const ProfilePage = async ({ params }: PageProps) => {
               </Link>
             </div> */}
 
-            {/* Profile Info Section */}
+            {/* Phần Thông Tin Hồ Sơ */}
             <div className="relative px-6 pb-6">
-              {/* Avatar - positioned to overlap with cover */}
+              {/* Ảnh đại diện - đặt vị trí để chồng lên ảnh bìa */}
               <div className="relative w-32 h-32 rounded-full overflow-hidden ring-4 ring-white dark:ring-zinc-800 shadow-xl mt-[-64px] mb-4 mx-auto md:mx-0">
                 <Image
                   src={user.avatar || "/noAvatar.png"}

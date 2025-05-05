@@ -21,10 +21,10 @@ export async function PATCH(
     const { id } = await context.params;
     const postId = parseInt(id);
     
-    // Log the request data for debugging
+    // Ghi log dữ liệu yêu cầu để gỡ lỗi
     console.log(`Updating post ${postId} with data:`, JSON.stringify(body));
 
-    // Define more robust schema
+    // Định nghĩa schema mạnh mẽ hơn
     const Post = z.object({
       desc: z.string().min(1).max(3000),
       img: z.string().nullable(),
@@ -44,7 +44,7 @@ export async function PATCH(
       );
     }
 
-    // Verify post ownership
+    // Xác minh quyền sở hữu bài đăng
     const post = await prisma.post.findUnique({
       where: {
         id: postId,

@@ -22,7 +22,7 @@ export default function PhotosLayout({
         {children}
       </div>
       <div className="hidden xl:block w-1/4">
-        {/* Right sidebar content if needed */}
+        {/* Nội dung thanh bên phải nếu cần */}
       </div>
     </div>
   );

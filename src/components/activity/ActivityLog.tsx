@@ -36,7 +36,7 @@ export default function ActivityLog({ initialActivities }: { initialActivities: 
     }
   }, [loading, hasMore, page]);
 
-  // Filter activities based on selected type
+  // Lọc hoạt động dựa trên loại đã chọn
   const filteredActivities = activities.filter(activity => {
     if (filter === 'all') return true;
     if (filter === 'posts' && activity.type === 'POST_CREATED') return true;

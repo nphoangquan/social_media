@@ -17,7 +17,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Receiver ID is required" }, { status: 400 });
     }
 
-    // Create birthday celebration notification
+    // Tạo thông báo chúc mừng sinh nhật
     await createBirthdayWishNotification(currentUserId, receiverId);
 
     return NextResponse.json({ success: true });

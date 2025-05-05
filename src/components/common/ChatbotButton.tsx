@@ -33,7 +33,7 @@ export default function ChatbotButton({ className = "" }: ChatbotButtonProps) {
         <Bot className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
       </button>
 
-      {/* Render chatbot modal using portal to avoid z-index issues */}
+      {/* Hiển thị cửa sổ chatbot sử dụng portal để tránh vấn đề về z-index */}
       {mounted && isOpen && createPortal(
         <AIChat onClose={() => setIsOpen(false)} />,
         document.body

@@ -22,7 +22,7 @@ export default function FriendsList({ initialFriends, selectedUsername }: Friend
     try {
       setIsLoading(true);
       const nextPage = page + 1;
-      const response = await fetch(`/api/friends?page=${nextPage}&limit=10`);
+      const response = await fetch(`/api/friends?page=${nextPage}&limit=15`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch friends');

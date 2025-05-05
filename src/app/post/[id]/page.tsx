@@ -19,7 +19,7 @@ export default async function PostPage({
   
   const { userId } = await auth();
   
-  // Redirect to login if no user ID
+  // Chuyển hướng đến trang đăng nhập nếu không có ID người dùng
   if (!userId) {
     redirect("/sign-in");
   }
@@ -30,12 +30,12 @@ export default async function PostPage({
     notFound();
   }
   
-  // Get highlight comment ID from search params if available
+  // Lấy ID comment nổi bật từ tham số tìm kiếm nếu có
   const highlightCommentId = commentParams.commentId 
     ? parseInt(commentParams.commentId as string) 
     : undefined;
   
-  // Fetch the post with comments, likes and user info
+  // Lấy bài đăng với comments, likes và thông tin người dùng
   const post = await prisma.post.findUnique({
     where: {
       id: postId,
@@ -78,7 +78,7 @@ export default async function PostPage({
     notFound();
   }
   
-  // Transform comments to include like count
+  // Chuyển đổi comments để bao gồm số lượng like
   const transformedComments = post.comments.map(comment => ({
     ...comment,
     likes: comment.likes.length,
@@ -88,7 +88,7 @@ export default async function PostPage({
     })),
   }));
 
-  // Transform post with comments and include current user ID
+  // Chuyển đổi bài đăng với comments và bao gồm ID người dùng hiện tại
   const transformedPost = {
     ...post,
     comments: transformedComments,

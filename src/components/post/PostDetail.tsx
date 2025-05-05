@@ -3,8 +3,7 @@
 import { Post, User, Comment } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState, useCallback } from "react";
-import { getPostComments } from "@/lib/actions/comment";
+import { useEffect, useState, useCallback, useRef } from "react";
 import PostInteraction from "../feed/PostInteraction";
 import CommentList from "../feed/CommentList";
 import { ArrowLeft, MessageCircle, Wand2 } from "lucide-react";
@@ -41,73 +40,80 @@ export default function PostDetail({
 }) {
   const [comments, setComments] = useState<CommentWithUser[]>(post.comments || []);
   const [postLikes, setPostLikes] = useState<string[]>(post.likes?.map(like => like.userId) || []);
-  // State to track whether the full description is shown
+  // State để hiển thị nội dung đã mở rộng
   const [isExpanded, setIsExpanded] = useState(false);
-  // State to control PostDetail modal visibility
+  // State để kiểm soát PostDetail modal visibility
   const [showPostDetail, setShowPostDetail] = useState(false);
-  // State to control whether to show all comments
+  // State để kiểm soát xem có hiển thị tất cả comments hay không
   const [showAllComments, setShowAllComments] = useState(false);
-  // State to track if the content is summarized
+  // State để kiểm soát nội dung đã tóm tắt
   const [isSummarized, setIsSummarized] = useState(false);
-  // State to store the original content
+  // State để lưu nội dung gốc
   const [originalDesc, setOriginalDesc] = useState(post.desc || "");
-  // State to store the summarized content
+  // State để lưu nội dung đã tóm tắt
   const [summarizedDesc, setSummarizedDesc] = useState("");
-  // Hook for summarization
+  // Hook cho tóm tắt
   const { generateSummary, loading: summarizing } = useSummarize();
-  // State to track if content is translated
+  // State để kiểm soát nội dung đã dịch
   const [isTranslated, setIsTranslated] = useState(false);
-  // State to store translated content
+  // State để lưu nội dung đã dịch
   const [translatedDesc, setTranslatedDesc] = useState("");
   
-  // Configure the character limit for truncation
+  // States cho cuộn vô hạn
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadingRef = useRef<HTMLDivElement | null>(null);
+  
+  // Cài đặt giới hạn ký tự cho cắt ngắn
   const MAX_CHARS = 150;
   
-  // Determine if the description needs truncation
+  // Xác định nếu nội dung cần cắt ngắn
   const needsTruncation = post.desc && post.desc.length > MAX_CHARS;
   
-  // Set original description when post changes
+  // Đặt nội dung gốc khi post thay đổi
   useEffect(() => {
     setOriginalDesc(post.desc || "");
-    // Reset states when post changes
+    // Reset states khi post thay đổi
     setIsSummarized(false);
     setSummarizedDesc("");
     setIsTranslated(false);
     setTranslatedDesc("");
   }, [post.desc]);
   
-  // Get the display description
+  // Lấy nội dung hiển thị
   const getDisplayedDesc = () => {
-    // If translated, show translated content
+    // Nếu đã dịch, hiển thị nội dung đã dịch
     if (isTranslated) return translatedDesc;
     
-    // If summarized, show summarized content
+    // Nếu đã tóm tắt, hiển thị nội dung đã tóm tắt
     if (isSummarized) return summarizedDesc;
     
-    // Otherwise, handle truncation logic
+    // Nếu không, xử lý logic cắt ngắn
     if (!originalDesc) return "";
     if (isExpanded || !needsTruncation) return originalDesc;
     return originalDesc.substring(0, MAX_CHARS) + "...";
   };
   
-  // Handle summarize button click
+  // Xử lý summarize button khi click vào
   const handleSummarize = async () => {
-    // If already summarized, switch back to original
+    // Nếu đã tóm tắt, chuyển lại sang nội dung gốc
     if (isSummarized) {
       setIsSummarized(false);
       return;
     }
     
-    // Only summarize if not already summarizing and the content is long enough
+    // Chỉ tóm tắt nếu không đang tóm tắt và nội dung đủ dài
     if (!summarizing && originalDesc.length > 200) {
       try {
         const summary = await generateSummary(originalDesc);
         if (summary) {
           setSummarizedDesc(summary);
           setIsSummarized(true);
-          // When summarized, always show full content (no truncation)
+          // Khi đã tóm tắt, luôn hiển thị nội dung đầy đủ (không cắt ngắn)
           setIsExpanded(true);
-          // Reset translation when summarizing
+          // Reset translation khi tóm tắt
           setIsTranslated(false);
         }
       } catch (error) {
@@ -116,17 +122,17 @@ export default function PostDetail({
     }
   };
 
-  // Handle translated text
+  // Xử lý dịch văn bản
   const handleTranslated = (translatedText: string) => {
     setTranslatedDesc(translatedText);
     setIsTranslated(true);
-    // Reset summarization when translating
+    // Reset tóm tắt khi dịch
     setIsSummarized(false);
-    // When translated, always show full content (no truncation)
+    // Khi dịch, luôn hiển thị nội dung đầy đủ (không cắt ngắn)
     setIsExpanded(true);
   };
 
-  // Handle reset translation
+  // Xử lý reset dịch
   const handleResetTranslation = () => {
     setIsTranslated(false);
     setTranslatedDesc("");
@@ -134,19 +140,63 @@ export default function PostDetail({
   
   const router = useRouter();
 
-  // Function to reload comments
-  const refreshComments = useCallback(async () => {
+  // Load comments ban đầu
+  const loadInitialComments = useCallback(async () => {
     try {
-      const updatedComments = await getPostComments(post.id);
-      if (updatedComments) {
-        setComments(updatedComments);
+      setIsLoadingComments(true);
+      const response = await fetch(`/api/comments?postId=${post.id}&page=1&limit=15`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch comments');
       }
+      
+      const data = await response.json();
+      setComments(data.comments);
+      setHasMore(data.hasMore);
+      setPage(1);
     } catch (error) {
-      console.error("Error refreshing comments:", error);
+      console.error("Error loading initial comments:", error);
+    } finally {
+      setIsLoadingComments(false);
     }
   }, [post.id]);
 
-  // Update likes from post prop when it changes
+  // Load thêm comments
+  const loadMoreComments = useCallback(async () => {
+    try {
+      if (!hasMore || isLoadingComments) return;
+      
+      setIsLoadingComments(true);
+      const nextPage = page + 1;
+      const response = await fetch(`/api/comments?postId=${post.id}&page=${nextPage}&limit=15`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch more comments');
+      }
+      
+      const data = await response.json();
+      
+      if (data.comments.length > 0) {
+        setComments(prevComments => [...prevComments, ...data.comments]);
+        setPage(nextPage);
+        setHasMore(data.hasMore);
+      } else {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error("Error loading more comments:", error);
+    } finally {
+      setIsLoadingComments(false);
+    }
+  }, [post.id, page, hasMore, isLoadingComments]);
+
+  // Function refresh comments sau khi thêm mới
+  const refreshComments = useCallback(() => {
+    // Không cần tải lại toàn bộ comments từ server
+    // Optimistic update sẽ được xử lý trong CommentList component
+  }, []);
+
+  // Update likes từ post prop khi nó thay đổi
   useEffect(() => {
     if (post.likes) {
       const likeUserIds = post.likes.map(like => like.userId);
@@ -154,15 +204,59 @@ export default function PostDetail({
     }
   }, [post.likes]);
 
-  // Use useEffect to listen for postId changes and update data
+  // Use useEffect để load initial comments và set up event listeners
   useEffect(() => {
-    refreshComments();
-  }, [post.id, refreshComments]);
+    // Chỉ load initial comments khi component được mount lần đầu
+    loadInitialComments();
+  }, [post.id, loadInitialComments]);
 
-  // Create a version of the post with updated comments
+  // Set up intersection observer cho cuộn vô hạn
+  useEffect(() => {
+    if (isLoadingComments) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadMoreComments();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observerRef.current = observer;
+
+    if (loadingRef.current) {
+      observer.observe(loadingRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [hasMore, isLoadingComments, loadMoreComments]);
+
+  // Tính tổng comments
+  const calculateTotalComments = useCallback((commentList: CommentWithUser[]) => {
+    let total = 0;
+    commentList.forEach(comment => {
+      total++; // Đếm comment cha
+      if (comment.replies && Array.isArray(comment.replies)) {
+        total += comment.replies.length; // Thêm số lượng reply
+      }
+    });
+    return total;
+  }, []);
+
+  // Tạo một phiên bản của post với comments đã cập nhật
   const postWithUpdatedComments = {
     ...post,
     comments: comments,
+    likes: postLikes.map(userId => ({ userId })),
+    _count: {
+      comments: calculateTotalComments(comments),
+      likes: postLikes.length
+    }
   };
 
   return (
@@ -221,13 +315,13 @@ export default function PostDetail({
             </p>
             <div className="flex items-center gap-3 mt-1">
               {needsTruncation && !isTranslated && !isSummarized && (
-              <button 
-                onClick={() => setIsExpanded(!isExpanded)} 
+                <button 
+                  onClick={() => setIsExpanded(!isExpanded)} 
                   className="text-emerald-600 dark:text-emerald-500 font-medium text-sm hover:underline focus:outline-none"
-              >
-                {isExpanded ? "See less" : "See more"}
-              </button>
-            )}
+                >
+                  {isExpanded ? "See less" : "See more"}
+                </button>
+              )}
               
               {originalDesc.length > 200 && !isTranslated && (
                 <button 
@@ -298,7 +392,7 @@ export default function PostDetail({
         <PostInteraction
           postId={post.id}
           likes={postLikes}
-          commentNumber={comments.length}
+          commentNumber={calculateTotalComments(comments)}
           post={postWithUpdatedComments}
         />
       </div>
@@ -325,6 +419,16 @@ export default function PostDetail({
           highlightCommentId={highlightCommentId}
           onViewAllCommentsClick={() => setShowAllComments(true)}
         />
+        
+        {/* Loader for infinite scroll */}
+        {hasMore && showAllComments && (
+          <div 
+            ref={loadingRef} 
+            className="py-4 text-center"
+          >
+            <div className="w-6 h-6 mx-auto border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
       </div>
       
       {/* Post Detail Modal */}

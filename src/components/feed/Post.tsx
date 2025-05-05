@@ -39,83 +39,83 @@ const Post = ({ post }: { post: FeedPostType }) => {
     comments: [],
     currentUserId: null,
   });
-  // State to track whether the full description is shown
+  // State để theo dõi xem mô tả đầy đủ có được hiển thị hay không
   const [isExpanded, setIsExpanded] = useState(false);
-  // State to control PostDetail modal visibility
+  // State để điều khiển hiển thị modal PostDetail
   const [showPostDetail, setShowPostDetail] = useState(false);
-  // State to keep track of post likes
+  // State để theo dõi lượt thích của bài viết
   const [currentLikes, setCurrentLikes] = useState<{ userId: string }[]>(post.likes || []);
-  // State to track if post has been deleted
+  // State để theo dõi nếu bài viết đã bị xóa
   const [isDeleted, setIsDeleted] = useState(false);
-  // State to track comment count
+  // State để theo dõi số lượng bình luận
   const [commentCount, setCommentCount] = useState(post._count.comments);
-  // State to track post content for updates
+  // State để theo dõi nội dung bài viết cho các cập nhật
   const [postContent, setPostContent] = useState({
     desc: post.desc,
     img: post.img,
     video: post.video
   });
-  // State to track if the content is summarized
+  // State để theo dõi nếu nội dung đã được tóm tắt
   const [isSummarized, setIsSummarized] = useState(false);
-  // State to store the original content
+  // State để lưu trữ nội dung gốc
   const [originalDesc, setOriginalDesc] = useState(post.desc || "");
-  // State to store the summarized content
+  // State để lưu trữ nội dung đã tóm tắt
   const [summarizedDesc, setSummarizedDesc] = useState("");
-  // State to track if the content is translated
+  // State để theo dõi nếu nội dung đã được dịch
   const [isTranslated, setIsTranslated] = useState(false);
-  // State to store the translated content
+  // State để lưu trữ nội dung đã dịch
   const [translatedDesc, setTranslatedDesc] = useState("");
-  // Hook for summarization
+  // Hook để tóm tắt
   const { generateSummary, loading: summarizing } = useSummarize();
   
-  // Configure the character limit for truncation
+  // Cấu hình giới hạn ký tự cho việc cắt ngắn
   const MAX_CHARS = 150;
   
-  // Determine if the description needs truncation
+  // Xác định xem mô tả có cần cắt ngắn không
   const needsTruncation = postContent.desc && postContent.desc.length > MAX_CHARS;
   
-  // Set original description when post content changes
+  // Đặt mô tả gốc khi nội dung bài viết thay đổi
   useEffect(() => {
     setOriginalDesc(postContent.desc || "");
-    // Reset states when post changes
+    // Đặt lại states khi bài viết thay đổi
     setIsSummarized(false);
     setSummarizedDesc("");
     setIsTranslated(false);
     setTranslatedDesc("");
   }, [postContent.desc]);
   
-  // Get the displayed description
+  // Lấy mô tả hiển thị
   const getDisplayedDesc = () => {
-    // If translated, show translated content
+    // Nếu đã dịch, hiển thị nội dung đã dịch
     if (isTranslated) return translatedDesc;
     
-    // If summarized, show summarized content
+    // Nếu đã tóm tắt, hiển thị nội dung đã tóm tắt
     if (isSummarized) return summarizedDesc;
     
-    // Otherwise, handle truncation logic
+    // Nếu không, xử lý logic cắt ngắn
     if (!postContent.desc) return "";
     if (isExpanded || !needsTruncation) return postContent.desc;
     return postContent.desc.substring(0, MAX_CHARS) + "...";
   };
   
-  // Handle summarize button click
+  // Xử lý khi nhấn nút tóm tắt
   const handleSummarize = async () => {
-    // If already summarized, switch back to original
+    // Nếu đã tóm tắt, chuyển về nội dung gốc
     if (isSummarized) {
       setIsSummarized(false);
       return;
     }
     
-    // Only summarize if not already summarizing and the content is long enough
+    // Chỉ tóm tắt nếu chưa đang tóm tắt và nội dung đủ dài
     if (!summarizing && originalDesc.length > 200) {
       try {
         const summary = await generateSummary(originalDesc);
         if (summary) {
           setSummarizedDesc(summary);
           setIsSummarized(true);
-          // When summarized, always show full content (no truncation)
+          // Khi đã tóm tắt, luôn hiển thị nội dung đầy đủ (không cắt ngắn)
           setIsExpanded(true);
-          // Reset translation when summarizing
+          // Đặt lại trạng thái dịch khi tóm tắt
           setIsTranslated(false);
         }
       } catch (error) {
@@ -124,40 +124,40 @@ const Post = ({ post }: { post: FeedPostType }) => {
     }
   };
 
-  // Handle translated text
+  // Xử lý khi văn bản đã được dịch
   const handleTranslated = (translatedText: string) => {
     setTranslatedDesc(translatedText);
     setIsTranslated(true);
-    // Reset summarization when translating
+    // Đặt lại trạng thái tóm tắt khi dịch
     setIsSummarized(false);
-    // When translated, always show full content (no truncation)
+    // Khi đã dịch, luôn hiển thị nội dung đầy đủ (không cắt ngắn)
     setIsExpanded(true);
   };
 
-  // Handle reset translation
+  // Xử lý đặt lại bản dịch
   const handleResetTranslation = () => {
     setIsTranslated(false);
     setTranslatedDesc("");
   };
 
-  // State to track if user has interacted with likes
+  // State để theo dõi nếu người dùng đã tương tác với lượt thích
   const [userLikeInteracted, setUserLikeInteracted] = useState(false);
 
   const handleLikeUpdate = useCallback((event: Event) => {
     const { postId, userId, isLiked } = (event as CustomEvent).detail;
     
     if (postId === post.id) {
-      // Mark that an interaction has happened
+      // Đánh dấu rằng đã có tương tác xảy ra
       setUserLikeInteracted(true);
       
       setCurrentLikes(prevLikes => {
         if (isLiked) {
-          // Add like if not already present
+          // Thêm lượt thích nếu chưa có
           if (!prevLikes.some(like => like.userId === userId)) {
             return [...prevLikes, { userId }];
           }
         } else {
-          // Remove like
+          // Xóa lượt thích
           return prevLikes.filter(like => like.userId !== userId);
         }
         return prevLikes;
@@ -165,19 +165,19 @@ const Post = ({ post }: { post: FeedPostType }) => {
     }
   }, [post.id]);
 
-  // Handler for delete post events
+  // Xử lý sự kiện xóa bài viết
   const handleDeletePost = useCallback((event: Event) => {
     const { postId } = (event as CustomEvent).detail;
     
     if (postId === post.id) {
-      // Mark this post as deleted
+      // Đánh dấu bài viết này đã bị xóa
       setIsDeleted(true);
-      // Close modal if open
+      // Đóng modal nếu đang mở
       setShowPostDetail(false);
     }
   }, [post.id]);
 
-  // Handler for comment update events
+  // Xử lý sự kiện cập nhật bình luận
   const handleCommentUpdate = useCallback((event: Event) => {
     const { postId: eventPostId, action } = (event as CustomEvent).detail;
     
@@ -193,31 +193,31 @@ const Post = ({ post }: { post: FeedPostType }) => {
     }
   }, [post.id]);
 
-  // Handler for post update events
+  // Xử lý sự kiện cập nhật bài viết
   const handlePostUpdate = useCallback((event: Event) => {
     const { postId, updatedPost } = (event as CustomEvent).detail;
     
     if (postId === post.id && updatedPost) {
-      // Update post content with the new data
+      // Cập nhật nội dung bài viết với dữ liệu mới
       setPostContent({
         desc: updatedPost.desc || "",
         img: updatedPost.img || null,
         video: updatedPost.video || null
       });
       
-      // Reset expanded state when description changes
+      // Đặt lại trạng thái mở rộng khi mô tả thay đổi
       setIsExpanded(false);
     }
   }, [post.id]);
 
   useEffect(() => {
-    // Add event listeners
+    // Thêm các event listeners
     window.addEventListener('likeUpdate', handleLikeUpdate);
     window.addEventListener('deletePost', handleDeletePost);
     window.addEventListener('commentUpdate', handleCommentUpdate);
     window.addEventListener('postUpdate', handlePostUpdate);
     
-    // Clean up
+    // Dọn dẹp
     return () => {
       window.removeEventListener('likeUpdate', handleLikeUpdate);
       window.removeEventListener('deletePost', handleDeletePost);
@@ -226,14 +226,14 @@ const Post = ({ post }: { post: FeedPostType }) => {
     };
   }, [handleLikeUpdate, handleDeletePost, handleCommentUpdate, handlePostUpdate]);
 
-  // Update when post likes change from props, but only if user hasn't interacted
+  // Cập nhật khi lượt thích bài viết thay đổi từ props, nhưng chỉ khi người dùng chưa tương tác
   useEffect(() => {
     if (!userLikeInteracted) {
       setCurrentLikes(post.likes || []);
     }
   }, [post.likes, userLikeInteracted]);
 
-  // Update comment count from props
+  // Cập nhật số lượng bình luận từ props
   useEffect(() => {
     setCommentCount(post._count.comments);
   }, [post._count.comments]);

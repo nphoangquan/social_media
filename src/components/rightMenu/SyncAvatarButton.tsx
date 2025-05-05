@@ -18,7 +18,7 @@ export default function SyncAvatarButton() {
       
       if (result.success) {
         setMessage("Avatar synchronized successfully!");
-        // Force refresh all components
+        // Buộc refresh tất cả components
         router.refresh();
       } else {
         setMessage("Failed to synchronize avatar.");

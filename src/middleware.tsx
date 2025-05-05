@@ -1,6 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// Define all routes that require authentication
+// Định nghĩa tất cả các tuyến đường yêu cầu xác thực
 const isProtectedRoute = createRouteMatcher([
   "/settings(.*)", 
   "/",
@@ -11,11 +11,11 @@ const isProtectedRoute = createRouteMatcher([
   "/notifications(.*)",
   "/events(.*)",
   "/stories(.*)",
-  "/post/(.*)" // Posts now require authentication
+  "/post/(.*)" // Bây giờ các bài đăng yêu cầu xác thực
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-  // Protect routes that need auth
+  // Bảo vệ các tuyến đường cần xác thực
   if (isProtectedRoute(req)) {
     await auth.protect();
   }
@@ -23,9 +23,9 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
+    // Bỏ qua các file nội bộ của Next.js và tất cả các file tĩnh, trừ khi được tìm thấy trong tham số tìm kiếm
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
+    // Luôn chạy cho các tuyến API
     "/(api|trpc)(.*)",
   ],
 };

@@ -5,13 +5,13 @@ import { auth } from "@clerk/nextjs/server";
 
 export async function getPostComments(postId: number) {
   try {
-    // Get current user ID
+    // Lấy ID người dùng hiện tại
     const { userId } = await auth();
     
     const comments = await prisma.comment.findMany({
       where: {
         postId: postId,
-        parentId: null, // Only fetch top-level comments
+        parentId: null, // Chỉ lấy bình luận cấp cao nhất
       },
       include: {
         user: true,
@@ -31,7 +31,7 @@ export async function getPostComments(postId: number) {
       },
     });
 
-    // Transform comments to include like count and whether current user has liked
+    // Chuyển đổi bình luận để bao gồm số lượng thích và xem người dùng hiện tại đã thích hay chưa
     const commentsWithLikes = comments.map(comment => ({
       ...comment,
       likes: comment.likes.length,

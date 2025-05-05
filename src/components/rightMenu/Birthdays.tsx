@@ -52,7 +52,6 @@ const Birthdays = () => {
     } catch (error) {
       console.error("Error celebrating birthday:", error);
     } finally {
-      // Keep the button disabled for better UX
       setTimeout(() => {
         setCelebrating(prev => ({ ...prev, [friendId]: false }));
       }, 5000);

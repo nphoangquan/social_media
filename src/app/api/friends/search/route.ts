@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Get search term from query params
+  // Lấy cụm từ tìm kiếm từ tham số truy vấn
   const { searchParams } = new URL(request.url);
   const term = searchParams.get("term");
   
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
   }
   
   try {
-    // Get all of the current user's friends first
+    // Trước tiên lấy tất cả bạn bè của người dùng hiện tại
     const followerIds = await prisma.follower.findMany({
       where: {
         followingId: userId,
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     
     const friendIds = followerIds.map(f => f.followerId);
     
-    // Search for friends that match the search term
+    // Tìm kiếm bạn bè phù hợp với cụm từ tìm kiếm
     const friends = await prisma.user.findMany({
       where: {
         id: {
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
           },
         ],
       },
-      take: 10, // Limit results
+      take: 10, // Giới hạn kết quả
     });
 
     return NextResponse.json({ friends });

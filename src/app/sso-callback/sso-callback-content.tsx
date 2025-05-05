@@ -10,7 +10,7 @@ export function SSOCallbackContent() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Extract the "createdSessionId" from the URL
+    // Lấy "createdSessionId" từ URL
     if (isLoaded && signIn) {
       const createdSessionId = searchParams.get("createdSessionId");
       
@@ -22,7 +22,7 @@ export function SSOCallbackContent() {
           router.push("/sign-in");
         });
       } else {
-        // Handle cases where the callback doesn't include a createdSessionId
+        // Xử lý trường hợp callback không bao gồm createdSessionId
         // Chuyển hướng người dùng về trang đăng nhập
         router.push("/sign-in"); 
       }

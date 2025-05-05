@@ -40,7 +40,7 @@ const Navbar = ({ logoFont }: NavbarProps) => {
             <span className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent transition-opacity duration-300"></span>
           </span>
           
-          {/* Emerald gradient outline on hover */}
+          {/* Emerald gradient outline khi hover */}
           <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-emerald-600 via-emerald-400 to-[#00ffbb] rounded-full group-hover:w-full transition-all duration-300"></div>
         </Link>
       </div>
@@ -59,7 +59,7 @@ const Navbar = ({ logoFont }: NavbarProps) => {
               <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">Homepage</span>
             </div>
             
-            {/* Gradient bar and shimmer on hover */}
+            {/* Gradient bar và shimmer khi hover */}
             <div className="absolute -bottom-1 left-0 w-0 h-0.5 overflow-hidden bg-gradient-to-r from-emerald-600 via-emerald-400 to-[#00ffbb] rounded-full group-hover:w-full transition-all duration-300">
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
             </div>
@@ -75,7 +75,7 @@ const Navbar = ({ logoFont }: NavbarProps) => {
               <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">Friends</span>
             </div>
             
-            {/* Gradient bar and shimmer on hover */}
+            {/* Gradient bar và shimmer khi hover */}
             <div className="absolute -bottom-1 left-0 w-0 h-0.5 overflow-hidden bg-gradient-to-r from-emerald-600 via-emerald-400 to-[#00ffbb] rounded-full group-hover:w-full transition-all duration-300">
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
             </div>
@@ -91,7 +91,7 @@ const Navbar = ({ logoFont }: NavbarProps) => {
               <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">Stories</span>
             </div>
             
-            {/* Gradient bar and shimmer on hover */}
+            {/* Gradient bar và shimmer khi hover */}
             <div className="absolute -bottom-1 left-0 w-0 h-0.5 overflow-hidden bg-gradient-to-r from-emerald-600 via-emerald-400 to-[#00ffbb] rounded-full group-hover:w-full transition-all duration-300">
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
             </div>
@@ -119,7 +119,7 @@ const Navbar = ({ logoFont }: NavbarProps) => {
                 </div>
               </Link>
               
-              {/* Hover highlight with shimmer */}
+              {/* Hover highlight với shimmer */}
               <div className="absolute inset-0 bg-emerald-500/10 opacity-0 rounded-full group-hover:opacity-100 overflow-hidden transition-opacity duration-200 -z-10">
                 <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
               </div>
@@ -128,7 +128,7 @@ const Navbar = ({ logoFont }: NavbarProps) => {
             <div className="group relative p-1.5">
               <ChatbotButton />
               
-              {/* Hover highlight with shimmer */}
+              {/* Hover highlight với shimmer */}
               <div className="absolute inset-0 bg-emerald-500/10 opacity-0 rounded-full group-hover:opacity-100 overflow-hidden transition-opacity duration-200 -z-10">
                 <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
               </div>
@@ -140,7 +140,7 @@ const Navbar = ({ logoFont }: NavbarProps) => {
                 <UserPlus className="w-6 h-6 absolute inset-0 text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
               </div>
               
-              {/* Hover highlight with shimmer */}
+              {/* Hover highlight với shimmer */}
               <div className="absolute inset-0 bg-emerald-500/10 opacity-0 rounded-full group-hover:opacity-100 overflow-hidden transition-opacity duration-200 -z-10">
                 <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
               </div>

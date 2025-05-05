@@ -43,7 +43,7 @@ export default function SignUpPage() {
   const [view, setView] = useState("main"); // main, form, verify
   const router = useRouter();
 
-  // For email/password sign up (first step)
+  // Cho email/password sign up (first step)
   const handleSubmitDetails = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoaded) return;
@@ -57,7 +57,7 @@ export default function SignUpPage() {
         emailAddress,
         password,
       }).then(() => {
-        // Send email verification code
+        // Gửi email verification code
         signUp.prepareEmailAddressVerification({ strategy: "email_code" }).then(() => {
           setView("verify");
         });
@@ -71,7 +71,7 @@ export default function SignUpPage() {
     }
   };
 
-  // For verification code submission
+  // Dành cho verification code submission
   const handleVerifyEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoaded) return;
@@ -99,7 +99,7 @@ export default function SignUpPage() {
     }
   };
 
-  // For social sign up
+  // Cho social sign up
   const handleSocialSignUp = async (provider: 'oauth_facebook' | 'oauth_google' | 'oauth_github') => {
     if (!isLoaded) return;
 
@@ -125,18 +125,18 @@ export default function SignUpPage() {
     setView("form");
   };
 
-  // Close error message
+  // Tắt error message
   const closeError = () => setError("");
 
-  // Handle back button
+  // Xử lý back button
   const handleBack = () => {
     setView("main");
     setError("");
   };
 
-  // Add hidden div for Clerk's invisible CAPTCHA
+  // Thêm hidden div cho Clerk's invisible CAPTCHA
   useEffect(() => {
-    // Create a div for clerk-captcha if it doesn't exist
+    // Tạo 1 div cho clerk-captcha nếu nó không tồn tại
     if (!document.getElementById('clerk-captcha')) {
       const captchaDiv = document.createElement('div');
       captchaDiv.id = 'clerk-captcha';
@@ -155,7 +155,7 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen w-full bg-zinc-950 flex justify-center items-center p-4">
-      {/* Hidden div for Clerk's invisible CAPTCHA */}
+      {/* Div ẩn cho Clerk's invisible CAPTCHA */}
       <div id="clerk-captcha" style={{ display: 'none' }}></div>
 
       <div className="w-full max-w-md">
@@ -200,7 +200,7 @@ export default function SignUpPage() {
               </p>
             </div>
 
-            {/* Main View - Social Options & Email Button */}
+            {/* View Chính - Social Options & Email Button */}
             {view === "main" && (
               <>
                 {/* Social Sign Up Buttons */}
@@ -240,7 +240,7 @@ export default function SignUpPage() {
                   <div className="h-px bg-zinc-800 flex-1"></div>
                 </div>
 
-                {/* Email Button */}
+                {/* Email */}
                 <button
                   onClick={continueWithEmail}
                   disabled={loading}

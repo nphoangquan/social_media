@@ -7,7 +7,7 @@ import { FileText, Heart, MessageCircle } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 
 export default function ActivityListItem({ activity }: { activity: ActivityItem }) {
-  // Function to format the date
+  // Hàm định dạng ngày tháng
   const formatDate = (date: Date) => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -31,7 +31,7 @@ export default function ActivityListItem({ activity }: { activity: ActivityItem 
     return format(date, 'MMM d, yyyy \'at\' h:mm a');
   };
 
-  // Function to get icon and description based on activity type
+  // Hàm lấy biểu tượng và mô tả dựa trên loại hoạt động
   const getActivityDetails = () => {
     switch (activity.type) {
       case 'POST_CREATED':

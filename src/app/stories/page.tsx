@@ -58,7 +58,7 @@ export default async function StoriesPage() {
               Select a story from the list or create your own
             </p>
             
-            {/* Featured story preview */}
+            {/* Phần Featured story preview */}
             {stories[0] && (
               <div className="mb-8 relative group">
                 <div className="w-full h-48 rounded-xl overflow-hidden mb-3 relative group-hover:shadow-lg group-hover:shadow-blue-500/10 transition-all">

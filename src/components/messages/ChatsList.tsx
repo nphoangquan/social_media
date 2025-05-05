@@ -13,7 +13,6 @@ interface ChatsListProps {
   initialChats?: ChatWithParticipant[];
 }
 
-// Move this interface outside the component
 interface ChatParticipant {
   userId: string;
   isRead: boolean;
@@ -76,14 +75,14 @@ export default function ChatsList({ userId, activeChatId, initialChats = [] }: C
     }
   };
 
-  // Load initial chats if not provided
+  // Load chat
   useEffect(() => {
     if (initialChats.length === 0) {
       loadChats();
     }
   }, [initialChats.length]);
 
-  // Set up intersection observer for infinite scroll
+  // Set intersection observer cho cuộn vô hạn
   useEffect(() => {
     if (loading) return;
 
@@ -127,12 +126,12 @@ export default function ChatsList({ userId, activeChatId, initialChats = [] }: C
           <div className="space-y-1 py-2">
             {chats.map((participant, index) => {
               const chat = participant.chat;
-              // Get the other participant(s)
+              // Lấy người tham gia khác
               const otherParticipants = chat.participants.filter(p => p.userId !== userId);
               const otherUser = otherParticipants[0]?.user;
               const lastMessage = chat.messages[0];
               
-              // Create ref for the last item
+              // Tạo ref cho item cuối
               const isLastItem = index === chats.length - 1;
               
               return (

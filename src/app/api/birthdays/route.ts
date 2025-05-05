@@ -10,7 +10,7 @@ export async function GET() {
   }
 
   try {
-    // Get all users that the current user follows
+    // Lấy tất cả người dùng mà người dùng hiện tại đang theo dõi
     const following = await prisma.follower.findMany({
       where: {
         followerId: userId,
@@ -29,7 +29,7 @@ export async function GET() {
       }
     });
 
-    // Filter out users without birthdate and add information about birthday status
+    // Lọc ra những người dùng có ngày sinh và thêm thông tin về trạng thái sinh nhật
     const friendsWithBirthday = following
       .map(follow => follow.following)
       .filter(friend => friend.birthDate)
@@ -37,24 +37,24 @@ export async function GET() {
         const today = new Date();
         const birthDate = new Date(friend.birthDate!);
         
-        // Check if today is the birthday (ignore year)
+        // Kiểm tra xem hôm nay có phải là sinh nhật không (bỏ qua năm)
         const isBirthdayToday = 
           today.getDate() === birthDate.getDate() && 
           today.getMonth() === birthDate.getMonth();
         
-        // Calculate upcoming birthday this year
+        // Tính toán ngày sinh nhật sắp tới trong năm nay
         const thisYearBirthday = new Date(
           today.getFullYear(),
           birthDate.getMonth(),
           birthDate.getDate()
         );
         
-        // If birthday already passed this year, set to next year
+        // Nếu sinh nhật đã qua trong năm nay, đặt vào năm sau
         if (thisYearBirthday < today) {
           thisYearBirthday.setFullYear(today.getFullYear() + 1);
         }
         
-        // Calculate days until next birthday
+        // Tính số ngày cho đến sinh nhật tiếp theo
         const daysUntilBirthday = Math.ceil(
           (thisYearBirthday.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
         );
@@ -65,7 +65,7 @@ export async function GET() {
           daysUntilBirthday
         };
       })
-      // Sort by closest birthday (today first, then by days until birthday)
+      // Sắp xếp theo sinh nhật gần nhất (hôm nay đầu tiên, sau đó theo số ngày đến sinh nhật)
       .sort((a, b) => {
         if (a.isBirthdayToday && !b.isBirthdayToday) return -1;
         if (!a.isBirthdayToday && b.isBirthdayToday) return 1;

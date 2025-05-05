@@ -17,7 +17,7 @@ export default async function FriendsPage() {
     );
   }
 
-  // Get the first 10 friends for initial render
+  // Lấy 10 người bạn đầu tiên cho việc hiển thị ban đầu
   const followers = await prisma.follower.findMany({
     where: {
       followingId: userId,
@@ -28,13 +28,13 @@ export default async function FriendsPage() {
     orderBy: {
       createdAt: 'desc',
     },
-    take: 10, // Only take the first 10 for initial load
+    take: 15, // Chỉ lấy 15 người đầu tiên cho việc tải ban đầu
   });
 
-  // Map followers to user objects
+  // Chuyển đổi từ người theo dõi sang đối tượng người dùng
   const initialFriends = followers.map(follow => follow.follower);
 
-  // Get total count for search component
+  // Lấy tổng số lượng cho component tìm kiếm
   const totalCount = await prisma.follower.count({
     where: {
       followingId: userId,
@@ -43,7 +43,7 @@ export default async function FriendsPage() {
 
   return (
     <div className="flex flex-col md:flex-row gap-6 max-w-6xl mx-auto py-8 px-4">
-      {/* Friend list sidebar */}
+      {/* Thanh bên danh sách bạn bè */}
       <div className="w-full">
         <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-zinc-800/20 p-6 border border-zinc-100/50 dark:border-zinc-800/50">
           <h1 className="text-2xl font-semibold text-zinc-800 dark:text-zinc-200 mb-6">Friends</h1>

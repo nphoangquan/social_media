@@ -6,7 +6,7 @@ import { unstable_cache } from "next/cache";
 import { cn } from "@/lib/utils";
 import { ExternalLink, Users } from "lucide-react";
 
-// Cache result for a short time but revalidate frequently
+// Cache kết quả trong thời gian ngắn nhưng tái xác thực thường xuyên
 const getUser = unstable_cache(
   async (userId: string) => {
     return prisma.user.findUnique({
@@ -23,7 +23,7 @@ const getUser = unstable_cache(
     });
   },
   ['user-profile-card'],
-  { revalidate: 5 } // Revalidate every 5 seconds
+  { revalidate: 5 } // Tái xác thực mỗi 5 giây
 );
 
 const ProfileCard = async () => {
@@ -31,18 +31,18 @@ const ProfileCard = async () => {
 
   if (!userId) return null;
 
-  // Use the cached function to get user data
+  // Sử dụng hàm cached để lấy dữ liệu người dùng
   const user = await getUser(userId);
 
   if (!user) return null;
 
   return (
     <div className="relative p-6 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md rounded-2xl shadow-lg dark:shadow-zinc-800/20 border border-zinc-100/50 dark:border-zinc-800/50 overflow-hidden group">
-      {/* Ambient background effects */}
+      {/* Ambient background effects - Hiệu ứng nền */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400/20 via-purple-500/20 to-emerald-600/20"></div>
       <div className="absolute -left-24 -bottom-24 w-48 h-48 bg-purple-400/5 dark:bg-purple-400/10 rounded-full blur-3xl group-hover:bg-purple-400/10 dark:group-hover:bg-purple-400/15 transition-all duration-700"></div>
       
-      {/* Cover Photo with enhanced gradient overlay */}
+      {/* Cover Photo with enhanced gradient overlay - Ảnh nền với hiệu ứng gradient che phủ */}
       <div className="relative h-36 -mx-6 -mt-6 mb-4 overflow-hidden">
         <Image
           src={user.cover || "/noCover.png"}
@@ -54,7 +54,7 @@ const ProfileCard = async () => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-black/5 group-hover:from-black/30 transition-all duration-500"></div>
       </div>
       
-      {/* Avatar with enhanced animations */}
+      {/* Avatar with enhanced animations - Ảnh đại diện với hiệu ứng zoom*/}
       <div className="flex justify-center -mt-16 mb-4 relative z-10">
         <Link href={`/profile/${user.username}`} className="block">
           <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-white dark:ring-zinc-900 group-hover:ring-emerald-200 dark:group-hover:ring-emerald-900/30 transition-all duration-300 cursor-pointer">

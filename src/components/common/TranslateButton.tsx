@@ -23,11 +23,11 @@ export default function TranslateButton({
   const [showLanguages, setShowLanguages] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
-  // Set icon size based on the size prop
+  // Thiết lập kích thước biểu tượng dựa trên thuộc tính size
   const iconSize = size === "sm" ? "w-3 h-3" : "w-4 h-4";
   const textSize = size === "sm" ? "text-xs" : "text-sm";
   
-  // Close the dropdown when clicking outside
+  // Đóng dropdown khi nhấp chuột bên ngoài
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {

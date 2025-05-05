@@ -55,11 +55,11 @@ export function useChatbot() {
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to get response from chatbot");
+        throw new Error(errorData.error || "Không thể nhận phản hồi từ chatbot");
       }
       
       const data = await response.json();
-      const reply = data.reply || "Sorry, I couldn't process your request.";
+      const reply = data.reply || "Xin lỗi, tôi không thể xử lý yêu cầu của bạn.";
       
       // Thêm tin nhắn AI vào danh sách
       const botMessage: ChatMessage = { role: "assistant", content: reply };
@@ -67,7 +67,7 @@ export function useChatbot() {
       
       return reply;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
+      const errorMessage = err instanceof Error ? err.message : "Đã xảy ra lỗi không xác định";
       setError(errorMessage);
       return "Xin lỗi, đã xảy ra lỗi khi xử lý yêu cầu của bạn.";
     } finally {
