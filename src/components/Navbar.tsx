@@ -12,6 +12,7 @@ import Image from "next/image";
 import NotificationBell from "./notifications/NotificationBell";
 import SearchBar from "./SearchBar";
 import MessagesBadge from "./messages/MessagesBadge";
+import ChatbotButton from "./common/ChatbotButton";
 
 interface NavbarProps {
   logoFont: string;
@@ -117,6 +118,15 @@ const Navbar = ({ logoFont }: NavbarProps) => {
                   <Search className="w-5 h-5 absolute inset-0 text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                 </div>
               </Link>
+              
+              {/* Hover highlight with shimmer */}
+              <div className="absolute inset-0 bg-emerald-500/10 opacity-0 rounded-full group-hover:opacity-100 overflow-hidden transition-opacity duration-200 -z-10">
+                <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
+              </div>
+            </div>
+            
+            <div className="group relative p-1.5">
+              <ChatbotButton />
               
               {/* Hover highlight with shimmer */}
               <div className="absolute inset-0 bg-emerald-500/10 opacity-0 rounded-full group-hover:opacity-100 overflow-hidden transition-opacity duration-200 -z-10">

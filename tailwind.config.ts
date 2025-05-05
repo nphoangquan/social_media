@@ -80,6 +80,19 @@ const config = {
           '0%': { transform: 'scale(0.95)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
         },
+        'pulse-slow': {
+          '0%, 100%': { opacity: '0.4' },
+          '50%': { opacity: '0.8' },
+        },
+        'bounce-slow': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-25%)' },
+        },
+        'gradient': {
+          '0%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+          '100%': { backgroundPosition: '0% 50%' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -87,6 +100,9 @@ const config = {
         'shimmer': 'shimmer 2s ease-in-out infinite',
         'fadeIn': 'fadeIn 0.2s ease-out',
         'scaleIn': 'scaleIn 0.2s ease-out',
+        'pulse-slow': 'pulse-slow 3s ease-in-out infinite',
+        'bounce-slow': 'bounce-slow 2s ease-in-out infinite',
+        'gradient': 'gradient 8s ease infinite',
       },
     },
   },

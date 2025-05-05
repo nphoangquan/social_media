@@ -7,9 +7,11 @@ import { useEffect, useState, useCallback } from "react";
 import { getPostComments } from "@/lib/actions/comment";
 import PostInteraction from "../feed/PostInteraction";
 import CommentList from "../feed/CommentList";
-import { ArrowLeft, MessageCircle } from "lucide-react";
+import { ArrowLeft, MessageCircle, Wand2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import PostDetailModal from "../feed/PostDetail";
+import { useSummarize } from "@/lib/hooks/useSummarize";
+import TranslateButton from "../common/TranslateButton";
 
 type CommentWithUser = Comment & {
   user: User;
@@ -45,6 +47,18 @@ export default function PostDetail({
   const [showPostDetail, setShowPostDetail] = useState(false);
   // State to control whether to show all comments
   const [showAllComments, setShowAllComments] = useState(false);
+  // State to track if the content is summarized
+  const [isSummarized, setIsSummarized] = useState(false);
+  // State to store the original content
+  const [originalDesc, setOriginalDesc] = useState(post.desc || "");
+  // State to store the summarized content
+  const [summarizedDesc, setSummarizedDesc] = useState("");
+  // Hook for summarization
+  const { generateSummary, loading: summarizing } = useSummarize();
+  // State to track if content is translated
+  const [isTranslated, setIsTranslated] = useState(false);
+  // State to store translated content
+  const [translatedDesc, setTranslatedDesc] = useState("");
   
   // Configure the character limit for truncation
   const MAX_CHARS = 150;
@@ -52,11 +66,70 @@ export default function PostDetail({
   // Determine if the description needs truncation
   const needsTruncation = post.desc && post.desc.length > MAX_CHARS;
   
-  // Get the truncated or full description depending on expanded state
+  // Set original description when post changes
+  useEffect(() => {
+    setOriginalDesc(post.desc || "");
+    // Reset states when post changes
+    setIsSummarized(false);
+    setSummarizedDesc("");
+    setIsTranslated(false);
+    setTranslatedDesc("");
+  }, [post.desc]);
+  
+  // Get the display description
   const getDisplayedDesc = () => {
-    if (!post.desc) return "";
-    if (isExpanded || !needsTruncation) return post.desc;
-    return post.desc.substring(0, MAX_CHARS) + "...";
+    // If translated, show translated content
+    if (isTranslated) return translatedDesc;
+    
+    // If summarized, show summarized content
+    if (isSummarized) return summarizedDesc;
+    
+    // Otherwise, handle truncation logic
+    if (!originalDesc) return "";
+    if (isExpanded || !needsTruncation) return originalDesc;
+    return originalDesc.substring(0, MAX_CHARS) + "...";
+  };
+  
+  // Handle summarize button click
+  const handleSummarize = async () => {
+    // If already summarized, switch back to original
+    if (isSummarized) {
+      setIsSummarized(false);
+      return;
+    }
+    
+    // Only summarize if not already summarizing and the content is long enough
+    if (!summarizing && originalDesc.length > 200) {
+      try {
+        const summary = await generateSummary(originalDesc);
+        if (summary) {
+          setSummarizedDesc(summary);
+          setIsSummarized(true);
+          // When summarized, always show full content (no truncation)
+          setIsExpanded(true);
+          // Reset translation when summarizing
+          setIsTranslated(false);
+        }
+      } catch (error) {
+        console.error("Error summarizing post:", error);
+      }
+    }
+  };
+
+  // Handle translated text
+  const handleTranslated = (translatedText: string) => {
+    setTranslatedDesc(translatedText);
+    setIsTranslated(true);
+    // Reset summarization when translating
+    setIsSummarized(false);
+    // When translated, always show full content (no truncation)
+    setIsExpanded(true);
+  };
+
+  // Handle reset translation
+  const handleResetTranslation = () => {
+    setIsTranslated(false);
+    setTranslatedDesc("");
   };
   
   const router = useRouter();
@@ -146,14 +219,40 @@ export default function PostDetail({
             <p className="text-zinc-600 dark:text-zinc-300 whitespace-pre-line">
               {getDisplayedDesc()}
             </p>
-            {needsTruncation && (
+            <div className="flex items-center gap-3 mt-1">
+              {needsTruncation && !isTranslated && !isSummarized && (
               <button 
                 onClick={() => setIsExpanded(!isExpanded)} 
-                className="text-emerald-600 dark:text-emerald-500 font-medium text-sm mt-1 hover:underline focus:outline-none"
+                  className="text-emerald-600 dark:text-emerald-500 font-medium text-sm hover:underline focus:outline-none"
               >
                 {isExpanded ? "See less" : "See more"}
               </button>
             )}
+              
+              {originalDesc.length > 200 && !isTranslated && (
+                <button 
+                  onClick={handleSummarize}
+                  disabled={summarizing}
+                  className={`flex items-center gap-1 text-sm font-medium ${summarizing ? 'text-zinc-400 dark:text-zinc-500' : 'text-emerald-600 dark:text-emerald-500 hover:underline'} focus:outline-none transition-colors`}
+                >
+                  <Wand2 className="w-3 h-3" />
+                  {summarizing 
+                    ? "Summarizing..." 
+                    : isSummarized 
+                      ? "Show original" 
+                      : "AI summarize"}
+                </button>
+              )}
+              
+              {originalDesc && !isSummarized && (
+                <TranslateButton 
+                  text={originalDesc}
+                  onTranslated={handleTranslated}
+                  onReset={handleResetTranslation}
+                  isTranslated={isTranslated}
+                />
+              )}
+            </div>
           </div>
         )}
 

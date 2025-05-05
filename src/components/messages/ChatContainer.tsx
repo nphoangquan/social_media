@@ -14,7 +14,6 @@ import {
   sendMessage,
   deleteMessage,
 } from "@/lib/actions/messages";
-import { uploadFile } from "@/lib/uploadMessages";
 import ChatHeader from "./ChatHeader";
 
 // Import emoji picker dynamically to avoid SSR issues
@@ -296,18 +295,24 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
         return;
       }
       
+      // Clean up previous object URL if it exists
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+      
       setSelectedImage(file);
       
-      // Create preview URL
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      // Create preview URL using URL.createObjectURL instead of FileReader
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreviewUrl(previewUrl);
     }
   };
 
   const handleCancelImage = () => {
+    // Clean up object URL
+    if (imagePreviewUrl) {
+      URL.revokeObjectURL(imagePreviewUrl);
+    }
     setSelectedImage(null);
     setImagePreviewUrl(null);
     setErrorMessage(null);
@@ -315,6 +320,16 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
       fileInputRef.current.value = '';
     }
   };
+
+  // Add useEffect for cleanup when component unmounts
+  useEffect(() => {
+    return () => {
+      // Clean up object URL when component unmounts
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+    };
+  }, [imagePreviewUrl]);
 
   const handleOpenImagePicker = () => {
     fileInputRef.current?.click();
@@ -345,7 +360,7 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
         const optimisticMessage = {
           id: tempId,
           content: messageText || "",
-          img: imagePreviewUrl,
+          img: imagePreviewUrl, // Use the temporary preview URL
           createdAt: new Date(),
           senderId: userId,
         };
@@ -357,9 +372,25 @@ export default function ChatContainer({ chatId, userId }: ChatContainerProps) {
         setNewMessage("");
         
         try {
-          // Upload the image to Cloudinary
-          const uploadResult = await uploadFile(selectedImage);
-          imageUrl = uploadResult.url;
+          // Upload directly to Cloudinary
+          const formData = new FormData();
+          formData.append('file', selectedImage);
+          formData.append('upload_preset', 'social-media');
+          
+          const uploadResponse = await fetch(
+            `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+            {
+              method: 'POST',
+              body: formData,
+            }
+          );
+          
+          if (!uploadResponse.ok) {
+            throw new Error('Upload to Cloudinary failed');
+          }
+          
+          const uploadData = await uploadResponse.json();
+          imageUrl = uploadData.secure_url;
         } catch (error) {
           console.error("Error uploading image:", error);
           // Remove the optimistic message if upload failed

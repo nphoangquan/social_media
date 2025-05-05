@@ -17,10 +17,13 @@ export default function CreateStoryPage() {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
 
-    // Check file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    // Check file size based on file type
+    const isVideo = selectedFile.type.startsWith("video/");
+    // 25MB for images, 100MB for videos
+    const maxSize = isVideo ? 100 * 1024 * 1024 : 25 * 1024 * 1024;
+    
     if (selectedFile.size > maxSize) {
-      alert('File is too large. Maximum size is 5MB.');
+      alert(`File is too large. Maximum size is ${isVideo ? '100MB' : '25MB'}.`);
       return;
     }
 
@@ -29,30 +32,49 @@ export default function CreateStoryPage() {
     setFileType(type);
     setFile(selectedFile);
 
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = () => {
-      setFilePreview(reader.result as string);
-    };
-    reader.readAsDataURL(selectedFile);
+    // Create preview URL
+    const url = URL.createObjectURL(selectedFile);
+    setFilePreview(url);
+    
+    // Clean up the URL when component unmounts
+    return () => URL.revokeObjectURL(url);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file || !filePreview) return;
+    if (!file || !fileType) return;
 
     try {
       setLoading(true);
       
-      // Create form data with base64 data
+      // Upload directly to Cloudinary
       const formData = new FormData();
-      formData.append("fileType", fileType || "");
-      formData.append("fileData", filePreview);
+      formData.append('file', file);
+      formData.append('upload_preset', 'social-media');
+      
+      const uploadResponse = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/${fileType}/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+      
+      if (!uploadResponse.ok) {
+        throw new Error('Upload to Cloudinary failed');
+      }
+      
+      const uploadData = await uploadResponse.json();
+      
+      // Send Cloudinary URL to our API
+      const apiFormData = new FormData();
+      apiFormData.append("fileType", fileType);
+      apiFormData.append("fileData", uploadData.secure_url);
       
       // Upload to server
       const response = await fetch("/api/stories", {
         method: "POST",
-        body: formData,
+        body: apiFormData,
       });
       
       if (response.ok) {
@@ -136,11 +158,11 @@ export default function CreateStoryPage() {
               <div className="flex gap-4 mt-6">
                 <div className="flex items-center gap-2 text-emerald-500 text-sm">
                   <ImageIcon className="w-4 h-4" />
-                  <span>Image</span>
+                  <span>Image (max 25MB)</span>
                 </div>
                 <div className="flex items-center gap-2 text-emerald-500 text-sm">
                   <Film className="w-4 h-4" />
-                  <span>Video</span>
+                  <span>Video (max 100MB)</span>
                 </div>
               </div>
             </div>

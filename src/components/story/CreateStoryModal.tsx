@@ -4,13 +4,21 @@ import { useState, useRef } from "react";
 import { X, Upload, Image as ImageIcon, Video } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { createStory } from "@/lib/actions";
+import { addStory } from "@/lib/actions";
+
+interface CloudinaryResult {
+  secure_url: string;
+  public_id: string;
+  format: string;
+  resource_type: string;
+}
 
 export default function CreateStoryModal({ onClose }: { onClose: () => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isVideo, setIsVideo] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [cloudinaryData, setCloudinaryData] = useState<CloudinaryResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
@@ -22,26 +30,76 @@ export default function CreateStoryModal({ onClose }: { onClose: () => void }) {
     const isVideoFile = selectedFile.type.startsWith('video/');
     setIsVideo(isVideoFile);
 
+    // Kiểm tra kích thước file - giới hạn khác nhau cho ảnh và video
+    if (isVideoFile) {
+      // Giới hạn video là 100MB
+      if (selectedFile.size > 100 * 1024 * 1024) {
+        alert('Video quá lớn. Kích thước tối đa là 100MB');
+        return;
+      }
+    } else {
+      // Giới hạn ảnh là 25MB
+      if (selectedFile.size > 25 * 1024 * 1024) {
+        alert('Ảnh quá lớn. Kích thước tối đa là 25MB');
+        return;
+      }
+    }
+
     // Create preview URL
     const url = URL.createObjectURL(selectedFile);
     setPreview(url);
     setFile(selectedFile);
 
+    // Upload to Cloudinary directly
+    uploadToCloudinary(selectedFile, isVideoFile ? 'video' : 'image');
+
     // Clean up the old preview URL
     return () => URL.revokeObjectURL(url);
   };
 
+  const uploadToCloudinary = async (file: File, resourceType: "image" | "video") => {
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'social-media');
+      
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+      
+      const data = await response.json();
+      setCloudinaryData({
+        secure_url: data.secure_url,
+        public_id: data.public_id,
+        format: data.format,
+        resource_type: data.resource_type
+      });
+    } catch (error) {
+      console.error("Error uploading to Cloudinary:", error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file || isUploading) return;
+    if (!file || isUploading || !cloudinaryData) return;
 
     try {
       setIsUploading(true);
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('type', isVideo ? 'video' : 'image');
-
-      await createStory(formData);
+      
+      // Gửi URL đã upload đến server
+      await addStory(cloudinaryData.secure_url, cloudinaryData.resource_type);
+      
       router.refresh();
       onClose();
     } catch (error) {
@@ -117,6 +175,12 @@ export default function CreateStoryModal({ onClose }: { onClose: () => void }) {
                   loop
                 />
               )}
+              
+              {isUploading && (
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                  <div className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+                </div>
+              )}
             </div>
 
             {/* Hidden file input */}
@@ -131,7 +195,7 @@ export default function CreateStoryModal({ onClose }: { onClose: () => void }) {
             {/* Submit button */}
             <button
               type="submit"
-              disabled={!file || isUploading}
+              disabled={!file || isUploading || !cloudinaryData}
               className="w-full py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isUploading ? 'Uploading...' : 'Share Story'}

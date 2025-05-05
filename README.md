@@ -98,6 +98,7 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_..."
 **Recommended Services:**
 - Vercel for frontend/backend
 - Neon PostgreSQL - Serverless SQL
+- Database by Railway
 - Cloudinary for media storage
 
 <!-- ## 🤝 Contributing

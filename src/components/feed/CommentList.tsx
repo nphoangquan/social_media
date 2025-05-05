@@ -9,6 +9,7 @@ import { Send, MessageCircle, Trash2, Heart } from "lucide-react";
 import PostDetail from "./PostDetail";
 import dynamic from "next/dynamic";
 import { useUserAvatar } from "@/lib/hooks/useUserAvatar";
+import TranslateButton from "../common/TranslateButton";
 
 type CommentWithUser = Comment & { 
   user: User;
@@ -271,6 +272,10 @@ function CommentList({
     });
     // State to track if user has interacted with like
     const [userLikeInteracted, setUserLikeInteracted] = useState(false);
+    // State to track if comment is translated
+    const [isTranslated, setIsTranslated] = useState(false);
+    // State to store translated comment
+    const [translatedDesc, setTranslatedDesc] = useState("");
     
     // Update like state when comment props change, but only if user hasn't interacted
     useEffect(() => {
@@ -293,9 +298,26 @@ function CommentList({
     
     // Get the truncated or full comment text depending on expanded state
     const getDisplayedCommentText = () => {
+      // If translated, show translated content
+      if (isTranslated) return translatedDesc;
+      
       if (!comment.desc) return "";
       if (isCommentExpanded || !needsCommentTruncation) return comment.desc;
       return comment.desc.substring(0, COMMENT_MAX_CHARS) + "...";
+    };
+    
+    // Handle translation
+    const handleTranslated = (translatedText: string) => {
+      setTranslatedDesc(translatedText);
+      setIsTranslated(true);
+      // When translated, always show full content
+      setIsCommentExpanded(true);
+    };
+
+    // Handle reset translation
+    const handleResetTranslation = () => {
+      setIsTranslated(false);
+      setTranslatedDesc("");
     };
     
     useEffect(() => {
@@ -399,7 +421,7 @@ function CommentList({
               </div>
               <div className="text-sm text-zinc-600 dark:text-zinc-300">
                 <span className="whitespace-pre-line">{getDisplayedCommentText()}</span>
-                {needsCommentTruncation && (
+                {needsCommentTruncation && !isTranslated && (
                   <button 
                     onClick={() => setIsCommentExpanded(!isCommentExpanded)} 
                     className="text-emerald-600 dark:text-emerald-500 font-medium text-xs ml-1 hover:underline focus:outline-none inline-flex items-center"
@@ -435,6 +457,15 @@ function CommentList({
               >
                 Reply
               </button>
+              {comment.desc && comment.desc.length > 20 && (
+                <TranslateButton 
+                  text={comment.desc}
+                  onTranslated={handleTranslated}
+                  onReset={handleResetTranslation}
+                  isTranslated={isTranslated}
+                  size="sm"
+                />
+              )}
               {user?.id === comment.userId && (
                 <button
                   type="button"

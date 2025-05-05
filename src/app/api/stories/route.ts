@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 24);
 
-    // Create story in database
+    // Create story in database with Cloudinary URL
     const story = await prisma.story.create({
       data: {
         userId,

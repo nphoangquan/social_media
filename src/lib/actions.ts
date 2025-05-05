@@ -4,7 +4,6 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "./client";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { uploadFile } from "./uploadFile";
 import { createLikeNotification, createCommentNotification, createFollowNotification, createNewPostNotification, createCommentLikeNotification } from "./actions/notifications";
 
 export const switchFollow = async (userId: string) => {
@@ -477,8 +476,25 @@ export async function createStory(formData: FormData) {
   if (!file) throw new Error('No file provided');
 
   try {
-    // Upload file to storage service (e.g. S3, Cloudinary)
-    const uploadedFile = await uploadFile(file);
+    // Upload file directly to Cloudinary
+    const formDataForCloudinary = new FormData();
+    formDataForCloudinary.append('file', file);
+    formDataForCloudinary.append('upload_preset', 'social-media');
+    
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/${type === 'video' ? 'video' : 'image'}/upload`,
+      {
+        method: 'POST',
+        body: formDataForCloudinary,
+      }
+    );
+    
+    if (!response.ok) {
+      throw new Error('Upload failed');
+    }
+    
+    const data = await response.json();
+    const fileUrl = data.secure_url;
 
     // Calculate expiry time (24 hours from now)
     const expiresAt = new Date();
@@ -490,8 +506,8 @@ export async function createStory(formData: FormData) {
         userId,
         expiresAt,
         ...(type === 'video' 
-          ? { video: uploadedFile.url } 
-          : { img: uploadedFile.url }
+          ? { video: fileUrl } 
+          : { img: fileUrl }
         ),
       },
     });

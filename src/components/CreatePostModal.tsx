@@ -3,11 +3,12 @@
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { useState, useTransition, useEffect, useRef } from "react";
-import { Smile, Image as ImageIcon, Video, X } from "lucide-react";
+import { Smile, Image as ImageIcon, Video, X, Wand2 } from "lucide-react";
 import { addPost } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import dynamic from "next/dynamic";
+import { useCaption } from "@/lib/hooks/useCaption";
 
 // Import emoji picker dynamically để tránh lỗi SSR
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), { 
@@ -35,6 +36,9 @@ const CreatePostModal = ({ onClose }: CreatePostModalProps) => {
   const [desc, setDesc] = useState("");
   const [uploading, setUploading] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [lastUploadedImage, setLastUploadedImage] = useState<File | null>(null);
+  const [generatingCaption, setGeneratingCaption] = useState(false);
+  const { generateCaption } = useCaption();
   const router = useRouter();
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -62,6 +66,11 @@ const CreatePostModal = ({ onClose }: CreatePostModalProps) => {
   const uploadToCloudinary = async (file: File, resourceType: "image" | "video") => {
     setUploading(true);
     try {
+      // Lưu lại file hình ảnh để có thể sử dụng cho tạo caption
+      if (resourceType === "image") {
+        setLastUploadedImage(file);
+      }
+      
       const formData = new FormData();
       formData.append('file', file);
       formData.append('upload_preset', 'social-media');
@@ -144,6 +153,23 @@ const CreatePostModal = ({ onClose }: CreatePostModalProps) => {
     }
   };
 
+  // Thêm hàm xử lý tạo caption
+  const handleGenerateCaption = async () => {
+    if (!lastUploadedImage || mediaType !== "image") return;
+    
+    setGeneratingCaption(true);
+    try {
+      const caption = await generateCaption(lastUploadedImage);
+      if (caption) {
+        setDesc(caption);
+      }
+    } catch (error) {
+      console.error("Error generating caption:", error);
+    } finally {
+      setGeneratingCaption(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -160,6 +186,7 @@ const CreatePostModal = ({ onClose }: CreatePostModalProps) => {
         setMedia(undefined);
         setMediaType(undefined);
         setDesc("");
+        setLastUploadedImage(null);
         
         // Dispatch a custom event to notify other components about the new post
         if (newPost) {
@@ -262,6 +289,7 @@ const CreatePostModal = ({ onClose }: CreatePostModalProps) => {
                   onClick={() => {
                     setMedia(undefined);
                     setMediaType(undefined);
+                    setLastUploadedImage(null);
                   }}
                   className="absolute top-2 right-2 p-1 rounded-full bg-zinc-900/50 hover:bg-zinc-900/70 text-white transition-colors cursor-pointer"
                   aria-label="Remove media"
@@ -327,6 +355,24 @@ const CreatePostModal = ({ onClose }: CreatePostModalProps) => {
                     </span>
                   )}
                 </button>
+                
+                {/* Thêm nút tạo caption bằng AI */}
+                {mediaType === "image" && (
+                  <button 
+                    type="button"
+                    className="text-zinc-500 hover:text-violet-500 transition-colors rounded-full p-2 relative"
+                    onClick={handleGenerateCaption}
+                    title="Tạo caption bằng AI"
+                    disabled={generatingCaption || !lastUploadedImage}
+                  >
+                    <Wand2 className="w-6 h-6" />
+                    {generatingCaption && (
+                      <span className="absolute inset-0 flex items-center justify-center">
+                        <span className="w-5 h-5 border-2 border-violet-500 border-t-transparent rounded-full animate-spin"></span>
+                      </span>
+                    )}
+                  </button>
+                )}
 
                 {/* Emoji button */}
                 <div className="relative">
@@ -364,7 +410,7 @@ const CreatePostModal = ({ onClose }: CreatePostModalProps) => {
           <div className="p-4 border-t border-zinc-100 dark:border-zinc-800">
             <button
               type="submit"
-              disabled={isPending || uploading || (!desc.trim() && !media)}
+              disabled={isPending || uploading || generatingCaption || (!desc.trim() && !media)}
               className="w-full rounded-lg bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/50 disabled:cursor-not-allowed text-white py-2.5 font-medium transition-colors"
             >
               {isPending ? (
