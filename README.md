@@ -1,6 +1,6 @@
 # Introvertia - Social Network - ĐỒ ÁN CƠ SỞ
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+<!-- [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) -->
 ![React Version](https://img.shields.io/badge/React-19-61DAFB?logo=react)
 ![Next.js Version](https://img.shields.io/badge/Next.js-15.2.4-000000?logo=next.js)
 ![Prisma Version](https://img.shields.io/badge/Prisma-6.5.0-2D3748?logo=prisma)
@@ -52,7 +52,8 @@ Một trang mạng xã hội được thực hiện bởi Nguyễn Phan Hoàng Q
 - **React 19** - JavaScript UI library
 - **Next.js 15.2.4** - React framework for SSR and routing
 - **TypeScript** - Type-safe programming language
-- **TailwindCSS** - Utility-first CSS framework
+- **TailwindCSS** - CSS framework
+<!-- - **TailwindCSS** - Utility-first CSS framework -->
 - **Lucide React** - Icon library
 - **Next Cloudinary** - Cloudinary media integration
 
