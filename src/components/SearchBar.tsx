@@ -24,6 +24,7 @@ interface Post {
     username: string;
     name: string | null;
     avatar: string | null;
+    role?: string;
   };
 }
 
@@ -41,25 +42,25 @@ export default function SearchBar() {
   const router = useRouter();
 
   // Hàm tìm kiếm bị giảm thiểu
-  const debouncedSearch = useCallback(
-    debounce(async (searchQuery: string) => {
-      if (searchQuery.trim().length < 2) {
-        setSearchResults({ users: [], posts: [] });
-        setIsLoading(false);
-        return;
-      }
+  const debouncedSearch = useCallback((searchQuery: string) => {
+    if (searchQuery.trim().length < 2) {
+      setSearchResults({ users: [], posts: [] });
+      setIsLoading(false);
+      return;
+    }
 
+    setIsLoading(true);
+    debounce(async (query: string) => {
       try {
-        const results = await searchContent(searchQuery);
+        const results = await searchContent(query);
         setSearchResults(results);
       } catch (error) {
         console.error("Search failed:", error);
       } finally {
         setIsLoading(false);
       }
-    }, 500),
-    [searchContent, setSearchResults, setIsLoading]
-  );
+    }, 500)(searchQuery);
+  }, []);
 
   // Xử lý thay đổi input
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,7 +68,6 @@ export default function SearchBar() {
     setQuery(value);
     
     if (value.trim().length >= 2) {
-      setIsLoading(true);
       debouncedSearch(value);
     } else {
       setSearchResults({ users: [], posts: [] });

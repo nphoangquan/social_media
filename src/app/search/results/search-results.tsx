@@ -13,6 +13,7 @@ interface User {
   name: string | null;
   surname: string | null;
   avatar: string | null;
+  role?: string;
 }
 
 interface Post {
@@ -23,6 +24,7 @@ interface Post {
     username: string;
     name: string | null;
     avatar: string | null;
+    role?: string;
   };
 }
 

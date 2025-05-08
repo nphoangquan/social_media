@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import MobileMenu from "./MobileMenu";
 import {
@@ -6,23 +8,48 @@ import {
   SignedIn,
   SignedOut,
   UserButton,
+  useUser,
 } from "@clerk/nextjs";
-import { Home, Users, BookOpen, Search, UserPlus, MessageSquare, LogIn } from "lucide-react";
+import { Home, Users, BookOpen, Search, UserPlus, MessageSquare, LogIn, ShieldAlert } from "lucide-react";
 import Image from "next/image";
 import NotificationBell from "./notifications/NotificationBell";
 import SearchBar from "./SearchBar";
 import MessagesBadge from "./messages/MessagesBadge";
 import ChatbotButton from "./common/ChatbotButton";
+import { useEffect, useState } from "react";
 
 interface NavbarProps {
   logoFont: string;
 }
 
 const Navbar = ({ logoFont }: NavbarProps) => {
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const { isSignedIn } = useUser();
+
+  useEffect(() => {
+    if (isSignedIn) {
+      const fetchUserRole = async () => {
+        try {
+          const response = await fetch("/api/user/role");
+          if (response.ok) {
+            const data = await response.json();
+            setUserRole(data.role);
+          }
+        } catch (error) {
+          console.error("Error fetching user role:", error);
+        }
+      };
+      
+      fetchUserRole();
+    }
+  }, [isSignedIn]);
+
+  const isAdminOrModerator = userRole === "admin" || userRole === "moderator";
+
   return (
-    <div className="h-24 flex items-center justify-between">
+    <div className="h-24 flex items-center justify-between px-4">
       {/* LEFT */}
-      <div className="md:hidden lg:block w-[25%] pl-2">
+      <div className="md:hidden lg:flex lg:w-[20%] items-center">
         <Link 
           href="/" 
           className="flex items-center gap-2 group relative"
@@ -46,9 +73,9 @@ const Navbar = ({ logoFont }: NavbarProps) => {
       </div>
       
       {/* CENTER */}
-      <div className="hidden md:flex w-[45%] text-sm items-center justify-between ml-6">
+      <div className="hidden md:flex md:w-[50%] lg:w-[45%] text-sm items-center justify-between ml-4">
         {/* LINKS */}
-        <div className="flex gap-6 text-zinc-400">
+        <div className="flex gap-4 lg:gap-6 text-zinc-400">
           <Link href="/" className="flex items-center gap-2 group relative">
             <div className="relative">
               <Home className="w-4 h-4 text-white transition-opacity duration-200" />
@@ -96,22 +123,40 @@ const Navbar = ({ logoFont }: NavbarProps) => {
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
             </div>
           </Link>
+          
+          {isAdminOrModerator && (
+            <Link href="/admin" className="flex items-center gap-2 group relative">
+              <div className="relative">
+                <ShieldAlert className="w-4 h-4 text-white transition-opacity duration-200" />
+                <ShieldAlert className="w-4 h-4 absolute inset-0 text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+              </div>
+              <div className="relative">
+                <span className="text-white transition-opacity duration-200">Admin</span>
+                <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">Admin</span>
+              </div>
+              
+              {/* Gradient bar và shimmer khi hover */}
+              <div className="absolute -bottom-1 left-0 w-0 h-0.5 overflow-hidden bg-gradient-to-r from-emerald-600 via-emerald-400 to-[#00ffbb] rounded-full group-hover:w-full transition-all duration-300">
+                <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
+              </div>
+            </Link>
+          )}
         </div>
         
-        <div className='hidden xl:block'>
+        <div className='hidden xl:block pl-4 lg:pl-8'>
           <SearchBar />
         </div>
       </div>
       
       {/* RIGHT */}
-      <div className="w-[30%] flex items-center gap-4 xl:gap-8 justify-end">
+      <div className="flex-1 md:w-[35%] lg:w-[30%] flex items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4 xl:gap-6 justify-end">
         <ClerkLoading>
           <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-zinc-600 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite]" />
         </ClerkLoading>
         
         <ClerkLoaded>
           <SignedIn>
-            <div className="xl:hidden group relative p-1.5">
+            <div className="xl:hidden group relative p-1">
               <Link href="/search">
                 <div className="relative">
                   <Search className="w-5 h-5 text-white transition-opacity duration-200" />
@@ -125,7 +170,21 @@ const Navbar = ({ logoFont }: NavbarProps) => {
               </div>
             </div>
             
-            <div className="group relative p-1.5">
+            {isAdminOrModerator && (
+              <Link href="/admin" className="group relative p-1">
+                <div className="relative">
+                  <ShieldAlert className="w-5 h-5 text-amber-400 transition-opacity duration-200" />
+                  <ShieldAlert className="w-5 h-5 absolute inset-0 text-transparent bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                </div>
+                
+                {/* Hover highlight với shimmer */}
+                <div className="absolute inset-0 bg-amber-500/10 opacity-0 rounded-full group-hover:opacity-100 overflow-hidden transition-opacity duration-200 -z-10">
+                  <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-amber-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
+                </div>
+              </Link>
+            )}
+            
+            <div className="group relative p-1">
               <ChatbotButton />
               
               {/* Hover highlight với shimmer */}
@@ -134,10 +193,10 @@ const Navbar = ({ logoFont }: NavbarProps) => {
               </div>
             </div>
             
-            <Link href="/friend-requests" className="group relative p-1.5">
+            <Link href="/friend-requests" className="group relative p-1">
               <div className="relative">
-                <UserPlus className="w-6 h-6 text-white transition-opacity duration-200" />
-                <UserPlus className="w-6 h-6 absolute inset-0 text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                <UserPlus className="w-5 h-5 sm:w-6 sm:h-6 text-white transition-opacity duration-200" />
+                <UserPlus className="w-5 h-5 sm:w-6 sm:h-6 absolute inset-0 text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
               </div>
               
               {/* Hover highlight với shimmer */}
@@ -146,7 +205,7 @@ const Navbar = ({ logoFont }: NavbarProps) => {
               </div>
             </Link>
             
-            <Link href="/messages" className="group relative p-1.5">
+            <Link href="/messages" className="group relative p-1">
               <div className="relative">
                 <MessageSquare className="w-5 h-5 text-white transition-opacity duration-200 cursor-pointer" />
                 <MessageSquare className="w-5 h-5 absolute inset-0 text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer" />
@@ -159,7 +218,7 @@ const Navbar = ({ logoFont }: NavbarProps) => {
               </div>
             </Link>
             
-            <div className="group relative p-1.5">
+            <div className="group relative p-1">
               <NotificationBell />
               
               {/* Hover highlight with shimmer */}
@@ -196,7 +255,9 @@ const Navbar = ({ logoFont }: NavbarProps) => {
           </SignedOut>
         </ClerkLoaded>
         
-        <MobileMenu />
+        <div className="block lg:hidden">
+          <MobileMenu />
+        </div>
       </div>
     </div>
   );

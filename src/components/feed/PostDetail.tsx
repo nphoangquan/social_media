@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
 import PostInteraction from "./PostInteraction";
+import ReportPostButton from "./ReportPostButton";
 
 type CommentWithUser = Comment & {
   user: User;
@@ -295,13 +296,20 @@ export default function PostDetail({
         {/* Header */}
         <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between shrink-0">
           <h2 className="text-xl font-semibold text-zinc-800 dark:text-zinc-200">Post</h2>
-          <button 
-            title="Close"
-            onClick={onClose}
-            className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors cursor-pointer"
-          >
-            <X className="w-5 h-5 text-zinc-600 dark:text-zinc-400" />
-          </button>
+          <div className="flex items-center gap-3">
+            {post.currentUserId && post.currentUserId !== post.userId && (
+              <div className="text-zinc-600 dark:text-zinc-400">
+                <ReportPostButton postId={post.id} />
+              </div>
+            )}
+            <button 
+              title="Close"
+              onClick={onClose}
+              className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5 text-zinc-600 dark:text-zinc-400" />
+            </button>
+          </div>
         </div>
 
         {/* Content */}

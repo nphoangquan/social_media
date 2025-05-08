@@ -21,6 +21,7 @@ interface ChatParticipant {
     username: string;
     name: string | null;
     avatar: string | null;
+    role?: string;
   };
 }
 

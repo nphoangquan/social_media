@@ -433,14 +433,34 @@ export const deletePost = async (postId: number) => {
   if (!userId) throw new Error("User is not authenticated!");
 
   try {
-    await prisma.post.delete({
-      where: {
-        id: postId,
-        userId,
-      },
+    // Kiểm tra quyền xóa bài viết
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true }
     });
-    revalidatePath("/");
-    return { success: true, postId };
+    
+    // Lấy thông tin bài viết
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      select: { userId: true }
+    });
+    
+    if (!post) {
+      return { success: false, error: "Post not found" };
+    }
+    
+    // Nếu là admin hoặc moderator, hoặc chính là người tạo bài viết
+    if (user?.role === "admin" || user?.role === "moderator" || post.userId === userId) {
+      await prisma.post.delete({
+        where: {
+          id: postId,
+        },
+      });
+      revalidatePath("/");
+      return { success: true, postId };
+    } else {
+      return { success: false, error: "You don't have permission to delete this post" };
+    }
   } catch (err) {
     console.log(err);
     return { success: false, error: "Failed to delete post" };
@@ -453,13 +473,34 @@ export const deleteComment = async (commentId: number) => {
   if (!userId) throw new Error("User is not authenticated!");
 
   try {
-    await prisma.comment.delete({
-      where: {
-        id: commentId,
-        userId, // Chỉ cho phép người dùng xóa bình luận của chính họ
-      },
+    // Kiểm tra quyền xóa bình luận
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true }
     });
-    revalidatePath("/");
+    
+    // Lấy thông tin bình luận
+    const comment = await prisma.comment.findUnique({
+      where: { id: commentId },
+      select: { userId: true }
+    });
+    
+    if (!comment) {
+      throw new Error("Comment not found");
+    }
+    
+    // Nếu là admin hoặc moderator, hoặc chính là người tạo bình luận
+    if (user?.role === "admin" || user?.role === "moderator" || comment.userId === userId) {
+      await prisma.comment.delete({
+        where: {
+          id: commentId,
+        },
+      });
+      revalidatePath("/");
+      return { success: true };
+    } else {
+      throw new Error("You don't have permission to delete this comment");
+    }
   } catch (err) {
     console.log(err);
     throw new Error("Something went wrong!");

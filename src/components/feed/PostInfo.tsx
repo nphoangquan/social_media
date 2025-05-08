@@ -3,9 +3,10 @@
 import { useRouter } from "next/navigation";
 import { deletePost } from "@/lib/actions";
 import { useState, useRef, useEffect } from "react";
-import { MoreVertical, Eye, Trash2, Edit } from "lucide-react";
+import { MoreVertical, Eye, Trash2, Edit, Flag } from "lucide-react";
 import EditPostWidget from "./EditPostWidget";
 import PostDetail from "./PostDetail";
+import ReportPostButton from "./ReportPostButton";
 import { Post, User, Comment } from "@prisma/client";
 
 type PostWithUserAndComments = Post & {
@@ -13,13 +14,16 @@ type PostWithUserAndComments = Post & {
   comments: (Comment & { user: User })[];
 };
 
-const PostInfo = ({ post }: { post: PostWithUserAndComments }) => {
+const PostInfo = ({ post, currentUserId }: { post: PostWithUserAndComments; currentUserId?: string }) => {
   const [open, setOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showPostDetail, setShowPostDetail] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
+
+  const isOwner = currentUserId === post.userId;
 
   const handleDeleteClick = async () => {
     try {
@@ -27,7 +31,6 @@ const PostInfo = ({ post }: { post: PostWithUserAndComments }) => {
       const result = await deletePost(post.id);
       
       if (result && result.success) {
-        // Dispatch một event để thông báo cho các component khác biết bài viết đã bị xóa
         const deletePostEvent = new CustomEvent('deletePost', {
           detail: { postId: post.id }
         });
@@ -40,7 +43,6 @@ const PostInfo = ({ post }: { post: PostWithUserAndComments }) => {
     }
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -90,29 +92,49 @@ const PostInfo = ({ post }: { post: PostWithUserAndComments }) => {
               type="button"
             >
               <Eye className="w-4 h-4 text-white group-hover:text-emerald-500 transition-colors" />
-              <span className="text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500 animate-gradient-slow bg-[length:200%_auto]">View</span>
+              <span className="text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500 animate-gradient-slow bg-[length:200%_auto]">View details</span>
             </button>
             
-            <button 
-              className="flex items-center gap-2 group cursor-pointer"
-              onClick={() => {
-                setOpen(false);
-                setIsEditing(true);
-              }}
-              type="button"
-            >
-              <Edit className="w-4 h-4 text-white group-hover:text-emerald-500 transition-colors" />
-              <span className="text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500 animate-gradient-slow bg-[length:200%_auto]">Edit</span>
-            </button>
+            {isOwner && (
+              <>
+                <button 
+                  className="flex items-center gap-2 group cursor-pointer"
+                  onClick={() => {
+                    setOpen(false);
+                    setIsEditing(true);
+                  }}
+                  type="button"
+                >
+                  <Edit className="w-4 h-4 text-white group-hover:text-emerald-500 transition-colors" />
+                  <span className="text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500 animate-gradient-slow bg-[length:200%_auto]">Edit</span>
+                </button>
+                
+                <button 
+                  className="flex items-center gap-2 group cursor-pointer"
+                  type="button"
+                  onClick={handleDeleteClick}
+                >
+                  <Trash2 className="w-4 h-4 text-red-500 group-hover:text-red-400 transition-colors" />
+                  <span className="text-red-500 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r from-red-500 via-red-400 to-red-500 animate-gradient-slow bg-[length:200%_auto]">Delete</span>
+                </button>
+              </>
+            )}
             
-            <button 
-              className="flex items-center gap-2 group cursor-pointer"
-              type="button"
-              onClick={handleDeleteClick}
-            >
-              <Trash2 className="w-4 h-4 text-red-500 group-hover:text-red-400 transition-colors" />
-              <span className="text-red-500 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r from-red-500 via-red-400 to-red-500 animate-gradient-slow bg-[length:200%_auto]">Delete</span>
-            </button>
+            {!isOwner && (
+              <button 
+                className="flex items-center gap-2 group cursor-pointer"
+                onClick={() => {
+                  setOpen(false);
+                  setShowReportModal(true);
+                }}
+                type="button"
+              >
+                <Flag className="w-4 h-4 text-yellow-500 group-hover:text-yellow-400 transition-colors" />
+                <span className="text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-500 animate-gradient-slow bg-[length:200%_auto]">
+                  Report
+                </span>
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -130,6 +152,13 @@ const PostInfo = ({ post }: { post: PostWithUserAndComments }) => {
           onClose={() => setShowPostDetail(false)}
         />
       )}
+      
+      {/* Nút report bài viết */}
+      <ReportPostButton 
+        postId={post.id} 
+        isModalOpen={showReportModal}
+        onModalClose={() => setShowReportModal(false)}
+      />
     </>
   );
 };

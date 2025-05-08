@@ -35,7 +35,7 @@ const AddPost = () => {
           className="flex-1 bg-zinc-100 dark:bg-zinc-800/50 rounded-full px-4 text-left text-zinc-500 dark:text-zinc-400 cursor-pointer hover:bg-zinc-200 dark:hover:bg-zinc-700/50 transition-colors"
           onClick={() => setIsModalOpen(true)}
         >
-          My fellow, write something...
+          Viết gì đi...
         </button>
       </div>
 

@@ -16,6 +16,13 @@ export default function AvatarRefresh() {
   useEffect(() => {
     if (!user || !isLoaded || syncInProgress) return;
     
+    // Kiểm tra xem người dùng có avatar hay không
+    // Nếu không có imageUrl hoặc imageUrl rỗng, không thực hiện đồng bộ
+    if (!user.imageUrl || user.imageUrl === '') {
+      console.log("User has no avatar image, skipping sync");
+      return;
+    }
+    
     // Chỉ kích hoạt làm mới nếu URL hình ảnh đã thay đổi
     if (user.imageUrl && user.imageUrl !== prevImageUrl) {
       console.log("Avatar image URL changed, syncing with database...");

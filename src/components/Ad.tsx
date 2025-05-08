@@ -7,13 +7,13 @@ const Ad = ({ size }: { size: "sm" | "md" | "lg" }) => {
     <div className="bg-zinc-900/90 rounded-xl shadow-lg text-sm overflow-hidden">
       {/* TOP */}
       <div className="flex items-center justify-between text-zinc-400 font-medium px-4 pt-3 pb-2">
-        <span className="text-xs uppercase tracking-wider font-semibold">Sponsored Ads</span>
+        <span className="text-xs uppercase tracking-wider font-semibold">Quảng Cáo - Ads</span>
         <MoreVertical className="w-4 h-4 cursor-pointer hover:text-zinc-300 transition-colors" />
       </div>
       {/* BOTTOM */}
       <Link href="/landing" className="block hover:opacity-95 transition-opacity">
         <div className={`flex flex-col ${size === "sm" ? "gap-2" : "gap-3"}`}>
-          {/* Main Image Container - No Border */}
+          {/* Main Image Container - Không có Border */}
           <div className={`relative w-full overflow-hidden ${
             size === "sm" ? "h-32" : size === "md" ? "h-40" : "h-52"
           }`}>
@@ -37,7 +37,7 @@ const Ad = ({ size }: { size: "sm" | "md" | "lg" }) => {
             </div>
             <div className="flex flex-col">
               <span className="text-zinc-100 font-medium">INTROVERTIA</span>
-              <span className="text-xs text-zinc-500">Sponsored</span>
+              <span className="text-xs text-zinc-500">Quảng Cáo</span>
             </div>
           </div>
           

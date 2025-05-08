@@ -8,6 +8,7 @@ import PostDetail from "./PostDetail";
 import ShareModal from "./ShareModal";
 import { Post, User, Comment } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import ReportPostButton from "./ReportPostButton";
 
 const PostInteraction = ({
   postId,
@@ -165,50 +166,69 @@ const PostInteraction = ({
     setShowShareModal(true);
   };
 
+  // Check if the current user is the owner of the post
+  const isOwner = currentUserId === post.userId;
+
   return (
-    <div className="flex items-center justify-between text-sm">
-      <div className="flex gap-4">
-        <div className="flex items-center gap-4 bg-zinc-100/80 dark:bg-zinc-800/50 px-4 py-2 rounded-xl group">
-          <button 
-            title="Like Post" 
-            className="hover:scale-110 transition-transform"
-            onClick={(e) => {
-              e.preventDefault();
-              likeAction();
-            }}
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between text-sm">
+        <div className="flex gap-4">
+          <div className="flex items-center gap-4 bg-zinc-100/80 dark:bg-zinc-800/50 px-4 py-2 rounded-xl group">
+            <button 
+              title="Like Post" 
+              className="hover:scale-110 transition-transform"
+              onClick={(e) => {
+                e.preventDefault();
+                likeAction();
+              }}
+            >
+              <Heart
+                className={`w-4 h-4 cursor-pointer transition-colors ${
+                  optimisticLikeState.isLiked 
+                    ? "fill-emerald-500 text-emerald-500 dark:fill-emerald-400 dark:text-emerald-400" 
+                    : "text-zinc-500 dark:text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400"
+                }`}
+              />
+            </button>
+            <span className="text-zinc-300 dark:text-zinc-600">|</span>
+            <span className="text-zinc-500 dark:text-zinc-400">
+              {optimisticLikeState.likeCount}
+              <span className="hidden md:inline ml-1">Likes</span>
+            </span>
+          </div>
+          <div className="flex items-center gap-4 bg-zinc-100/80 dark:bg-zinc-800/50 px-4 py-2 rounded-xl group cursor-pointer" onClick={() => setShowPostDetail(true)}>
+            <MessageCircle className="w-4 h-4 cursor-pointer text-zinc-500 dark:text-zinc-400 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors" />
+            <span className="text-zinc-300 dark:text-zinc-600">|</span>
+            <span className="text-zinc-500 dark:text-zinc-400">
+              {currentCommentCount}<span className="hidden md:inline ml-1">Comments</span>
+            </span>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          {!isOwner && (
+            <div className="hidden sm:flex items-center bg-zinc-100/80 dark:bg-zinc-800/50 px-3 py-2 rounded-xl">
+              <ReportPostButton postId={postId} variant="compact" />
+            </div>
+          )}
+          <div 
+            className="flex items-center gap-4 bg-zinc-100/80 dark:bg-zinc-800/50 px-4 py-2 rounded-xl group cursor-pointer"
+            onClick={handleShare}
           >
-            <Heart
-              className={`w-4 h-4 cursor-pointer transition-colors ${
-                optimisticLikeState.isLiked 
-                  ? "fill-emerald-500 text-emerald-500 dark:fill-emerald-400 dark:text-emerald-400" 
-                  : "text-zinc-500 dark:text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400"
-              }`}
-            />
-          </button>
-          <span className="text-zinc-300 dark:text-zinc-600">|</span>
-          <span className="text-zinc-500 dark:text-zinc-400">
-            {optimisticLikeState.likeCount}
-            <span className="hidden md:inline ml-1">Likes</span>
-          </span>
-        </div>
-        <div className="flex items-center gap-4 bg-zinc-100/80 dark:bg-zinc-800/50 px-4 py-2 rounded-xl group cursor-pointer" onClick={() => setShowPostDetail(true)}>
-          <MessageCircle className="w-4 h-4 cursor-pointer text-zinc-500 dark:text-zinc-400 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors" />
-          <span className="text-zinc-300 dark:text-zinc-600">|</span>
-          <span className="text-zinc-500 dark:text-zinc-400">
-            {currentCommentCount}<span className="hidden md:inline ml-1">Comments</span>
-          </span>
+            <Share2 className="w-4 h-4 cursor-pointer text-zinc-500 dark:text-zinc-400 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors" />
+            <span className="text-zinc-300 dark:text-zinc-600">|</span>
+            <span className="text-zinc-500 dark:text-zinc-400">
+              <span className="hidden md:inline">Share</span>
+            </span>
+          </div>
         </div>
       </div>
-      <div 
-        className="flex items-center gap-4 bg-zinc-100/80 dark:bg-zinc-800/50 px-4 py-2 rounded-xl group cursor-pointer"
-        onClick={handleShare}
-      >
-        <Share2 className="w-4 h-4 cursor-pointer text-zinc-500 dark:text-zinc-400 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors" />
-        <span className="text-zinc-300 dark:text-zinc-600">|</span>
-        <span className="text-zinc-500 dark:text-zinc-400">
-          <span className="hidden md:inline">Share</span>
-        </span>
-      </div>
+      
+      {!isOwner && (
+        <div className="flex sm:hidden justify-end">
+          <ReportPostButton postId={postId} />
+        </div>
+      )}
+      
       {showPostDetail && (
         <PostDetail
           post={post}

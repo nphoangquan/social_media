@@ -125,6 +125,7 @@ const StoryList = ({
         work: "",
         school: "",
         website: "",
+        role: "user",
         birthDate: null,
         createdAt: new Date(Date.now()),
       },

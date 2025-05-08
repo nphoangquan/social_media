@@ -21,7 +21,7 @@ export default async function VideosPage() {
     <div className="flex flex-col gap-6">
       <div className="p-6 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-zinc-800/20 border border-zinc-100/50 dark:border-zinc-800/50">
         <h1 className="text-2xl font-bold mb-4 text-zinc-800 dark:text-zinc-200">
-          Your Videos
+          Videos
         </h1>
         
         {videos.length === 0 ? (

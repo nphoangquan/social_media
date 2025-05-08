@@ -23,7 +23,7 @@ const SettingsPage = () => {
             
             <div className="pl-7">
               <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
-                If your profile avatar doesn&apos;t update after changing it in Clerk, you can manually sync it using the button below.
+                Nếu hình ảnh đại diện của bạn không cập nhật sau khi thay đổi nó trong Clerk, bạn có thể đồng bộ hóa nó bằng cách nhấp vào nút bên dưới.
               </p>
               
               <SyncAvatarButton />

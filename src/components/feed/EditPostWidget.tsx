@@ -1,8 +1,7 @@
 "use client";
 
-import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X, Image as ImageIcon, Video, Save } from "lucide-react";
 import { Post, User } from "@prisma/client";
 import { useRouter } from "next/navigation";
@@ -30,6 +29,9 @@ export default function EditPostWidget({ post, onClose }: EditPostWidgetProps) {
   const [mounted, setMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -44,6 +46,66 @@ export default function EditPostWidget({ post, onClose }: EditPostWidgetProps) {
       setMediaType("video");
     }
   }, [post.img, post.video]);
+
+  const uploadToCloudinary = async (file: File, resourceType: "image" | "video") => {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'social-media');
+      
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+      
+      const data = await response.json();
+      setMedia({
+        secure_url: data.secure_url,
+        public_id: data.public_id,
+        format: data.format,
+        resource_type: data.resource_type
+      });
+      setMediaType(resourceType);
+    } catch (error) {
+      console.error("Error uploading to Cloudinary:", error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Check file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setError("File too large. Maximum size is 10MB");
+      return;
+    }
+    
+    uploadToCloudinary(file, "image");
+  };
+
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Check file size (max 100MB)
+    if (file.size > 100 * 1024 * 1024) {
+      setError("File too large. Maximum size is 100MB");
+      return;
+    }
+    
+    uploadToCloudinary(file, "video");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -218,111 +280,53 @@ export default function EditPostWidget({ post, onClose }: EditPostWidgetProps) {
           <div className="px-6 py-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
             {/* Media Upload Options */}
             <div className="flex items-center gap-6 text-zinc-500 dark:text-zinc-400">
-              <CldUploadWidget
-                uploadPreset="social-media"
-                onSuccess={(result, { widget }) => {
-                  setMedia(result.info as CloudinaryResult);
-                  setMediaType("image");
-                  widget.close();
-                }}
-                options={{
-                  resourceType: "image",
-                  clientAllowedFormats: ["jpg", "jpeg", "png", "gif"],
-                  maxFileSize: 10000000,
-                  styles: {
-                    palette: {
-                      window: "#0a0a0a",
-                      windowBorder: "#a1a1aa",
-                      windowShadow: "rgba(0, 0, 0, 0.95)",
-                      tabIcon: "#10b981",
-                      menuIcons: "#10b981",
-                      textDark: "#ffffff",
-                      textLight: "#f4f4f5",
-                      link: "#10b981",
-                      action: "#10b981",
-                      inactiveTabIcon: "#a1a1aa",
-                      error: "#e11d48",
-                      inProgress: "#10b981",
-                      complete: "#10b981",
-                      sourceBg: "#0a0a0a",
-                    },
-                    fonts: {
-                      default: null,
-                      "'Inter', sans-serif": {
-                        url: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap",
-                        active: true,
-                      },
-                    },
-                    frame: {
-                      background: "rgba(0, 0, 0, 0.8)"
-                    }
-                  }
-                }}
-              >
-                {({ open }) => (
-                  <button
-                    type="button"
-                    onClick={() => open()}
-                    className="flex items-center gap-2 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors cursor-pointer"
-                  >
-                    <ImageIcon className="w-6 h-6" />
-                    <span className="text-base font-medium">Photo</span>
-                  </button>
-                )}
-              </CldUploadWidget>
+              {/* Hidden file inputs */}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                ref={imageInputRef}
+                onChange={handleImageChange}
+              />
+              <input
+                type="file"
+                accept="video/*"
+                className="hidden"
+                ref={videoInputRef}
+                onChange={handleVideoChange}
+              />
 
-              <CldUploadWidget
-                uploadPreset="social-media"
-                onSuccess={(result, { widget }) => {
-                  setMedia(result.info as CloudinaryResult);
-                  setMediaType("video");
-                  widget.close();
-                }}
-                options={{
-                  resourceType: "video",
-                  clientAllowedFormats: ["mp4", "mov", "avi", "webm"],
-                  maxFileSize: 100000000,
-                  styles: {
-                    palette: {
-                      window: "#0a0a0a",
-                      windowBorder: "#a1a1aa",
-                      windowShadow: "rgba(0, 0, 0, 0.95)",
-                      tabIcon: "#10b981",
-                      menuIcons: "#10b981",
-                      textDark: "#ffffff",
-                      textLight: "#f4f4f5",
-                      link: "#10b981",
-                      action: "#10b981",
-                      inactiveTabIcon: "#a1a1aa",
-                      error: "#e11d48",
-                      inProgress: "#10b981",
-                      complete: "#10b981",
-                      sourceBg: "#0a0a0a",
-                    },
-                    fonts: {
-                      default: null,
-                      "'Inter', sans-serif": {
-                        url: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap",
-                        active: true,
-                      },
-                    },
-                    frame: {
-                      background: "rgba(0, 0, 0, 0.8)"
-                    }
-                  }
-                }}
+              {/* Image upload button */}
+              <button
+                type="button"
+                onClick={() => imageInputRef.current?.click()}
+                className="flex items-center gap-2 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors cursor-pointer relative"
+                disabled={uploading}
               >
-                {({ open }) => (
-                  <button
-                    type="button"
-                    onClick={() => open()}
-                    className="flex items-center gap-2 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors cursor-pointer"
-                  >
-                    <Video className="w-6 h-6" />
-                    <span className="text-base font-medium">Video</span>
-                  </button>
+                <ImageIcon className="w-6 h-6" />
+                <span className="text-base font-medium">Photo</span>
+                {uploading && mediaType === "image" && (
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    <span className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></span>
+                  </span>
                 )}
-              </CldUploadWidget>
+              </button>
+
+              {/* Video upload button */}
+              <button
+                type="button"
+                onClick={() => videoInputRef.current?.click()}
+                className="flex items-center gap-2 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors cursor-pointer relative"
+                disabled={uploading}
+              >
+                <Video className="w-6 h-6" />
+                <span className="text-base font-medium">Video</span>
+                {uploading && mediaType === "video" && (
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    <span className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></span>
+                  </span>
+                )}
+              </button>
             </div>
 
             {/* Submit Button */}

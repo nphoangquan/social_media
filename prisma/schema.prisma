@@ -26,6 +26,7 @@ model User {
   school                 String?
   work                   String?
   website                String?
+  role                   String          @default("user") // Có thể là "user", "moderator", "admin"
   createdAt              DateTime        @default(now())
   posts                  Post[]
   comments               Comment[]
@@ -41,6 +42,9 @@ model User {
   notificationsSent      Notification[]  @relation("NotificationsSent")
   chatParticipations     ChatParticipant[]
   sentMessages           Message[]
+  // Thêm quan hệ với Report model
+  submittedReports       Report[]        @relation("ReportSubmitter")
+  reportedContent        Report[]        @relation("ReportedUser")
 }
 
 model Post {
@@ -178,4 +182,27 @@ model Message {
   senderId  String
   chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
   chatId    Int
+}
+
+// Thêm model cho hệ thống báo cáo
+model Report {
+  id          Int      @id @default(autoincrement())
+  type        String   // "POST", "COMMENT", "USER"
+  reason      String
+  description String?
+  status      String   @default("pending") // "pending", "resolved", "rejected"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Người tạo báo cáo
+  submitter   User     @relation("ReportSubmitter", fields: [submitterId], references: [id], onDelete: Cascade)
+  submitterId String
+
+  // Người dùng bị báo cáo (nếu báo cáo liên quan đến người dùng)
+  reportedUser User?    @relation("ReportedUser", fields: [reportedUserId], references: [id], onDelete: SetNull)
+  reportedUserId String?
+
+  // ID của nội dung bị báo cáo
+  postId      Int?
+  commentId   Int?
 }

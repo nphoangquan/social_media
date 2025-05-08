@@ -3,10 +3,10 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // Khởi tạo máy chủ Socket.IO 
+    // Khởi tạo server Socket.IO 
     const io = initSocket(null);
     
-    // Đảm bảo máy chủ đã sẵn sàng nhận kết nối
+    // Đảm bảo server đã sẵn sàng nhận kết nối
     if (io) {
       console.log();
     }

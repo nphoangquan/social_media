@@ -2,6 +2,7 @@
 
 import { switchBlock, switchFollow } from "@/lib/actions";
 import { useOptimistic, useState } from "react";
+import ReportUserButton from "../profile/ReportUserButton";
 
 const UserInfoCardInteraction = ({
   userId,
@@ -71,11 +72,16 @@ const UserInfoCardInteraction = ({
             : "Follow"}
         </button>
       </form>
-      <form action={block} className="self-end">
-        <button className="text-red-400 text-xs cursor-pointer hover:underline hover:text-red-600 dark:hover:text-red-300 transition-colors">
-          {optimisticState.blocked ? "Unblock User" : "Block User"}
-        </button>
-      </form>
+      
+      <div className="flex items-center justify-between text-xs">
+        <ReportUserButton userId={userId} username={userId.split('-')[0]} />
+        
+        <form action={block}>
+          <button className="text-red-400 cursor-pointer hover:underline hover:text-red-600 dark:hover:text-red-300 transition-colors">
+            {optimisticState.blocked ? "Unblock User" : "Block User"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

@@ -292,7 +292,7 @@ const Post = ({ post }: { post: FeedPostType }) => {
               </span>
             </Link>
           </div>
-          {postData.currentUserId === post.user.id && <PostInfo post={postWithComments} />}
+          <PostInfo post={postWithComments} currentUserId={postData.currentUserId || undefined} />
         </div>
         {/* DESC */}
         <div className="flex flex-col gap-4">

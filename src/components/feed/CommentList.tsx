@@ -223,6 +223,7 @@ function CommentList({
         website: "",
         birthDate: null,
         createdAt: now,
+        role: "user",
       },
     };
 
@@ -607,7 +608,7 @@ function CommentList({
           >
             <input
               name="comment"
-              placeholder="Write a comment..."
+              placeholder="Viết 1 comment..."
               className="flex-1 bg-zinc-100 dark:bg-zinc-800/50 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 ring-emerald-500/20 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 text-zinc-600 dark:text-zinc-300"
             />
             <button

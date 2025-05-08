@@ -5,13 +5,13 @@ import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Introvertia - Connect With Us",
-  description: "A social platform designed by for introverts."
+  description: "A social platform designed by Nguyen Phan Hoang Quan."
 }
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-white relative overflow-hidden rounded-2xl">
-      {/* Background decorative elements */}
+      {/* Background thiết kế */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-[30%] -left-[20%] w-[80%] h-[80%] rounded-full bg-gradient-to-br from-emerald-900/20 to-purple-900/5 blur-3xl"></div>
         <div className="absolute -bottom-[30%] -right-[20%] w-[80%] h-[80%] rounded-full bg-gradient-to-br from-purple-900/20 to-emerald-900/5 blur-3xl"></div>
@@ -65,10 +65,11 @@ export default function LandingPage() {
               <div className="px-3 py-1 rounded-full bg-emerald-400/10 border border-emerald-400/20 text-emerald-400 text-xs font-medium">
                 NEW
               </div>
-              <span className="text-zinc-400 text-sm">The social network for introverts</span>
+              <span className="text-zinc-400 text-sm">The social network made by Nguyễn Phan Hoàng Quân</span>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold leading-tight">
               Connect With <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-500 animate-gradient">Us</span>
+              <br />Kết nối với <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-500 animate-gradient">Chúng Tôi</span>
             </h1>
             <p className="text-xl text-zinc-300 max-w-lg">
               A social platform designed by Nguyễn Phan Hoàng Quân.
@@ -110,7 +111,7 @@ export default function LandingPage() {
                 height={600}
                 className="rounded-2xl"
               />
-              {/* Overlay gradient on hover */}
+              {/* Overlay gradient khi hover */}
               <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500"></div>
               {/* Animated orbs */}
               <div className="absolute top-5 right-5 w-20 h-20 rounded-full bg-gradient-to-br from-purple-500/10 to-emerald-500/20 blur-xl animate-pulse-slow"></div>
@@ -140,7 +141,7 @@ export default function LandingPage() {
               Why Choose <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-500">INTROVERTIA</span>
             </h2>
             <p className="text-zinc-400 max-w-2xl mx-auto">
-              Designed with the needs of introverts in mind, our platform offers features that respect your social energy and personal space.
+              Thiết kế dựa trên nhu cầu của người dùng.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -183,17 +184,17 @@ export default function LandingPage() {
                 <StepCard 
                   number="1"
                   title="Create Your Space"
-                  description="Set up your profile...."
+                  description="Tạo profile của bạn và tùy biến nó theo ý thích...."
                 />
                 <StepCard 
                   number="2"
                   title="Connect"
-                  description="Finds people who share your interests and communication style."
+                  description="Tìm bạn bè hợp ý."
                 />
                 <StepCard 
                   number="3"
                   title="Engage On Your Terms"
-                  description="Lets others know when you need space."
+                  description="Hãy để mọi người không làm phiền thời gian riêng tư của bạn."
                 />
               </div>
             </div>
@@ -229,7 +230,7 @@ export default function LandingPage() {
               What Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-500">Users Say</span>
             </h2>
             <p className="text-zinc-400 max-w-2xl mx-auto">
-              Hear from our community of introverts.
+              Xem các bài review của các người dùng.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -310,7 +311,7 @@ export default function LandingPage() {
               <span className="text-emerald-400 font-bold text-2xl">INTROVERTIA</span>
             </div>
             <p className="text-zinc-400 text-center max-w-md mb-8">
-              A social platform created by Nguyen Phan Hoang Quan.
+              A social platform designed by Nguyen Phan Hoang Quan.
             </p>
             <div className="flex gap-4 mb-8">
               <SocialButton icon={<Users className="w-5 h-5" />} />
@@ -333,7 +334,7 @@ export default function LandingPage() {
   )
 }
 
-// Reusable components
+// Components tái sử dụng
 const NavLink = ({ href, children }: { href: string, children: React.ReactNode }) => (
   <Link 
     href={href} 
