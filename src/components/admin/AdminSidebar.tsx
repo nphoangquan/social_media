@@ -6,7 +6,7 @@ import {
   LayoutDashboard,
   Users,
   AlertTriangle,
-  Settings,
+  // Settings,
   BarChart3,
   ShieldAlert,
   Home,
@@ -49,12 +49,12 @@ const AdminSidebar = ({ userRole }: AdminSidebarProps) => {
       icon: <BarChart3 className="h-5 w-5" />,
       access: ["admin"],
     },
-    {
-      name: "Cài đặt",
-      href: "/admin/settings",
-      icon: <Settings className="h-5 w-5" />,
-      access: ["admin"],
-    },
+    // {
+    //   name: "Cài đặt",
+    //   href: "/admin/settings",
+    //   icon: <Settings className="h-5 w-5" />,
+    //   access: ["admin"],
+    // },
   ];
 
   return (

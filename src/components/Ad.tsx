@@ -25,7 +25,7 @@ const Ad = ({ size }: { size: "sm" | "md" | "lg" }) => {
             />
           </div>
           
-          {/* Logo and Title */}
+          {/* Logo và Title */}
           <div className="flex items-center gap-3 px-4">
             <div className="relative w-8 h-8 rounded-md overflow-hidden">
               <Image

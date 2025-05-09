@@ -244,7 +244,7 @@ export default function SearchBar() {
                 </div>
               )}
 
-              {/* No Results */}
+              {/* Không có Results */}
               {query.trim().length >= 2 && 
                 searchResults.users.length === 0 && 
                 searchResults.posts.length === 0 && (
