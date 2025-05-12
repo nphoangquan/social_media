@@ -1,6 +1,5 @@
 # Introvertia - Social Network - ĐỒ ÁN CƠ SỞ
 
-<!-- [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) -->
 ![React Version](https://img.shields.io/badge/React-19-61DAFB?logo=react)
 ![Next.js Version](https://img.shields.io/badge/Next.js-15.2.4-000000?logo=next.js)
 ![Prisma Version](https://img.shields.io/badge/Prisma-6.5.0-2D3748?logo=prisma)
@@ -48,6 +47,7 @@ Trang mạng xã hội được thực hiện bởi Nguyễn Phan Hoàng Quân
 - Tạo caption tự động cho ảnh bằng AI
 - Tóm tắt nội dung bằng AI
 - Dịch đa ngôn ngữ với AI
+- AI ChatBot Hỗ trợ
 
 ### Eng
 - Real-time chat with Socket.io
@@ -71,6 +71,7 @@ Trang mạng xã hội được thực hiện bởi Nguyễn Phan Hoàng Quân
 - AI caption generation for images
 - AI content summarization
 - Multi-language translation with AI
+- AI Assistant ChatBot
 
 ## Tech Stack - Công Nghệ Sử Dụng
 
