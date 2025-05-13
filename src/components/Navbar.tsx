@@ -15,7 +15,6 @@ import Image from "next/image";
 import NotificationBell from "./notifications/NotificationBell";
 import SearchBar from "./SearchBar";
 import MessagesBadge from "./messages/MessagesBadge";
-import ChatbotButton from "./common/ChatbotButton";
 import { useEffect, useState } from "react";
 
 interface NavbarProps {
@@ -185,25 +184,18 @@ const Navbar = ({ logoFont }: NavbarProps) => {
             )}
             
             <div className="group relative p-1">
-              <ChatbotButton />
-              
-              {/* Hover highlight với shimmer */}
-              <div className="absolute inset-0 bg-emerald-500/10 opacity-0 rounded-full group-hover:opacity-100 overflow-hidden transition-opacity duration-200 -z-10">
-                <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
-              </div>
+              <Link href="/friend-requests" className="group relative p-1">
+                <div className="relative">
+                  <UserPlus className="w-5 h-5 sm:w-6 sm:h-6 text-white transition-opacity duration-200" />
+                  <UserPlus className="w-5 h-5 sm:w-6 sm:h-6 absolute inset-0 text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                </div>
+                
+                {/* Hover highlight với shimmer */}
+                <div className="absolute inset-0 bg-emerald-500/10 opacity-0 rounded-full group-hover:opacity-100 overflow-hidden transition-opacity duration-200 -z-10">
+                  <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
+                </div>
+              </Link>
             </div>
-            
-            <Link href="/friend-requests" className="group relative p-1">
-              <div className="relative">
-                <UserPlus className="w-5 h-5 sm:w-6 sm:h-6 text-white transition-opacity duration-200" />
-                <UserPlus className="w-5 h-5 sm:w-6 sm:h-6 absolute inset-0 text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-              </div>
-              
-              {/* Hover highlight với shimmer */}
-              <div className="absolute inset-0 bg-emerald-500/10 opacity-0 rounded-full group-hover:opacity-100 overflow-hidden transition-opacity duration-200 -z-10">
-                <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
-              </div>
-            </Link>
             
             <Link href="/messages" className="group relative p-1">
               <div className="relative">

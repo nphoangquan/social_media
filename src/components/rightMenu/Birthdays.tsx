@@ -73,7 +73,7 @@ const Birthdays = () => {
     <div className="p-6 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-zinc-800/20 text-sm border border-zinc-100/50 dark:border-zinc-800/50 hover:shadow-xl dark:hover:shadow-zinc-800/30 transition-all duration-300">
       {/* TOP */}
       <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 font-medium mb-5">
-        <span className="text-xs uppercase tracking-wider font-semibold">Birthdays</span>
+        <span className="text-xs uppercase tracking-wider font-semibold">Sinh nhật - Birthdays</span>
         <MoreVertical className="w-4 h-4 cursor-pointer hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors" />
       </div>
 
@@ -96,7 +96,7 @@ const Birthdays = () => {
                   {friend.name || friend.username}
                 </span>
                 <span className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
-                  <Cake className="w-3 h-3" /> Today
+                  <Cake className="w-3 h-3" /> Hôm nay - Today
                 </span>
               </div>
               <button 
@@ -128,7 +128,7 @@ const Birthdays = () => {
           </div>
           <div className="flex flex-col gap-1">
             <span className="text-zinc-800 dark:text-zinc-200 font-medium group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-              Upcoming Birthdays
+              Sinh nhật sắp tới - Upcoming Birthdays
             </span>
             <span className="text-xs text-zinc-500 dark:text-zinc-400">
               {upcomingBirthdaysCount} friend{upcomingBirthdaysCount !== 1 ? 's' : ''} with upcoming birthdays

@@ -102,9 +102,9 @@ const UpdateUser = ({ user }: { user: User }) => {
             }
             className="p-10 bg-white dark:bg-zinc-900 rounded-2xl shadow-lg dark:shadow-zinc-800/20 border border-zinc-100/50 dark:border-zinc-800/50 flex flex-col gap-4 w-full md:w-1/2 xl:w-1/3 relative"
           >
-            <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Update Profile</h1>
+            <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Cập nhật profile</h1>
             <div className="text-xs text-zinc-500 dark:text-zinc-400">
-              Use the navbar profile to change the avatar or username.
+              Sử dụng thanh bên để thay đổi avatar hoặc tên người dùng.
             </div>
 
             {/* Hidden file input */}
@@ -121,7 +121,7 @@ const UpdateUser = ({ user }: { user: User }) => {
               onClick={() => fileInputRef.current?.click()}
             >
               <label className="text-xs text-zinc-600 dark:text-zinc-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                Cover Picture
+                Hình nền
               </label>
               <div className="flex items-center gap-2">
                 <div className="w-12 h-8 rounded-md overflow-hidden shadow-sm relative group-hover:shadow-md transition-all">
@@ -164,7 +164,7 @@ const UpdateUser = ({ user }: { user: User }) => {
               })}
               <div className="flex flex-col gap-1 w-full md:w-[48%]">
                 <label htmlFor="birthDate" className="text-xs text-zinc-600 dark:text-zinc-300">
-                  Birth Date
+                  Ngày Sinh
                 </label>
                 <input
                   type="date"

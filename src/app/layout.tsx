@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import { ClerkProvider } from "@clerk/nextjs";
 import { NotificationProvider } from "@/lib/contexts/NotificationContext";
 import AvatarRefresh from "@/components/AvatarRefresh";
+import Chatbot from '@/components/Chatbot';
 
 const inter = Inter({ subsets: ["latin"] });
 const orbitron = Orbitron({ subsets: ["latin"] });
@@ -41,6 +42,7 @@ export default function RootLayout({
             <div className="bg-zinc-950 px-4 md:px-8 lg:px-24 xl:px-40 2xl:px-80 pt-4">
               {children}
             </div>
+            <Chatbot />
           </NotificationProvider>
         </body>
       </html>

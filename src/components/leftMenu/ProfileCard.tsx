@@ -102,7 +102,7 @@ const ProfileCard = async () => {
           "text-white text-sm font-medium px-8 py-2.5 rounded-xl transition-all duration-300",
           "group-hover:shadow-md group-hover:shadow-emerald-500/10 dark:group-hover:shadow-emerald-400/5",
         )}>
-          <span>View Profile</span>
+          <span>Profile</span>
           <ExternalLink className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
           
           {/* Button hover effect */}

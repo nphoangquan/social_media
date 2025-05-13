@@ -98,7 +98,7 @@ const UserInfoCard = async ({ user }: { user: User }) => {
           <div className="flex items-center gap-2 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group">
             <MapPin className="w-4 h-4 group-hover:scale-110 transition-transform" />
             <span>
-              Living in <b className="text-zinc-800 dark:text-zinc-200">{user.city}</b>
+              Sống tại <b className="text-zinc-800 dark:text-zinc-200">{user.city}</b>
             </span>
           </div>
         )}
@@ -107,7 +107,7 @@ const UserInfoCard = async ({ user }: { user: User }) => {
           <div className="flex items-center gap-2 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group">
             <GraduationCap className="w-4 h-4 group-hover:scale-110 transition-transform" />
             <span>
-              Went to <b className="text-zinc-800 dark:text-zinc-200">{user.school}</b>
+              Đã tốt nghiệp tại <b className="text-zinc-800 dark:text-zinc-200">{user.school}</b>
             </span>
           </div>
         )}
@@ -116,7 +116,7 @@ const UserInfoCard = async ({ user }: { user: User }) => {
           <div className="flex items-center gap-2 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group">
             <Briefcase className="w-4 h-4 group-hover:scale-110 transition-transform" />
             <span>
-              Works at <b className="text-zinc-800 dark:text-zinc-200">{user.work}</b>
+              Làm việc tại <b className="text-zinc-800 dark:text-zinc-200">{user.work}</b>
             </span>
           </div>
         )}
@@ -136,13 +136,13 @@ const UserInfoCard = async ({ user }: { user: User }) => {
         {user.birthDate && (
           <div className="flex gap-1 items-center text-xs text-zinc-500 dark:text-zinc-400 group hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
             <Cake className="w-4 h-4 group-hover:scale-110 transition-transform" />
-            <span>Born on <b className="text-zinc-800 dark:text-zinc-200">{formattedBirthDate}</b></span>
+            <span>Sinh ngày <b className="text-zinc-800 dark:text-zinc-200">{formattedBirthDate}</b></span>
           </div>
         )}
         
         <div className="flex gap-1 items-center text-xs text-zinc-500 dark:text-zinc-400 group hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
           <CalendarDays className="w-4 h-4 group-hover:scale-110 transition-transform" />
-          <span>Joined {formattedDate}</span>
+          <span>Đã tham gia {formattedDate}</span>
         </div>
 
         {currentUserId && currentUserId !== user.id && (
