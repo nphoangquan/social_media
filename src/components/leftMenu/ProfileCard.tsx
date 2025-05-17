@@ -58,7 +58,7 @@ const ProfileCard = async () => {
       <div className="flex justify-center -mt-16 mb-4 relative z-10">
         <Link href={`/profile/${user.username}`} className="block">
           <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-white dark:ring-zinc-900 group-hover:ring-emerald-200 dark:group-hover:ring-emerald-900/30 transition-all duration-300 cursor-pointer">
-            {/* Pulse effect behind avatar */}
+            {/* Pulse effect o sau avatar */}
             <div className="absolute inset-0 rounded-full animate-pulse-slow bg-gradient-to-r from-emerald-400/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             
             <Image
@@ -75,7 +75,7 @@ const ProfileCard = async () => {
         </Link>
       </div>
       
-      {/* User info with enhanced styling */}
+      {/* User info voi enhanced styling */}
       <div className="text-center relative z-10">
         <h2 className="font-semibold text-zinc-800 dark:text-zinc-200 mb-1 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors duration-300">
           {user.name && user.surname
@@ -83,7 +83,7 @@ const ProfileCard = async () => {
             : user.username}
         </h2>
         
-        {/* Followers badge */}
+        {/* The Followers */}
         <div className="flex items-center justify-center gap-2 text-sm mb-4">
           <div className="py-1.5 px-3 bg-zinc-50/80 dark:bg-zinc-800/30 rounded-lg border border-zinc-100/80 dark:border-zinc-700/30 flex items-center gap-1.5">
             <Users className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
@@ -93,7 +93,7 @@ const ProfileCard = async () => {
         </div>
       </div>
       
-      {/* Button with enhanced styling */}
+      {/* Button voi styling tang cuong */}
       <Link href={`/profile/${user.username}`} className="block">
         <button className={cn(
           "relative w-full flex items-center justify-center gap-2 overflow-hidden",
@@ -105,7 +105,7 @@ const ProfileCard = async () => {
           <span>Profile</span>
           <ExternalLink className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
           
-          {/* Button hover effect */}
+          {/* Button hover hieu ung */}
           <div className="absolute inset-0 w-full h-full bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
         </button>
       </Link>

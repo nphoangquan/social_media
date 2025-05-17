@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 
 const openai = new OpenAI();
 
-// Define interface for query analysis
+// Define interface chỉ định phân tích câu hỏi
 interface QueryAnalysis {
   type: string;
   entities: string[];
@@ -18,7 +18,7 @@ interface QueryAnalysis {
   searchTerms: string[]; // Từ khóa tìm kiếm
 }
 
-// Interface for User data
+// Interface dữ liệu người dùng
 interface UserData {
   id: string;
   username: string;
@@ -347,7 +347,7 @@ export async function POST(req: Request) {
   try {
     const { userId } = await auth();
     
-    // Kiểm tra người dùng đã đăng nhập chưa
+    // Kiểm tra người dùng đã đăng nhập
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
@@ -361,7 +361,7 @@ export async function POST(req: Request) {
     const relevantData = await getRelevantData(userId, queryAnalysis);
     const currentUser = relevantData.currentUser as UserData | undefined;
 
-    // Tạo system prompt thông minh
+    // Tạo system prompt
     const systemPrompt = `Bạn là một trợ lý AI thông minh cho mạng xã hội. 
     Hãy tuân thủ các quy tắc sau:
     1. Chỉ trả lời dựa trên thông tin có sẵn trong context
