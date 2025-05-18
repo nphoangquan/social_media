@@ -216,7 +216,7 @@ const CreatePostModal = ({ onClose }: CreatePostModalProps) => {
       <div className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-xl max-h-[90vh] shadow-lg dark:shadow-zinc-800/20 border border-zinc-100/50 dark:border-zinc-800/50 flex flex-col relative">
         {/* Header */}
         <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-center relative">
-          <h2 className="text-xl font-semibold text-zinc-800 dark:text-zinc-200">Create post</h2>
+          <h2 className="text-xl font-semibold text-zinc-800 dark:text-zinc-200">Tạo post</h2>
           <button 
             type="button"
             onClick={onClose}
@@ -305,7 +305,7 @@ const CreatePostModal = ({ onClose }: CreatePostModalProps) => {
           <div className="p-4 border-t border-zinc-100 dark:border-zinc-800">
             <div className="flex items-center justify-between">
               <div className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Add to your post
+                Thêm vào post
               </div>
               <div className="flex items-center gap-4">
                 {/* Hidden file inputs */}

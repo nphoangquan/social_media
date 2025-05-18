@@ -39,7 +39,7 @@ export default function Stories({ stories }: { stories: StoryWithUser[] }) {
               <div className="w-10 h-10 rounded-full bg-emerald-800/80 backdrop-blur-sm flex items-center justify-center shadow-lg border border-emerald-400/30">
                 <Plus className="w-5 h-5 text-emerald-100" />
               </div>
-              <span className="text-sm font-medium text-white">Create Story</span>
+              <span className="text-sm font-medium text-white">Tạo Story</span>
             </div>
           </button>
         </div>

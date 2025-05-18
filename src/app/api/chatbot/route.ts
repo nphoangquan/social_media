@@ -53,19 +53,8 @@ async function analyzeQuery(query: string): Promise<QueryAnalysis> {
   try {
     const analysis = JSON.parse(completion.choices[0].message.content || "{}") as Partial<QueryAnalysis>;
     
-    // Xác định searchMode dựa trên từ khóa
-    let defaultSearchMode: 'user_data' | 'global' | 'both' = 'user_data';
-    if (
-      query.toLowerCase().includes('tìm') || 
-      query.toLowerCase().includes('kiếm') || 
-      query.toLowerCase().includes('search') ||
-      query.toLowerCase().includes('ai') ||
-      query.toLowerCase().includes('người') ||
-      query.toLowerCase().includes('bài') ||
-      query.toLowerCase().includes('tên')
-    ) {
-      defaultSearchMode = 'global';
-    }
+    // Mặc định sử dụng chế độ tìm kiếm 'both' để chatbot được tự do tìm kiếm
+    const defaultSearchMode: 'user_data' | 'global' | 'both' = 'both';
     
     // Đảm bảo các trường mặc định
     const finalAnalysis: QueryAnalysis = {
@@ -81,10 +70,8 @@ async function analyzeQuery(query: string): Promise<QueryAnalysis> {
   } catch (error) {
     console.error('Error parsing analysis response:', error);
     
-    // Xác định chế độ tìm kiếm dựa trên từ khóa
-    const searchMode: 'user_data' | 'global' | 'both' = query.toLowerCase().includes('tìm') || 
-                        query.toLowerCase().includes('kiếm') || 
-                        query.toLowerCase().includes('search') ? 'global' : 'user_data';
+    // Mặc định sử dụng chế độ tìm kiếm 'both' để chatbot được tự do tìm kiếm
+    const searchMode: 'user_data' | 'global' | 'both' = 'both';
     
     return { 
       type: "general", 
@@ -124,6 +111,7 @@ async function getRelevantData(userId: string, analysis: QueryAnalysis): Promise
       if (analysis.type === 'users' || analysis.type === 'general') {
         const searchTerms = analysis.searchTerms?.filter(term => term.length > 2) || [];
         
+        // Nếu có từ khóa, tìm theo từ khóa, nếu không thì lấy một số người dùng gần đây
         if (searchTerms.length > 0) {
           const searchConditions = searchTerms.map(term => ({
             OR: [
@@ -138,6 +126,28 @@ async function getRelevantData(userId: string, analysis: QueryAnalysis): Promise
               OR: searchConditions,
             },
             take: 5,
+            select: {
+              id: true,
+              username: true,
+              name: true,
+              surname: true,
+              description: true,
+              avatar: true,
+              createdAt: true,
+              _count: {
+                select: {
+                  posts: true,
+                  followers: true,
+                  followings: true
+                }
+              }
+            }
+          });
+        } else {
+          // Nếu không có từ khóa, lấy 5 người dùng gần đây
+          data.foundUsers = await prisma.user.findMany({
+            take: 5,
+            orderBy: { createdAt: 'desc' },
             select: {
               id: true,
               username: true,
@@ -190,6 +200,28 @@ async function getRelevantData(userId: string, analysis: QueryAnalysis): Promise
               }
             }
           });
+        } else {
+          // Nếu không có từ khóa, lấy 5 bài viết gần đây
+          data.foundPosts = await prisma.post.findMany({
+            take: 5,
+            orderBy: { createdAt: 'desc' },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  username: true,
+                  name: true,
+                  avatar: true,
+                }
+              },
+              _count: {
+                select: {
+                  comments: true,
+                  likes: true
+                }
+              }
+            }
+          });
         }
       }
       
@@ -206,6 +238,28 @@ async function getRelevantData(userId: string, analysis: QueryAnalysis): Promise
             where: {
               OR: searchConditions,
             },
+            take: 5,
+            orderBy: { createdAt: 'desc' },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  username: true,
+                  name: true,
+                  avatar: true,
+                }
+              },
+              post: {
+                select: {
+                  id: true,
+                  desc: true,
+                }
+              }
+            }
+          });
+        } else {
+          // Nếu không có từ khóa, lấy 5 bình luận gần đây
+          data.foundComments = await prisma.comment.findMany({
             take: 5,
             orderBy: { createdAt: 'desc' },
             include: {
@@ -362,28 +416,24 @@ export async function POST(req: Request) {
     const currentUser = relevantData.currentUser as UserData | undefined;
 
     // Tạo system prompt
-    const systemPrompt = `Bạn là một trợ lý AI thông minh cho mạng xã hội. 
-    Hãy tuân thủ các quy tắc sau:
-    1. Chỉ trả lời dựa trên thông tin có sẵn trong context
-    2. Nếu không có thông tin hoặc dữ liệu rỗng, hãy nói "Tôi không tìm thấy thông tin về điều này trong dữ liệu" một cách tự nhiên
-    3. Không được bịa ra thông tin
-    4. Trả lời ngắn gọn, rõ ràng và hữu ích
-    5. Sử dụng ngôn ngữ tự nhiên, thân thiện
-    6. Với các câu hỏi không liên quan đến mạng xã hội, hãy trả lời một cách chung chung
+    const systemPrompt = `Bạn là một trợ lý AI thông minh và đa năng cho mạng xã hội, với khả năng tự do truy xuất và đưa ra thông tin phù hợp.
     
-    Phân tích câu hỏi:
-    - Loại câu hỏi: ${queryAnalysis.type}
-    - Chế độ tìm kiếm: ${queryAnalysis.searchMode} (user_data = chỉ trong dữ liệu người dùng, global = toàn bộ database)
-    - Từ khóa tìm kiếm: ${queryAnalysis.searchTerms?.join(', ') || 'Không có'}
-    - Thực thể được đề cập: ${queryAnalysis.entities?.join(', ') || 'Không có'}
-    - Khoảng thời gian: ${queryAnalysis.timeRange}
+    Hãy tuân thủ các quy tắc sau:
+    1. Hỗ trợ người dùng một cách toàn diện và chủ động
+    2. Trả lời thoải mái mà không bị ràng buộc chặt chẽ vào từ khóa cụ thể
+    3. Cung cấp thông tin hữu ích từ dữ liệu có sẵn 
+    4. Đảm bảo thông tin đưa ra phải chính xác, không bịa thông tin
+    5. Sử dụng ngôn ngữ tự nhiên, thân thiện và phù hợp với ngữ cảnh
+    6. Nếu không có thông tin cụ thể, hãy cung cấp thông tin tổng quan hoặc gợi ý có liên quan
+
+    Chế độ tìm kiếm: ${queryAnalysis.searchMode} (đã được cấu hình để tìm kiếm cả dữ liệu người dùng và toàn cục)
     
     Dữ liệu liên quan:
     ${JSON.stringify(relevantData, null, 2)}
     
     Người dùng hiện tại có username: ${currentUser?.username || 'unknown'}
     
-    Trả lời câu hỏi của người dùng dựa trên dữ liệu được cung cấp. Nếu là tìm kiếm bài viết/người dùng và không tìm thấy, hãy nói rõ là không tìm thấy thông tin phù hợp.`;
+    Hãy phân tích dữ liệu được cung cấp và đưa ra câu trả lời hữu ích nhất. Nếu câu hỏi yêu cầu dữ liệu không có trong context, hãy đưa ra các thông tin tổng quan liên quan và gợi ý cho người dùng.`;
 
     // Gọi OpenAI API
     const completion = await openai.chat.completions.create({
@@ -393,7 +443,7 @@ export async function POST(req: Request) {
         { role: "user", content: message }
       ],
       temperature: 0.7,
-      max_tokens: 1000,
+      max_tokens: 1600,
       presence_penalty: 0.6,
       frequency_penalty: 0.3,
     });

@@ -95,7 +95,7 @@ const BirthdaysPage = () => {
   if (friends.length === 0) {
     return (
       <div className="p-8 max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">Sinh Nhật</h1>
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">Birthdays - Sinh Nhật</h1>
         <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 text-center">
           <div className="flex flex-col items-center gap-4">
             <Cake className="w-12 h-12 text-zinc-400 dark:text-zinc-500" />
@@ -111,7 +111,7 @@ const BirthdaysPage = () => {
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">Sinh Nhật</h1>
+      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">Birthdays - Sinh Nhật</h1>
       
       {/* Sinh Nhật Hôm Nay */}
       {friends.some(friend => friend.isBirthdayToday) && (

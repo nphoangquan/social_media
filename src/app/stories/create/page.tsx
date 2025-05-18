@@ -107,7 +107,7 @@ export default function CreateStoryPage() {
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 rounded-lg">
       <div className="max-w-md w-full bg-zinc-900/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-xl p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-semibold text-zinc-100">Create Story</h1>
+          <h1 className="text-xl font-semibold text-zinc-100">Tạo Story</h1>
           <button 
             onClick={() => router.push("/stories")}
             className="p-2 hover:bg-zinc-800 rounded-full transition-colors"
@@ -152,8 +152,8 @@ export default function CreateStoryPage() {
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="w-12 h-12 text-zinc-600 mb-4" />
-              <p className="text-zinc-400 text-center mb-2">Drag and drop or click to upload</p>
-              <p className="text-zinc-500 text-sm text-center">Upload an image or video for your story</p>
+              <p className="text-zinc-400 text-center mb-2">Kéo và thả hoặc bấm để tải lên</p>
+              <p className="text-zinc-500 text-sm text-center">Tải lên hình ảnh hoặc video cho story</p>
               
               <div className="flex gap-4 mt-6">
                 <div className="flex items-center gap-2 text-emerald-500 text-sm">
@@ -189,7 +189,7 @@ export default function CreateStoryPage() {
             
             {/* Content */}
             <span className="relative z-10 text-white font-medium">
-              {loading ? "Creating..." : "Create Story"}
+              {loading ? "Creating..." : "Tạo Story"}
             </span>
           </button>
         </form>

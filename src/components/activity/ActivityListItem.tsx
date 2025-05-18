@@ -99,7 +99,7 @@ export default function ActivityListItem({ activity }: { activity: ActivityItem 
             href={link}
             className="inline-flex items-center gap-1 text-xs px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-800/40 transition-colors"
           >
-            <span>View Post</span>
+            <span>Xem Post</span>
           </Link>
         </div>
         

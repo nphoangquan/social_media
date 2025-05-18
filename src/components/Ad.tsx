@@ -53,7 +53,7 @@ const Ad = ({ size }: { size: "sm" | "md" | "lg" }) => {
           {/* Button */}
           <div className="px-4 pb-4">
             <button className="bg-zinc-800 text-zinc-200 p-2.5 text-xs rounded-lg hover:bg-zinc-700 transition-colors font-medium w-full">
-              Learn more
+              Learn more - Xem thêm
             </button>
           </div>
         </div>

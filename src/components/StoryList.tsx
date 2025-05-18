@@ -182,7 +182,7 @@ const StoryList = ({
             
             {/* Text với direct effect khi hover */}
             <span className="text-white font-medium text-sm relative">
-              {uploading ? "Uploading..." : "Create story"}
+              {uploading ? "Uploading..." : "Tạo Story"}
               <span className="absolute bottom-0 left-0 w-full h-0.5 bg-emerald-500 scale-x-0 transition-transform duration-300 hover:scale-x-100"></span>
             </span>
           </div>

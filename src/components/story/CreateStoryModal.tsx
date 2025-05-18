@@ -114,7 +114,7 @@ export default function CreateStoryModal({ onClose }: { onClose: () => void }) {
       <div className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-lg shadow-lg dark:shadow-zinc-800/20 border border-zinc-100/50 dark:border-zinc-800/50">
         {/* Header */}
         <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-zinc-800 dark:text-zinc-200">Create Story</h2>
+          <h2 className="text-xl font-semibold text-zinc-800 dark:text-zinc-200">Tạo Story</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
@@ -135,7 +135,7 @@ export default function CreateStoryModal({ onClose }: { onClose: () => void }) {
                     <Upload className="w-8 h-8 text-emerald-500" />
                   </div>
                   <div className="text-sm text-zinc-500 dark:text-zinc-400">
-                    Click to upload your story
+                    Bấm để upload story
                   </div>
                   <div className="flex gap-4">
                     <button

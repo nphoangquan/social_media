@@ -21,14 +21,14 @@ export default async function StoriesPage() {
                 <Plus className="w-8 h-8 text-white" />
               </div>
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">Start Your Story</h1>
-            <p className="text-zinc-400 mb-8">Share your moments with friends in a creative way</p>
+            <h1 className="text-2xl font-bold text-white mb-2">STORIES</h1>
+            <p className="text-zinc-400 mb-8">Chia sẻ khoảnh khắc của bạn với bạn bè bằng cách tạo story</p>
             <Link 
               href="/stories/create" 
               className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white rounded-xl font-medium inline-flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-[1.02]"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Create First Story</span>
+              <span>Tạo Story</span>
             </Link>
           </div>
         </div>
@@ -55,7 +55,7 @@ export default async function StoriesPage() {
             </div>
             
             <p className="text-zinc-400 text-center text-sm mb-8">
-              Select a story from the list or create your own
+              Chọn story từ danh sách hoặc tạo story
             </p>
             
             {/* Phần Featured story preview */}
@@ -111,14 +111,14 @@ export default async function StoriesPage() {
                 className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium inline-flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 hover:scale-[1.02] flex-1 justify-center"
               >
                 <Clock className="w-4 h-4" />
-                <span>View Latest</span>
+                <span>Xem Mới Nhất</span>
               </Link>
               <Link 
                 href="/stories/create" 
                 className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white rounded-xl font-medium inline-flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-[1.02] flex-1 justify-center"
               >
                 <Sparkles className="w-4 h-4" />
-                <span>Create New</span>
+                <span>Tạo Mới</span>
               </Link>
             </div>
           </div>

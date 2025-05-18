@@ -178,14 +178,14 @@ export default function StoryList({ stories: initialStories, currentStoryId }: {
                 <Plus className="w-5 h-5 text-emerald-100" />
               </div>
               <div className="flex flex-col ml-3">
-                <span className="text-white font-semibold text-lg group-hover:translate-x-1 transition-transform duration-300">Create Story</span>
-                <span className="text-emerald-100/70 text-xs group-hover:translate-x-1 transition-transform duration-500">Share your moments</span>
+                <span className="text-white font-semibold text-lg group-hover:translate-x-1 transition-transform duration-300">Tạo Story</span>
+                <span className="text-emerald-100/70 text-xs group-hover:translate-x-1 transition-transform duration-500">Chia sẻ khoảnh khắc của bạn</span>
               </div>
             </div>
           </div>
           
           <div className="text-center py-4 text-zinc-400 text-sm">
-            No stories available
+            Không có story nào
           </div>
         </div>
       </div>
@@ -317,7 +317,7 @@ export default function StoryList({ stories: initialStories, currentStoryId }: {
             {loading ? (
               <div className="flex items-center gap-2">
                 <Loader2 className="w-5 h-5 text-emerald-400 animate-spin" />
-                <span className="text-sm text-zinc-400">Loading more stories...</span>
+                <span className="text-sm text-zinc-400">Loading nhiều stories...</span>
               </div>
             ) : (
               <div className="h-4" /> // Spacer to trigger intersection
