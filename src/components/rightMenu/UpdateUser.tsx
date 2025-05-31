@@ -92,7 +92,7 @@ const UpdateUser = ({ user }: { user: User }) => {
         className="text-emerald-500 text-xs cursor-pointer hover:underline hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors"
         onClick={() => setOpen(true)}
       >
-        Update
+        Cập nhật
       </span>
       {open && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">

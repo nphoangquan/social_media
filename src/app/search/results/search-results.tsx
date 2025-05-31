@@ -75,7 +75,7 @@ export function SearchResults() {
             <ArrowLeft className="w-6 h-6" />
           </Link>
           <h1 className="text-xl font-semibold text-zinc-100">
-            Search Results for &ldquo;{query}&rdquo;
+            Kết quả tìm kiếm cho &ldquo;{query}&rdquo;
           </h1>
         </div>
 
@@ -89,7 +89,7 @@ export function SearchResults() {
                 : "text-zinc-400 hover:text-zinc-200"
             }`}
           >
-            All
+            Tất cả
           </button>
           <button
             onClick={() => setActiveTab("people")}
@@ -99,7 +99,7 @@ export function SearchResults() {
                 : "text-zinc-400 hover:text-zinc-200"
             }`}
           >
-            People
+            Người dùng
           </button>
           <button
             onClick={() => setActiveTab("posts")}
@@ -109,7 +109,7 @@ export function SearchResults() {
                 : "text-zinc-400 hover:text-zinc-200"
             }`}
           >
-            Posts
+            Bài viết
           </button>
         </div>
 
@@ -123,9 +123,9 @@ export function SearchResults() {
             {/* No results */}
             {displayUsers.length === 0 && displayPosts.length === 0 && (
               <div className="text-center py-12">
-                <p className="text-zinc-400 text-lg">No results found</p>
+                <p className="text-zinc-400 text-lg">No results found - Không tìm thấy kết quả</p>
                 <p className="text-zinc-500 mt-2">
-                  Try different keywords or check your spelling
+                  Try different keywords or check your spelling - Thử từ khóa khác hoặc kiểm tra lại chính tả
                 </p>
               </div>
             )}
@@ -134,7 +134,7 @@ export function SearchResults() {
             {displayUsers.length > 0 && (
               <div className="mb-8">
                 {activeTab !== "people" && (
-                  <h2 className="text-lg font-medium text-zinc-200 mb-4">People</h2>
+                  <h2 className="text-lg font-medium text-zinc-200 mb-4">Người dùng</h2>
                 )}
                 <div className="space-y-4">
                   {displayUsers.map((user) => (
@@ -169,7 +169,7 @@ export function SearchResults() {
             {displayPosts.length > 0 && (
               <div>
                 {activeTab !== "posts" && (
-                  <h2 className="text-lg font-medium text-zinc-200 mb-4">Posts</h2>
+                  <h2 className="text-lg font-medium text-zinc-200 mb-4">Bài viết</h2>
                 )}
                 <div className="space-y-4">
                   {displayPosts.map((post) => (

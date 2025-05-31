@@ -21,9 +21,9 @@ const UserMediaCard = async ({ user }: { user: User }) => {
     <div className="p-6 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-zinc-800/20 border border-zinc-100/50 dark:border-zinc-800/50 text-sm">
       {/* TOP */}
       <div className="flex justify-between items-center mb-6">
-        <span className="font-medium text-zinc-600 dark:text-zinc-300">User Media</span>
+        <span className="font-medium text-zinc-600 dark:text-zinc-300">User Media - Media người dùng</span>
         <Link href={`/profile/${user.username}/photos`} className="text-emerald-500 dark:text-emerald-400 text-xs hover:text-emerald-600 dark:hover:text-emerald-500 transition-colors">
-          See all
+          Xem tất cả
         </Link>
       </div>
       {/* BOTTOM */}
@@ -40,7 +40,7 @@ const UserMediaCard = async ({ user }: { user: User }) => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
             ))
-          : <span className="text-zinc-500 dark:text-zinc-400 col-span-full text-center py-4">No media found!</span>}
+          : <span className="text-zinc-500 dark:text-zinc-400 col-span-full text-center py-4">No media found! - Không tìm thấy media!</span>}
       </div>
     </div>
   );

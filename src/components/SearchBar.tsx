@@ -238,7 +238,7 @@ export default function SearchBar() {
                     onClick={handleViewAllResults}
                     className="w-full p-2 flex items-center justify-center gap-2 bg-zinc-700/50 hover:bg-zinc-700 rounded-md text-zinc-300 hover:text-zinc-100 transition-colors"
                   >
-                    <span>View all results</span>
+                    <span>Xem tất cả kết quả</span>
                     <ExternalLink className="w-4 h-4" />
                   </button>
                 </div>

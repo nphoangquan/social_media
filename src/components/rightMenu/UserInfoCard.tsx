@@ -75,7 +75,7 @@ const UserInfoCard = async ({ user }: { user: User }) => {
     <div className="p-6 bg-white/80 dark:bg-zinc-900/80 rounded-2xl shadow-lg dark:shadow-zinc-800/20 text-sm border border-zinc-100/50 dark:border-zinc-800/50 hover:shadow-xl dark:hover:shadow-zinc-800/30 transition-all duration-300 flex flex-col gap-4">
       {/* TOP */}
       <div className="flex justify-between items-center mb-2 font-medium text-zinc-500 dark:text-zinc-400">
-        <span className="text-xs uppercase tracking-wider font-semibold">User Information</span>
+        <span className="text-xs uppercase tracking-wider font-semibold">User Info - Thông tin người dùng</span>
         {currentUserId === user.id ? (
           <UpdateUser user={user} />
         ) : (

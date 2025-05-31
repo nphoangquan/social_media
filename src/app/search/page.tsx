@@ -50,8 +50,8 @@ export default function SearchPage() {
         
         {/* Instructions */}
         <div className="text-zinc-400 text-center mt-8">
-          <p>Search for people or posts</p>
-          <p className="text-sm mt-2">Try typing names, usernames, or keywords from posts</p>
+          <p>Tìm kiếm người dùng hoặc bài viết</p>
+          <p className="text-sm mt-2">Thử gõ tên, tên người dùng, hoặc từ khóa từ bài viết</p>
         </div>
       </div>
     </div>

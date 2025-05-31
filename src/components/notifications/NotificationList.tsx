@@ -164,8 +164,8 @@ const NotificationList = () => {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-center">
         <Bell className="w-16 h-16 text-zinc-600 mb-4" />
-        <h3 className="text-xl font-semibold">No notifications</h3>
-        <p className="text-zinc-500 mt-2">You will receive notifications when someone interacts with you</p>
+        <h3 className="text-xl font-semibold">Không có thông báo</h3>
+        <p className="text-zinc-500 mt-2">Bạn sẽ nhận được thông báo khi có sự tương tác với bạn</p>
       </div>
     );
   }
@@ -175,7 +175,7 @@ const NotificationList = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-sm text-zinc-400">
-            {unreadCount > 0 ? `${unreadCount} unread notifications` : 'All read'}
+            {unreadCount > 0 ? `${unreadCount} thông báo chưa đọc` : 'Tất cả đã đọc'}
           </span>
         </div>
         
@@ -185,7 +185,7 @@ const NotificationList = () => {
               onClick={markAllAsRead}
               className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
             >
-              Mark all as read
+              Đánh dấu tất cả đã đọc
             </button>
           )}
           
@@ -197,12 +197,12 @@ const NotificationList = () => {
             {isDeletingAll ? (
               <>
                 <div className="w-3 h-3 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
-                Deleting...
+                Đang xóa...
               </>
             ) : (
               <>
                 <Trash2 className="w-4 h-4" />
-                Delete all
+                Xóa tất cả
               </>
             )}
           </button>
@@ -211,7 +211,7 @@ const NotificationList = () => {
       
       {todayNotifications.length > 0 && (
         <div className="flex flex-col gap-2">
-          <h3 className="font-semibold text-sm text-zinc-500 uppercase">Today</h3>
+          <h3 className="font-semibold text-sm text-zinc-500 uppercase">Hôm nay</h3>
           <div className="flex flex-col divide-y divide-zinc-800 border border-zinc-800 rounded-lg overflow-hidden">
             {todayNotifications.map((notification) => (
               <NotificationItem key={notification.id} notification={notification} />
@@ -222,7 +222,7 @@ const NotificationList = () => {
       
       {earlierNotifications.length > 0 && (
         <div className="flex flex-col gap-2">
-          <h3 className="font-semibold text-sm text-zinc-500 uppercase">Earlier</h3>
+          <h3 className="font-semibold text-sm text-zinc-500 uppercase">Trước đây</h3>
           <div className="flex flex-col divide-y divide-zinc-800 border border-zinc-800 rounded-lg overflow-hidden">
             {earlierNotifications.map((notification) => (
               <NotificationItem key={notification.id} notification={notification} />

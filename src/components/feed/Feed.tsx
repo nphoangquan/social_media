@@ -145,7 +145,7 @@ const Feed = ({ username }: FeedProps) => {
         ))
       ) : (
         <div className="text-center py-8 text-zinc-500 dark:text-zinc-400 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl shadow-md dark:shadow-zinc-800/20">
-          No posts found!
+          No posts found! - Không có bài viết nào được tìm thấy!
         </div>
       )}
       {loading && (

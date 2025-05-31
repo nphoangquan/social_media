@@ -69,7 +69,7 @@ export default function NewChatDialog({ userId }: NewChatDialogProps) {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-zinc-900 rounded-lg shadow-lg w-full max-w-md overflow-hidden">
             <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
-              <h3 className="text-lg font-medium">New Message</h3>
+              <h3 className="text-lg font-medium">Tạo cuộc trò chuyện mới</h3>
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-1 rounded-full hover:bg-zinc-800 transition-colors"
@@ -84,7 +84,7 @@ export default function NewChatDialog({ userId }: NewChatDialogProps) {
                 <div className="flex-1 relative">
                   <input
                     type="text"
-                    placeholder="Search for friends..."
+                    placeholder="Tìm kiếm bạn bè..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -97,7 +97,7 @@ export default function NewChatDialog({ userId }: NewChatDialogProps) {
                   disabled={isLoading}
                   className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Search
+                  Tìm kiếm
                 </button>
               </div>
               
@@ -133,7 +133,7 @@ export default function NewChatDialog({ userId }: NewChatDialogProps) {
                     ))}
                   </div>
                 ) : searchTerm ? (
-                  <p className="text-center py-4 text-zinc-500">No users found</p>
+                  <p className="text-center py-4 text-zinc-500">No users found - Không tìm thấy người dùng nào!</p>
                 ) : null}
               </div>
             </div>
