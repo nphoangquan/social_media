@@ -3,8 +3,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { Bot, ChevronUp, MessageSquare, Sparkles, X } from 'lucide-react';
 import { ChatbotWelcome, ChatMessage, ThinkingIndicator, ChatInput } from './ui/ChatbotUI';
+import { useUser } from "@clerk/nextjs";
 
 export default function Chatbot() {
+  const { user, isLoaded } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [message, setMessage] = useState('');
@@ -87,6 +89,11 @@ export default function Chatbot() {
     setIsOpen(true);
     setTimeout(() => setIsAnimating(false), 500);
   };
+
+  // Không hiển thị chatbot nếu chưa load xong hoặc user chưa đăng nhập
+  if (!isLoaded || !user) {
+    return null;
+  }
 
   if (!isOpen) {
     return (

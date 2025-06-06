@@ -6,11 +6,13 @@ import ReportUserButton from "../profile/ReportUserButton";
 
 const UserInfoCardInteraction = ({
   userId,
+  username,
   isUserBlocked,
   isFollowing,
   isFollowingSent,
 }: {
   userId: string;
+  username: string;
   isUserBlocked: boolean;
   isFollowing: boolean;
   isFollowingSent: boolean;
@@ -74,7 +76,7 @@ const UserInfoCardInteraction = ({
       </form>
       
       <div className="flex items-center justify-between text-xs">
-        <ReportUserButton userId={userId} username={userId.split('-')[0]} />
+        <ReportUserButton userId={userId} username={username} />
         
         <form action={block}>
           <button className="text-red-400 cursor-pointer hover:underline hover:text-red-600 dark:hover:text-red-300 transition-colors">

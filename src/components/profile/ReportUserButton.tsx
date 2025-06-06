@@ -80,35 +80,42 @@ const ReportUserButton = ({ userId, username }: ReportUserButtonProps) => {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center p-4 border-b border-zinc-200 dark:border-zinc-800">
-              <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
-                {isConfirmStep ? "Báo cáo đã được gửi" : `Báo cáo người dùng @${username}`}
-              </h2>
+          <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-6 border-b border-zinc-200 dark:border-zinc-800">
+              <div>
+                <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
+                  {isConfirmStep ? "Báo cáo đã được gửi" : "Báo cáo người dùng"}
+                </h2>
+                {!isConfirmStep && (
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+                    @{username}
+                  </p>
+                )}
+              </div>
               <button 
                 onClick={resetModal}
-                className="p-1 rounded-full text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 dark:text-zinc-400 transition-colors"
+                className="p-2 rounded-full text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 dark:text-zinc-400 transition-colors"
                 aria-label="Đóng"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             
-            <div className="p-5">
+            <div className="p-6">
               {isConfirmStep ? (
-                <div className="flex flex-col items-center justify-center py-4">
-                  <div className="w-16 h-16 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30 mb-4">
-                    <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
+                <div className="flex flex-col items-center justify-center py-8">
+                  <div className="w-20 h-20 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30 mb-6">
+                    <Check className="w-10 h-10 text-green-600 dark:text-green-400" />
                   </div>
-                  <h3 className="text-lg font-medium text-zinc-900 dark:text-white mb-2">
+                  <h3 className="text-xl font-medium text-zinc-900 dark:text-white mb-3">
                     Cảm ơn bạn đã báo cáo
                   </h3>
-                  <p className="text-center text-zinc-600 dark:text-zinc-400 mb-6">
+                  <p className="text-center text-zinc-600 dark:text-zinc-400 mb-8 max-w-md leading-relaxed">
                     Báo cáo của bạn đã được gửi đến đội ngũ quản trị. Chúng tôi sẽ xem xét người dùng này và thực hiện các biện pháp phù hợp.
                   </p>
                   <button
                     onClick={resetModal}
-                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white font-medium rounded-lg transition-colors"
+                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white font-medium rounded-lg transition-colors"
                   >
                     Đóng
                   </button>
@@ -129,18 +136,18 @@ const ReportUserButton = ({ userId, username }: ReportUserButtonProps) => {
                   )}
                   
                   <form onSubmit={handleSubmit}>
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-3">
                         Vui lòng chọn lý do báo cáo <span className="text-red-500">*</span>
                       </label>
-                      <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-2 -mr-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[35vh] overflow-y-auto pr-2 -mr-2">
                         {reportReasons.map((reportReason) => (
                           <label 
                             key={reportReason.id} 
-                            className={`block p-3 rounded-lg border cursor-pointer transition-colors ${
+                            className={`block p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
                               reason === reportReason.label
-                                ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 dark:border-emerald-600'
-                                : 'border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                                ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 dark:border-emerald-600 shadow-md'
+                                : 'border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-600'
                             }`}
                           >
                             <div className="flex items-start">
@@ -152,11 +159,11 @@ const ReportUserButton = ({ userId, username }: ReportUserButtonProps) => {
                                 onChange={(e) => setReason(e.target.value)}
                                 className="mt-1 mr-3 text-emerald-600 focus:ring-emerald-500 dark:focus:ring-emerald-400"
                               />
-                              <div>
+                              <div className="flex-1 min-w-0">
                                 <span className="block text-sm font-medium text-zinc-800 dark:text-zinc-200">
                                   {reportReason.label}
                                 </span>
-                                <span className="block text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                                <span className="block text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
                                   {reportReason.description}
                                 </span>
                               </div>
@@ -166,32 +173,32 @@ const ReportUserButton = ({ userId, username }: ReportUserButtonProps) => {
                       </div>
                     </div>
                     
-                    <div className="mb-4">
-                      <label htmlFor="description" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+                    <div className="mb-6">
+                      <label htmlFor="description" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-3">
                         Thông tin bổ sung (không bắt buộc)
                       </label>
                       <textarea
                         id="description"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        className="w-full p-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-emerald-500 dark:focus:border-emerald-400"
+                        className="w-full p-4 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors resize-none"
                         placeholder="Cung cấp thông tin chi tiết về vấn đề bạn gặp phải với người dùng này..."
                         rows={4}
                       />
                     </div>
                     
-                    <div className="flex justify-end gap-3 mt-6">
+                    <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
                       <button
                         type="button"
                         onClick={resetModal}
-                        className="px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg transition-colors"
+                        className="px-6 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg transition-colors"
                         disabled={isSubmitting}
                       >
                         Hủy
                       </button>
                       <button
                         type="submit"
-                        className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 rounded-lg transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                        className="px-6 py-3 text-sm font-medium text-white bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 rounded-lg transition-colors disabled:opacity-50 disabled:pointer-events-none"
                         disabled={isSubmitting}
                       >
                         {isSubmitting ? "Đang gửi..." : "Gửi báo cáo"}
