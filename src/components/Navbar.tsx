@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import MobileMenu from "./MobileMenu";
+import MobileMenu from "@/shared/ui/MobileMenu";
 import {
   ClerkLoaded,
   ClerkLoading,
@@ -12,9 +12,10 @@ import {
 } from "@clerk/nextjs";
 import { Home, Users, BookOpen, Search, UserPlus, MessageSquare, LogIn, ShieldAlert } from "lucide-react";
 import Image from "next/image";
-import NotificationBell from "./notifications/NotificationBell";
-import SearchBar from "./SearchBar";
-import MessagesBadge from "./messages/MessagesBadge";
+import NotificationBell from "@/app/notifications/_components/NotificationBell";
+import SearchBar from "@/shared/ui/SearchBar";
+import dynamic from "next/dynamic";
+const MessagesBadge = dynamic(() => import("./messages/MessagesBadge"), { ssr: false });
 import { useEffect, useState } from "react";
 
 interface NavbarProps {
@@ -29,7 +30,7 @@ const Navbar = ({ logoFont }: NavbarProps) => {
     if (isSignedIn) {
       const fetchUserRole = async () => {
         try {
-          const response = await fetch("/api/user/role");
+          const response = await fetch("/api/users/me/role");
           if (response.ok) {
             const data = await response.json();
             setUserRole(data.role);

@@ -5,6 +5,7 @@ import prisma from "./client";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createLikeNotification, createCommentNotification, createFollowNotification, createNewPostNotification, createCommentLikeNotification } from "./actions/notifications";
+import { addCommentSchema } from "@/shared/validation/comment";
 
 export const switchFollow = async (userId: string) => {
   const { userId: currentUserId } = await auth();
@@ -286,6 +287,9 @@ export const addComment = async (postId: number, desc: string, parentId?: number
   }
 
   try {
+    const parsed = addCommentSchema.safeParse({ postId, desc, parentId: parentId ?? null });
+    if (!parsed.success) throw new Error("Invalid comment payload");
+
     const comment = await prisma.comment.create({
       data: {
         desc,
@@ -523,7 +527,7 @@ export async function createStory(formData: FormData) {
     formDataForCloudinary.append('upload_preset', 'social-media');
     
     const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/${type === 'video' ? 'video' : 'image'}/upload`,
+      `https://api.cloudinary.com/v1_1/${(await import("@/shared/config/env")).env.client.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/${type === 'video' ? 'video' : 'image'}/upload`,
       {
         method: 'POST',
         body: formDataForCloudinary,
@@ -585,6 +589,27 @@ export const deleteStory = async (storyId: number) => {
     return false;
   }
 };
+
+// Update only avatar URL for current user
+export async function updateUserAvatar(avatarUrl: string) {
+  const { userId } = await auth();
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { avatar: avatarUrl },
+    });
+    revalidatePath("/", "layout");
+    revalidatePath("/profile/[username]", "layout");
+    revalidatePath("/settings", "layout");
+    return { success: true };
+  } catch (err) {
+    console.error("Failed to update user avatar:", err);
+    return { success: false, error: "Failed to update user avatar" };
+  }
+}
 
 // Search for users and posts
 export const searchContent = async (query: string) => {

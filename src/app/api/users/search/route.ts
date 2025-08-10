@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/client";
+import { z } from "zod";
 
 export async function GET(req: NextRequest) {
   try {
@@ -10,11 +11,9 @@ export async function GET(req: NextRequest) {
     }
 
     const searchParams = req.nextUrl.searchParams;
-    const query = searchParams.get("query");
-
-    if (!query) {
-      return NextResponse.json({ error: "Query parameter is required" }, { status: 400 });
-    }
+    const q = z.object({ query: z.string().min(1) }).safeParse({ query: searchParams.get("query") });
+    if (!q.success) return NextResponse.json({ error: "Query parameter is required" }, { status: 400 });
+    const { query } = q.data;
 
     // Lấy danh sách người dùng mà người dùng hiện tại chưa chặn và chưa bị chặn bởi người dùng hiện tại
     const users = await prisma.user.findMany({

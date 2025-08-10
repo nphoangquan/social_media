@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import prisma from "@/lib/client";
 import { auth } from "@clerk/nextjs/server";
 import { initSocket } from "@/lib/socket";
+import { sendMessageSchema } from "@/shared/validation/messages";
 
 export type UserSearchResult = {
   id: string;
@@ -102,6 +103,12 @@ export async function sendMessage(chatId: number, content: string, img?: string)
 
   if (!participant) {
     throw new Error("Not a participant in this chat");
+  }
+
+  // Validate payload
+  const parsed = sendMessageSchema.safeParse({ chatId, content, img });
+  if (!parsed.success) {
+    throw new Error("Invalid message payload");
   }
 
   // Tạo tin nhắn

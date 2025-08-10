@@ -1,6 +1,6 @@
 import prisma from "@/lib/client";
 import { auth } from "@clerk/nextjs/server";
-import FriendRequestList from "@/components/rightMenu/FriendRequestList";
+import FriendRequestList from "./_components/FriendRequestList";
 
 export default async function FriendRequestsPage() {
   const { userId } = await auth();

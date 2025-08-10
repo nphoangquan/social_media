@@ -1,6 +1,6 @@
-import LeftMenu from "@/components/leftMenu/LeftMenu";
-import RightMenu from "@/components/rightMenu/RightMenu";
-import SyncAvatarButton from "@/components/rightMenu/SyncAvatarButton";
+import LeftMenu from "@/app/(app)/_components/LeftMenu";
+import RightMenu from "@/app/(app)/_components/RightMenu";
+import SyncAvatarButton from "./_components/SyncAvatarButton";
 import { User } from "lucide-react";
 
 const SettingsPage = () => {  

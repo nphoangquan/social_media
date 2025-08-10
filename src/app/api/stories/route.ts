@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/client";
+import { storyCreateSchema } from "@/shared/validation/story";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,15 +12,15 @@ export async function POST(request: NextRequest) {
     }
 
     const formData = await request.formData();
-    const fileType = formData.get("fileType") as string;
-    const fileData = formData.get("fileData") as string;
-    
-    if (!fileData || !fileType) {
-      return NextResponse.json(
-        { error: "No file data provided" },
-        { status: 400 }
-      );
+    const validation = storyCreateSchema.safeParse({
+      fileType: formData.get("fileType"),
+      fileData: formData.get("fileData"),
+    });
+
+    if (!validation.success) {
+      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
+    const { fileType, fileData } = validation.data;
 
     // Kiểm tra story hiện có từ người dùng này và xóa chúng
     const existingStories = await prisma.story.findMany({

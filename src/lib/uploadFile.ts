@@ -3,8 +3,9 @@ export async function uploadFile(file: File) {
   formData.append('file', file);
   formData.append('upload_preset', 'unsigned_upload');
 
+  const { env } = await import("@/shared/config/env");
   const response = await fetch(
-    `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/auto/upload`,
+    `https://api.cloudinary.com/v1_1/${env.client.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/auto/upload`,
     {
       method: 'POST',
       body: formData,

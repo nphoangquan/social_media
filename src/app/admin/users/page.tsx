@@ -1,6 +1,6 @@
 import { getAllUsers } from "@/lib/actions/admin";
-import UserRoleForm from "@/components/admin/UserRoleForm";
-import DeleteUserButton from "@/components/admin/DeleteUserButton";
+import UserRoleForm from "@/app/admin/_components/UserRoleForm";
+import DeleteUserButton from "@/app/admin/_components/DeleteUserButton";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import Image from "next/image";

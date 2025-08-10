@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { createBirthdayWishNotification } from "@/lib/actions/notifications";
+import { z } from "zod";
 
 export async function POST(req: Request) {
   const { userId: currentUserId } = await auth();
@@ -11,11 +12,9 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { receiverId } = body;
-
-    if (!receiverId) {
-      return NextResponse.json({ error: "Receiver ID is required" }, { status: 400 });
-    }
+    const parsed = z.object({ receiverId: z.string().min(1) }).safeParse(body);
+    if (!parsed.success) return NextResponse.json({ error: "Receiver ID is required" }, { status: 400 });
+    const { receiverId } = parsed.data;
 
     // Tạo thông báo chúc mừng sinh nhật
     await createBirthdayWishNotification(currentUserId, receiverId);

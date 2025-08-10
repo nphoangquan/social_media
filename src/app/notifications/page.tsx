@@ -1,4 +1,4 @@
-import NotificationList from "@/components/notifications/NotificationList";
+import NotificationList from "./_components/NotificationList";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 

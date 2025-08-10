@@ -1,7 +1,7 @@
 import { getUserActivity } from "@/lib/actions/activity";
 import ActivityLog from "@/components/activity/ActivityLog";
-import LeftMenu from "@/components/leftMenu/LeftMenu";
-import RightMenu from "@/components/rightMenu/RightMenu";
+import LeftMenu from "@/app/(app)/_components/LeftMenu";
+import RightMenu from "@/app/(app)/_components/RightMenu";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 

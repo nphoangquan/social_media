@@ -1,4 +1,4 @@
-import LeftMenu from "@/components/leftMenu/LeftMenu";
+import LeftMenu from "@/app/(app)/_components/LeftMenu";
 import { Suspense } from "react";
 
 export const metadata = {

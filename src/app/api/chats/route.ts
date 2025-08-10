@@ -1,14 +1,20 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/client";
+import { z } from "zod";
 
 export async function GET(request: Request) {
   const { userId } = await auth();
   const url = new URL(request.url);
-  
-  // Phân trang mặc định: 15 mục mỗi trang, bắt đầu từ trang 0
-  const page = parseInt(url.searchParams.get('page') || '0');
-  const limit = parseInt(url.searchParams.get('limit') || '15');
+  const q = z.object({
+    page: z.string().regex(/^\d+$/).transform(Number).optional(),
+    limit: z.string().regex(/^\d+$/).transform(Number).optional(),
+  }).safeParse({
+    page: url.searchParams.get('page') ?? undefined,
+    limit: url.searchParams.get('limit') ?? undefined,
+  });
+  const page = q.success ? (q.data.page ?? 0) : 0;
+  const limit = q.success ? (q.data.limit ?? 15) : 15;
   const skip = page * limit;
   
   if (!userId) {

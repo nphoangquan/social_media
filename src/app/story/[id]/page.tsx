@@ -1,5 +1,5 @@
 import { getStoryById, getAllStories } from "@/lib/actions/story";
-import StoryViewer from "@/components/story/StoryViewer";
+import StoryViewer from "@/app/stories/_components/StoryViewer";
 import { notFound } from "next/navigation";
 
 type PageProps = {

@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/client";
+import { z } from "zod";
 
 // Lấy danh sách thông báo của người dùng
 export async function GET(req: NextRequest) {
@@ -13,9 +14,18 @@ export async function GET(req: NextRequest) {
 
     // Lấy URL search params
     const url = new URL(req.url);
-    const page = parseInt(url.searchParams.get("page") || "1");
-    const limit = parseInt(url.searchParams.get("limit") || "10");
-    const unreadOnly = url.searchParams.get("unread") === "true";
+    const q = z.object({
+      page: z.string().regex(/^\d+$/).transform(Number).optional(),
+      limit: z.string().regex(/^\d+$/).transform(Number).optional(),
+      unread: z.enum(["true", "false"]).optional(),
+    }).safeParse({
+      page: url.searchParams.get("page") ?? undefined,
+      limit: url.searchParams.get("limit") ?? undefined,
+      unread: url.searchParams.get("unread") ?? undefined,
+    });
+    const page = q.success ? (q.data.page ?? 1) : 1;
+    const limit = q.success ? (q.data.limit ?? 10) : 10;
+    const unreadOnly = q.success ? (q.data.unread === "true") : false;
     
     // Tính toán offset cho phân trang
     const skip = (page - 1) * limit;

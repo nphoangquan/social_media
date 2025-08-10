@@ -1,7 +1,7 @@
 'use server';
 
 import prisma from "@/lib/client";
-import { FeedPostType } from "@/components/feed/Post";
+import { FeedPostType } from "@/shared/types/post";
 import { auth } from "@clerk/nextjs/server";
 
 export async function getPosts(page: number = 1, limit: number = 2, username?: string): Promise<FeedPostType[]> {

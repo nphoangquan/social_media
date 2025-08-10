@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/client";
-import AdminSidebar from "@/components/admin/AdminSidebar";
+import AdminSidebar from "@/app/admin/_components/AdminSidebar";
 
 export default async function AdminLayout({
   children,

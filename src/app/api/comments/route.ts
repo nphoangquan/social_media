@@ -1,77 +1,54 @@
-import { auth } from "@clerk/nextjs/server";
-import prisma from "@/lib/client";
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import prisma from "@/lib/client";
+import { auth } from "@clerk/nextjs/server";
+import { DEFAULT_PAGE, DEFAULT_LIMIT } from "@/shared/constants/pagination";
 
 export async function GET(request: NextRequest) {
   const { userId } = await auth();
-
-  if (!userId) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
-  }
-
-  // Lấy tham số từ URL
   const { searchParams } = new URL(request.url);
-  const postId = parseInt(searchParams.get("postId") || "0");
-  const page = parseInt(searchParams.get("page") || "1", 10);
-  const limit = parseInt(searchParams.get("limit") || "15", 10);
-  
-  if (!postId) {
-    return NextResponse.json(
-      { error: "Post ID is required" },
-      { status: 400 }
-    );
+  const q = z.object({
+    postId: z.string().regex(/^\d+$/),
+    page: z.string().regex(/^\d+$/).transform(Number).optional(),
+    limit: z.string().regex(/^\d+$/).transform(Number).optional(),
+  }).safeParse({
+    postId: searchParams.get("postId"),
+    page: searchParams.get("page") ?? undefined,
+    limit: searchParams.get("limit") ?? undefined,
+  });
+
+  if (!q.success) {
+    return NextResponse.json({ error: "Invalid query" }, { status: 400 });
   }
-  
-  // Tính toán phân trang
+
+  const postId = parseInt(q.data.postId);
+  const page = q.data.page ?? DEFAULT_PAGE;
+  const limit = q.data.limit ?? DEFAULT_LIMIT;
   const skip = (page - 1) * limit;
-  
+
   try {
-    // Lấy comments với phân trang
     const comments = await prisma.comment.findMany({
-      where: {
-        postId: postId,
-        parentId: null, // Chỉ lấy bình luận cấp cao nhất
-      },
+      where: { postId, parentId: null },
       include: {
         user: true,
         likes: true,
-        replies: {
-          include: {
-            user: true,
-            likes: true,
-          },
-          orderBy: {
-            createdAt: 'asc',
-          },
-        },
+        replies: { include: { user: true, likes: true }, orderBy: { createdAt: 'asc' } },
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: { createdAt: 'desc' },
       skip,
       take: limit,
     });
 
-    // Lấy tổng số lượng comment cho phân trang
-    const totalCount = await prisma.comment.count({
-      where: {
-        postId: postId,
-        parentId: null,
-      },
-    });
+    const totalCount = await prisma.comment.count({ where: { postId, parentId: null } });
 
-    // Chuyển đổi bình luận để bao gồm số lượng thích và xem người dùng hiện tại đã thích hay chưa
-    const commentsWithLikes = comments.map(comment => ({
+    const commentsWithLikes = comments.map((comment) => ({
       ...comment,
       likes: comment.likes.length,
-      likedByCurrentUser: userId ? comment.likes.some(like => like.userId === userId) : false,
-      replies: comment.replies.map(reply => ({
+      likedByCurrentUser: userId ? comment.likes.some((l) => l.userId === userId) : false,
+      replies: comment.replies.map((reply) => ({
         ...reply,
         likes: reply.likes.length,
-        likedByCurrentUser: userId ? reply.likes.some(like => like.userId === userId) : false,
+        likedByCurrentUser: userId ? reply.likes.some((l) => l.userId === userId) : false,
       })),
     }));
 
@@ -80,13 +57,10 @@ export async function GET(request: NextRequest) {
       totalCount,
       currentPage: page,
       totalPages: Math.ceil(totalCount / limit),
-      hasMore: skip + limit < totalCount
+      hasMore: skip + limit < totalCount,
     });
   } catch (error) {
-    console.error("Error fetching paginated comments:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch comments" },
-      { status: 500 }
-    );
+    console.error("Error fetching comments:", error);
+    return NextResponse.json({ error: "Failed to fetch comments" }, { status: 500 });
   }
-} 
+}

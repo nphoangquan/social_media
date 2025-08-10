@@ -153,6 +153,16 @@
     background-color: transparent;
   }
   
+  /* Hide scrollbar completely */
+  .scrollbar-none {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  
+  .scrollbar-none::-webkit-scrollbar {
+    display: none; /* WebKit */
+  }
+  
   /* Styles for Firefox */
   .scrollbar-thin {
     scrollbar-width: thin;

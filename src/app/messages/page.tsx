@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import ChatsList from "@/components/messages/ChatsList";
-import NoSelectedChat from "@/components/messages/NoSelectedChat";
+import ChatsList from "@/app/messages/_components/ChatsList";
+import NoSelectedChat from "@/app/messages/_components/NoSelectedChat";
 import prisma from "@/lib/client";
 
 export default async function MessagesPage() {

@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { env } from "@/shared/config/env";
 import { useRouter } from "next/navigation";
 import { Upload, X, Image as ImageIcon, Film } from "lucide-react";
 import Image from "next/image";
+import { isFeatureEnabled } from "@/shared/constants/featureFlags";
 
 export default function CreateStoryPage() {
   const router = useRouter();
@@ -19,6 +21,10 @@ export default function CreateStoryPage() {
 
     // Kiểm tra kích thước file dựa trên loại file
     const isVideo = selectedFile.type.startsWith("video/");
+    if (isVideo && !isFeatureEnabled("enableStoryVideoUpload")) {
+      alert("Video upload is currently disabled.");
+      return;
+    }
     // 25MB cho ảnh, 100MB cho video
     const maxSize = isVideo ? 100 * 1024 * 1024 : 25 * 1024 * 1024;
     
@@ -52,8 +58,9 @@ export default function CreateStoryPage() {
       formData.append('file', file);
       formData.append('upload_preset', 'social-media');
       
+      const kind = fileType === "video" && !isFeatureEnabled("enableStoryVideoUpload") ? "image" : fileType;
       const uploadResponse = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/${fileType}/upload`,
+        `https://api.cloudinary.com/v1_1/${env.client.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/${kind}/upload`,
         {
           method: 'POST',
           body: formData,
@@ -68,7 +75,7 @@ export default function CreateStoryPage() {
       
       // Gửi URL Cloudinary đến API của chúng tôi
       const apiFormData = new FormData();
-      apiFormData.append("fileType", fileType);
+      apiFormData.append("fileType", kind);
       apiFormData.append("fileData", uploadData.secure_url);
       
       // Tải lên đến server
@@ -160,10 +167,12 @@ export default function CreateStoryPage() {
                   <ImageIcon className="w-4 h-4" />
                   <span>Image (max 25MB)</span>
                 </div>
-                <div className="flex items-center gap-2 text-emerald-500 text-sm">
-                  <Film className="w-4 h-4" />
-                  <span>Video (max 100MB)</span>
-                </div>
+                {isFeatureEnabled("enableStoryVideoUpload") && (
+                  <div className="flex items-center gap-2 text-emerald-500 text-sm">
+                    <Film className="w-4 h-4" />
+                    <span>Video (max 100MB)</span>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -172,7 +181,7 @@ export default function CreateStoryPage() {
             type="file"
             ref={fileInputRef}
             onChange={handleFileChange}
-            accept="image/*,video/*"
+            accept={isFeatureEnabled("enableStoryVideoUpload") ? "image/*,video/*" : "image/*"}
             className="hidden"
           />
           

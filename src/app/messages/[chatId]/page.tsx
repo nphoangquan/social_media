@@ -1,8 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/client";
-import ChatsList from "@/components/messages/ChatsList"; 
-import ChatContainer from "@/components/messages/ChatContainer";
+import ChatsList from "@/app/messages/_components/ChatsList"; 
+import ChatContainer from "@/app/messages/_components/ChatContainer";
 
 interface ChatPageProps {
   params: Promise<{

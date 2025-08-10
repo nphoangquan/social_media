@@ -1,8 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/client";
+import { USER_ROLES, type UserRole } from "@/shared/constants/roles";
 
 // Các vai trò trong hệ thống
-export type UserRole = "user" | "moderator" | "admin";
+export type { UserRole };
 
 // Enum cho quyền hạn
 export enum Permission {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/client";
+import { z } from "zod";
 
 type RouteContext = {
   params: Promise<{ chatId: string }>;
@@ -12,10 +13,16 @@ export async function GET(
 ): Promise<NextResponse> {
   const { userId } = await auth();
   const url = new URL(request.url);
-  
-  // Phân trang mặc định: 15 tin nhắn mỗi trang, bắt đầu từ trang 0
-  const page = parseInt(url.searchParams.get('page') || '0');
-  const limit = parseInt(url.searchParams.get('limit') || '15');
+  const querySchema = z.object({
+    page: z.string().regex(/^\d+$/).transform(Number).optional(),
+    limit: z.string().regex(/^\d+$/).transform(Number).optional(),
+  });
+  const parsed = querySchema.safeParse({
+    page: url.searchParams.get('page') ?? undefined,
+    limit: url.searchParams.get('limit') ?? undefined,
+  });
+  const page = parsed.success ? (parsed.data.page ?? 0) : 0;
+  const limit = parsed.success ? (parsed.data.limit ?? 15) : 15;
   const skip = page * limit;
 
   if (!userId) {

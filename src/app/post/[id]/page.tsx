@@ -1,9 +1,9 @@
 import prisma from "@/lib/client";
 import { auth } from "@clerk/nextjs/server";
 import { notFound, redirect } from "next/navigation";
-import PostDetail from "@/components/post/PostDetail";
-import LeftMenu from "@/components/leftMenu/LeftMenu";
-import RightMenu from "@/components/rightMenu/RightMenu";
+import PostDetail from "@/app/(app)/_components/PostDetail";
+import LeftMenu from "@/app/(app)/_components/LeftMenu";
+import RightMenu from "@/app/(app)/_components/rightMenu/RightMenu";
 
 type PageProps = {
   params: Promise<{ id: string }>;

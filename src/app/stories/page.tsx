@@ -1,5 +1,5 @@
 import { getAllStories } from "@/lib/actions/story";
-import StoryList from "@/components/story/StoryList";
+import StoryList from "@/app/stories/_components/StoryList";
 import Link from "next/link";
 import { Plus, Sparkles, Clock, Film } from "lucide-react";
 import Image from "next/image";

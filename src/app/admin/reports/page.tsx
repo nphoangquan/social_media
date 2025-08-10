@@ -1,5 +1,5 @@
 import { getReports } from "@/lib/actions/admin";
-import ReportStatusForm from "@/components/admin/ReportStatusForm";
+import ReportStatusForm from "@/app/admin/_components/ReportStatusForm";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import Image from "next/image";

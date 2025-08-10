@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPaginatedStories } from "@/lib/actions/story";
+import { z } from "zod";
 
 export async function GET(request: NextRequest) {
   try {
     // Lấy các tham số từ URL
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
+    const q = z.object({
+      page: z.string().regex(/^\d+$/).transform(Number).optional(),
+      limit: z.string().regex(/^\d+$/).transform(Number).optional(),
+    }).safeParse({
+      page: searchParams.get("page") ?? undefined,
+      limit: searchParams.get("limit") ?? undefined,
+    });
+    const page = q.success ? (q.data.page ?? 1) : 1;
+    const limit = q.success ? (q.data.limit ?? 10) : 10;
 
     // Lấy dữ liệu story theo trang
     const result = await getPaginatedStories(page, limit);

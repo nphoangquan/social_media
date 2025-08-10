@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/client";
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 
 export async function GET(request: NextRequest) {
   const { userId } = await auth();
@@ -14,11 +15,11 @@ export async function GET(request: NextRequest) {
 
   // Lấy cụm từ tìm kiếm từ tham số truy vấn
   const { searchParams } = new URL(request.url);
-  const term = searchParams.get("term");
-  
-  if (!term) {
+  const q = z.object({ term: z.string().min(1) }).safeParse({ term: searchParams.get("term") });
+  if (!q.success) {
     return NextResponse.json({ friends: [] });
   }
+  const { term } = q.data;
   
   try {
     // Trước tiên lấy tất cả bạn bè của người dùng hiện tại

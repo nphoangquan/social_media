@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getUnreadCount } from '@/lib/actions/messages';
 import { io, Socket } from 'socket.io-client';
+import { isFeatureEnabled } from '@/shared/constants/featureFlags';
 import { useAuth } from '@clerk/nextjs';
 
 export default function MessagesBadge() {
@@ -26,7 +27,7 @@ export default function MessagesBadge() {
     loadUnreadCount();
 
     // Set socket cho real-time updates
-    if (!socket) {
+    if (!socket && isFeatureEnabled('enableSocketNotifications')) {
       const newSocket = io('', {
         path: '/api/socket',
         autoConnect: false

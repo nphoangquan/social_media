@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/client";
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
+import { updatePostSchema } from "@/shared/validation/post";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -25,13 +25,7 @@ export async function PATCH(
     console.log(`Updating post ${postId} with data:`, JSON.stringify(body));
 
     // Định nghĩa schema mạnh mẽ hơn
-    const Post = z.object({
-      desc: z.string().min(1).max(3000),
-      img: z.string().nullable(),
-      video: z.string().nullable(),
-    });
-
-    const validatedFields = Post.safeParse(body);
+    const validatedFields = updatePostSchema.safeParse(body);
 
     if (!validatedFields.success) {
       const errors = validatedFields.error.format();

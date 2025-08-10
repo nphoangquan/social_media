@@ -1,7 +1,7 @@
 import prisma from "@/lib/client";
 import { auth } from "@clerk/nextjs/server";
-import FriendsList from "@/components/friends/FriendsList";
-import FriendsSearch from "@/components/friends/FriendsSearch";
+import FriendsList from "./_components/FriendsList";
+import FriendsSearch from "./_components/FriendsSearch";
 
 export default async function FriendsPage() {
   const { userId } = await auth();

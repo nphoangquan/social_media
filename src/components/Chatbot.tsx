@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Bot, ChevronUp, MessageSquare, Sparkles, X } from 'lucide-react';
-import { ChatbotWelcome, ChatMessage, ThinkingIndicator, ChatInput } from './ui/ChatbotUI';
+import { ChatbotWelcome, ChatMessage, ThinkingIndicator, ChatInput } from '@/shared/ui/ChatbotUI';
 import { useUser } from "@clerk/nextjs";
 
 export default function Chatbot() {
