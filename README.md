@@ -1,10 +1,6 @@
-# Introvertia - Social Media Platform
-
-A modern, full-featured social media platform built with cutting-edge web technologies. Introvertia offers real-time communication, AI-powered features, and a seamless user experience across all devices.
-
 ## Overview
 
-Introvertia is a comprehensive social networking platform that connects people through shared experiences, real-time messaging, and intelligent content features. Built with modern web technologies and powered by AI, it provides users with an intuitive and engaging social media experience.
+This is my final-year project - Social Media Platform.
 
 ## Key Features
 
@@ -96,5 +92,3 @@ npm run dev
 - **Vercel** - Optimized for Next.js applications
 - **Neon** - Serverless PostgreSQL database
 - **Cloudinary** - Media storage and optimization
-
-**Contact**: hq16101971@gmail.com |
