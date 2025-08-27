@@ -1,6 +1,8 @@
-## Overview
+## Introvertia Social Media
 
-This is my final-year project - Social Media Platform.
+Introvertia is a fully functional social media platform with multiple features built with NextJS.
+
+Leave a star if you like what you see ⭐
 
 ## Key Features
 
